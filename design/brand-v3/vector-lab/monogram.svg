@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="700" viewBox="0 0 1440 700" role="img" aria-labelledby="board-title board-desc">
+  <title id="board-title">27PM — symboles après la limite</title>
+  <desc id="board-desc">Trois symboles abstraits monochromes. Chacun semble achevé, puis poursuit son mouvement au-delà de son propre seuil.</desc>
+
+  <defs>
+    <!-- APRÈS
+         Une boucle est réellement fermée avant que le même trait ne reparte.
+         Son prolongement suit 27 degrés, sans former une flèche. Une forme. -->
+    <symbol id="mark-after" viewBox="0 0 144 132">
+      <path d="M84 26H50C30 26 18 38 18 58V80C18 100 30 112 50 112H74C94 112 106 100 106 80V58C106 39 98 29 84 26L126 4.6"
+            fill="none" stroke="currentColor" stroke-width="17" stroke-linecap="square" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- SEUIL
+         Le volume principal est autosuffisant. Une tranche, séparée par un
+         seuil négatif à 27 degrés, continue exactement sa direction. Deux formes. -->
+    <symbol id="mark-threshold" viewBox="0 0 144 132">
+      <path fill="currentColor" fill-rule="evenodd" d="M38 13H87L111 37V94C111 109 102 118 87 118H37C22 118 13 109 13 94V38C13 23 23 13 38 13ZM43 43C38 43 35 47 35 52V82C35 87 38 90 43 90H77C82 90 85 87 85 82V51C85 46 82 43 77 43Z"/>
+      <path fill="currentColor" d="M101 7H131L115 39H85Z"/>
+    </symbol>
+
+    <!-- RELAIS
+         Deux pièces de même vocabulaire construisent ensemble une enceinte.
+         La seconde dépasse la hauteur commune de 1/8, soit 3/24. Deux formes. -->
+    <symbol id="mark-relay" viewBox="0 0 144 132">
+      <path fill="currentColor" d="M14 72V48C14 28 27 15 47 15H79V39H50C42 39 38 43 38 51V72Z"/>
+      <path fill="currentColor" d="M130 0V84C130 104 117 117 97 117H46V93H94C102 93 106 89 106 81V48H82V72H58V48C58 33 68 24 83 24H106V0Z"/>
+    </symbol>
+  </defs>
+
+  <rect width="1440" height="700" fill="#f4f0e7"/>
+
+  <g fill="#191816" font-family="Arial, Helvetica, sans-serif">
+    <text x="72" y="64" font-size="15" font-weight="700" letter-spacing="2.6">27PM · SYMBOL LAB / 04</text>
+    <text x="72" y="111" font-size="34" font-weight="600" letter-spacing="-1">Après la limite.</text>
+    <text x="1368" y="64" text-anchor="end" font-size="12" font-weight="700" letter-spacing="1.8">1 COULEUR · 1–2 FORMES · 16 PX</text>
+  </g>
+  <path d="M72 148H1368" stroke="#191816" stroke-opacity=".18"/>
+
+  <!-- Card 01 -->
+  <g transform="translate(72 188)">
+    <rect width="400" height="414" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816">
+      <use href="#mark-after" x="82" y="44" width="236" height="216"/>
+    </g>
+    <path d="M299 42L323 29.8" stroke="#2846b8" stroke-width="1.5"/>
+    <path d="M299 42H326" stroke="#2846b8" stroke-opacity=".28"/>
+    <text x="326" y="32" fill="#2846b8" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">27°</text>
+
+    <g transform="translate(28 320)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.7">01 · APRÈS</text>
+      <text y="31" fill="#191816" fill-opacity=".64" font-size="14">La boucle est finie. Le même trait repart.</text>
+      <text y="58" fill="#2846b8" font-size="11" font-weight="700" letter-spacing="1.2">1 TRAIT · PROLONGEMENT À 27°</text>
+    </g>
+    <g transform="translate(344 326)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 144 132">
+        <use href="#mark-after"/>
+      </svg>
+      <text x="14" y="49" text-anchor="middle" fill="#191816" fill-opacity=".55" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <!-- Card 02 -->
+  <g transform="translate(520 188)">
+    <rect width="400" height="414" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816">
+      <use href="#mark-threshold" x="83" y="40" width="234" height="220"/>
+    </g>
+
+    <g transform="translate(28 320)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.7">02 · SEUIL</text>
+      <text y="31" fill="#191816" fill-opacity=".64" font-size="14">Un tout complet. Une tranche passe au-delà.</text>
+      <text y="58" fill="#2846b8" font-size="11" font-weight="700" letter-spacing="1.2">2 FORMES · SEUIL NÉGATIF</text>
+    </g>
+    <g transform="translate(344 326)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 144 132">
+        <use href="#mark-threshold"/>
+      </svg>
+      <text x="14" y="49" text-anchor="middle" fill="#191816" fill-opacity=".55" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <!-- Card 03 -->
+  <g transform="translate(968 188)">
+    <rect width="400" height="414" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816">
+      <use href="#mark-relay" x="82" y="42" width="236" height="216"/>
+    </g>
+    <path d="M300 42V62" stroke="#2846b8" stroke-width="1.5"/>
+    <path d="M292 62H308" stroke="#2846b8" stroke-opacity=".34"/>
+    <text x="312" y="56" fill="#2846b8" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">+ 3/24</text>
+
+    <g transform="translate(28 320)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.7">03 · RELAIS</text>
+      <text y="31" fill="#191816" fill-opacity=".64" font-size="14">Deux pièces font le signe. L’une continue.</text>
+      <text y="58" fill="#2846b8" font-size="11" font-weight="700" letter-spacing="1.2">2 FORMES · DÉPASSEMENT 3/24</text>
+    </g>
+    <g transform="translate(344 326)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 144 132">
+        <use href="#mark-relay"/>
+      </svg>
+      <text x="14" y="49" text-anchor="middle" fill="#191816" fill-opacity=".55" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <g transform="translate(72 650)" fill="#191816" font-family="Arial, Helvetica, sans-serif">
+    <text font-size="12" font-weight="700" letter-spacing="1.55">RÈGLE COMMUNE</text>
+    <text x="174" font-size="12" fill-opacity=".57">Le signe atteint son équilibre, puis refuse de s’arrêter — sans raconter littéralement son origine.</text>
+  </g>
+</svg>

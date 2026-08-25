@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 540" role="img" aria-labelledby="title desc">
+  <title id="title">27PM — quatre marques après la limite</title>
+  <desc id="desc">Quatre silhouettes tactiles presque closes, chacune traversée par une seule contreforme qui continue hors de son bord.</desc>
+
+  <defs>
+    <!-- I — DÉPASSEMENT LATÉRAL. Une lèvre de 3 unités prolonge un corps de 24. -->
+    <g id="aftermark-one">
+      <path d="M17 7H74C84 7 91 13 95 22L98 40C99 46 103 48 109 48L108 61C101 59 96 61 93 67L85 85C81 94 74 98 63 99H23L7 83V35C7 22 10 13 17 7Z"/>
+    </g>
+
+    <!-- II — CRÊTE. Le contour dépasse son propre pan selon une tangente de 27 degrés. -->
+    <g id="aftermark-two">
+      <path d="M18 9H65C75 9 80 7 85 2L96 10C90 16 90 22 97 28L103 34L99 80L82 98H22L5 81L8 27Z"/>
+    </g>
+
+    <!-- III — RETOMBÉE. Le dernier pan continue après la borne basse sans se détacher. -->
+    <g id="aftermark-three">
+      <path d="M17 7L82 4L103 24L100 69C100 75 103 79 109 82L102 93C97 89 91 89 86 95L83 99H22L5 84L8 24Z"/>
+    </g>
+
+    <!-- IV — REPRISE. Un pli émoussé franchit l'aplomb puis rentre dans la masse. -->
+    <g id="aftermark-four">
+      <path d="M20 5H76L97 18L100 36C100 42 103 45 109 46L108 59C102 57 98 59 96 64L88 98H26L7 87L3 31Z"/>
+    </g>
+  </defs>
+
+  <rect width="1680" height="540" fill="#F4F0E7"/>
+  <path d="M420 66V474M840 66V474M1260 66V474" fill="none" stroke="#191816" stroke-opacity=".16" stroke-width="2"/>
+
+  <g fill="#191816">
+    <use href="#aftermark-one" transform="translate(79 99) scale(2.72)"/>
+    <use href="#aftermark-one" transform="translate(351 430) scale(.16)"/>
+    <path d="M79 462H111V468H79Z"/>
+  </g>
+
+  <g fill="#191816">
+    <use href="#aftermark-two" transform="translate(499 99) scale(2.72)"/>
+    <use href="#aftermark-two" transform="translate(771 430) scale(.16)"/>
+    <path d="M499 462H531V468H499ZM539 462H571V468H539Z"/>
+  </g>
+
+  <g fill="#191816">
+    <use href="#aftermark-three" transform="translate(919 99) scale(2.72)"/>
+    <use href="#aftermark-three" transform="translate(1191 430) scale(.16)"/>
+    <path d="M919 462H951V468H919ZM959 462H991V468H959ZM999 462H1031V468H999Z"/>
+  </g>
+
+  <g fill="#191816">
+    <use href="#aftermark-four" transform="translate(1339 99) scale(2.72)"/>
+    <use href="#aftermark-four" transform="translate(1611 430) scale(.16)"/>
+    <path d="M1339 462H1371V468H1339ZM1379 462H1411V468H1379ZM1419 462H1451V468H1419ZM1459 462H1491V468H1459Z"/>
+  </g>
+</svg>

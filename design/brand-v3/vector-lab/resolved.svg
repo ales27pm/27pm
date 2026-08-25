@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" fill="none">
+  <defs>
+    <!--
+      I / OPEN SEAM
+      Two shoulders remain joined below the expected closure.
+      The third presence is the counterform: it enters at 27 degrees,
+      turns once, and deliberately stays open beyond the upper limit.
+    -->
+    <symbol id="mark-open-seam" viewBox="0 0 120 120">
+      <path d="M48 8H33C19.1929 8 8 19.1929 8 33V87C8 100.807 19.1929 112 33 112H87C100.807 112 112 100.807 112 87V33C112 19.1929 100.807 8 87 8H76L69.5361 23.0144C65.8524 31.5672 68.4086 41.5412 75.8105 47.1937L79.0708 49.6829C88.2784 56.7107 89.2184 70.2059 81.0746 78.4514C71.6392 88.0048 56.0548 88.5123 46.017 79.5927C32.7366 67.7914 28.9102 48.5563 36.7037 32.5842L48 8Z" fill="currentColor"/>
+    </symbol>
+
+    <!--
+      II / AFTER THE EDGE
+      Two equal-weight planes share an implied body. Their separating seam
+      is fixed at 27 degrees from vertical. The second plane exceeds the
+      pair's expected cap by three construction units.
+    -->
+    <symbol id="mark-after-edge" viewBox="0 0 120 120">
+      <path d="M93 17C82.6119 9.11643 69.7996 6.01679 57 8C40.057 10.6253 25.1643 18.4324 15 31C1.84972 47.2603 2.60261 74.4253 19 94C25.9093 102.247 34.4084 107.617 43 110L88 18C89.1547 15.3756 91.1052 15.5623 93 17Z" fill="currentColor"/>
+      <path d="M100 24C110.102 37.3857 114.336 54.5347 111 70C107.565 85.9191 98.1395 98.347 85 106C74.8389 111.919 62.9483 114.12 51 112L96 23C97.2628 20.5015 98.5212 22.0405 100 24Z" fill="currentColor"/>
+    </symbol>
+
+    <!--
+      III / THIRD IMPULSE
+      Two equal lower volumes establish the pair. A smaller upper volume,
+      grown from their shared mass rather than attached to it, carries the
+      silhouette three units beyond the implicit 24-unit field.
+    -->
+    <symbol id="mark-third-impulse" viewBox="0 0 120 120">
+      <path d="M56 22C47.2082 8.45713 29.1512 7.05031 18 20C6.94562 32.836 10.7932 51.8587 26 62C12.2186 71.6581 10.8767 90.8843 24 103C36.9731 114.977 57.0855 111.025 66 95C78.5835 108.147 98.3492 106.933 109 92C120.326 76.1154 113.154 57.0539 96 51C101.246 34.6343 89.6874 18.5468 73 17C66.3576 16.3843 60.3868 18.2574 56 22Z" fill="currentColor"/>
+    </symbol>
+
+    <filter id="paper" x="0" y="0" width="100%" height="100%" filterUnits="objectBoundingBox">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="27" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono">
+        <feFuncA type="table" tableValues="0 0.028"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="760" fill="#F4F1E9"/>
+  <rect width="1440" height="760" fill="#17192E" opacity="0.12" filter="url(#paper)"/>
+
+  <path d="M480 64V696M960 64V696" stroke="#17192E" stroke-opacity="0.12"/>
+  <path d="M72 606H1368" stroke="#17192E" stroke-opacity="0.12"/>
+
+  <!-- Geometry-only labels: one, two, three units. -->
+  <g fill="#17192E">
+    <circle cx="240" cy="73" r="4"/>
+    <circle cx="710" cy="73" r="4"/>
+    <circle cx="730" cy="73" r="4"/>
+    <circle cx="1180" cy="73" r="4"/>
+    <circle cx="1200" cy="73" r="4"/>
+    <circle cx="1220" cy="73" r="4"/>
+  </g>
+
+  <!-- Large autonomous symbols. -->
+  <g color="#17192E">
+    <use href="#mark-open-seam" x="144" y="146" width="192" height="192"/>
+    <use href="#mark-after-edge" x="624" y="146" width="192" height="192"/>
+    <use href="#mark-third-impulse" x="1104" y="146" width="192" height="192"/>
+  </g>
+
+  <!-- Implied 24-unit fields; intentionally presentation-only. -->
+  <g stroke="#17192E" stroke-opacity="0.18" fill="none">
+    <rect x="136" y="138" width="208" height="208" rx="52"/>
+    <rect x="616" y="138" width="208" height="208" rx="52"/>
+    <rect x="1096" y="138" width="208" height="208" rx="52"/>
+    <path d="M306 133L316 111"/>
+    <path d="M786 133L796 111"/>
+    <path d="M1266 133L1276 111"/>
+  </g>
+
+  <!-- Exact optical reduction tests at 48 px and 16 px. -->
+  <g color="#17192E">
+    <use href="#mark-open-seam" x="190" y="438" width="48" height="48"/>
+    <use href="#mark-open-seam" x="270" y="454" width="16" height="16"/>
+    <use href="#mark-after-edge" x="670" y="438" width="48" height="48"/>
+    <use href="#mark-after-edge" x="750" y="454" width="16" height="16"/>
+    <use href="#mark-third-impulse" x="1150" y="438" width="48" height="48"/>
+    <use href="#mark-third-impulse" x="1230" y="454" width="16" height="16"/>
+  </g>
+
+  <g stroke="#17192E" stroke-opacity="0.18" fill="none">
+    <circle cx="214" cy="462" r="34"/>
+    <circle cx="278" cy="462" r="18"/>
+    <circle cx="694" cy="462" r="34"/>
+    <circle cx="758" cy="462" r="18"/>
+    <circle cx="1174" cy="462" r="34"/>
+    <circle cx="1238" cy="462" r="18"/>
+    <path d="M176 510H304M656 510H784M1136 510H1264"/>
+  </g>
+
+  <!-- Hidden construction key: 24 + 3. -->
+  <g fill="#17192E">
+    <rect x="207" y="648" width="48" height="6" rx="3"/>
+    <rect x="261" y="648" width="6" height="6" rx="3"/>
+    <rect x="273" y="648" width="6" height="6" rx="3"/>
+    <rect x="285" y="648" width="6" height="6" rx="3"/>
+
+    <rect x="687" y="648" width="48" height="6" rx="3"/>
+    <rect x="741" y="648" width="6" height="6" rx="3"/>
+    <rect x="753" y="648" width="6" height="6" rx="3"/>
+    <rect x="765" y="648" width="6" height="6" rx="3"/>
+
+    <rect x="1167" y="648" width="48" height="6" rx="3"/>
+    <rect x="1221" y="648" width="6" height="6" rx="3"/>
+    <rect x="1233" y="648" width="6" height="6" rx="3"/>
+    <rect x="1245" y="648" width="6" height="6" rx="3"/>
+  </g>
+</svg>

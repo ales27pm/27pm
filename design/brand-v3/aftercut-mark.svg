@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 104" role="img" aria-labelledby="title desc">
+  <title id="title">Symbole 27PM — Après-coupe</title>
+  <desc id="desc">Deux masses séparées par une coupe ascendante et un fragment qui poursuit le mouvement au-delà de la limite.</desc>
+  <g fill="#191816">
+    <path d="M8 8H84V29H76L20 58H8Z" />
+    <path d="M8 70H23L79 41H84V96H8Z" />
+    <path d="M94 27L102 23L107 32L99 36Z" />
+  </g>
+</svg>

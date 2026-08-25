@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 560" role="img" aria-labelledby="title desc">
+  <title id="title">27PM — trois symboles après la limite</title>
+  <desc id="desc">Trois symboles monochromes abstraits construits autour d'une trajectoire qui continue après une limite supposée.</desc>
+
+  <defs>
+    <!--
+      I — APRÈS-COUPE
+      La contreforme monte à 27 degrés et paraît s'arrêter sur l'aplomb x=84.
+      Elle réapparaît au-delà sous forme d'un éclat. Le corps mesure 24 unités
+      conceptuelles, la reprise 3 : rapport caché 8:1.
+    -->
+    <g id="mark-aftercut">
+      <path d="M8 8H84V29H76L20 58H8Z"/>
+      <path d="M8 70H23L79 41H84V96H8Z"/>
+      <path d="M94 27L102 23L107 32L99 36Z"/>
+    </g>
+
+    <!--
+      II — DÉBORDEMENT
+      Une entrée humaine et irrégulière devient une couture exacte. Les deux
+      masses établissent une fin commune à x=84; la masse basse la dépasse de
+      3 unités conceptuelles après un corps de 24. Le 2/7 ne vit que dans la
+      courbe et la diagonale du contreforme, jamais comme lettrage.
+    -->
+    <g id="mark-overrun">
+      <path d="M8 15C8 8 13 5 21 5H84V31H62L44 49H17C20 40 17 33 8 30Z"/>
+      <path d="M8 59H39L58 40H84V86H93V97H8V76L28 59Z"/>
+    </g>
+
+    <!--
+      III — REPRISE
+      Une trajectoire pliée traverse trois états sans former d'initiale. Son
+      dernier segment de 24 unités est suivi, après le blanc, d'une reprise de
+      3 unités sur le même axe. La cassure est la limite; le petit fragment est
+      ce qui existe encore après elle.
+    -->
+    <g id="mark-restart">
+      <path d="M8 86L55 62L31 38L55 14" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="butt" stroke-linejoin="bevel"/>
+      <path d="M62 7L68 1" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="butt"/>
+    </g>
+  </defs>
+
+  <rect width="1440" height="560" fill="#F4F0E7"/>
+
+  <!-- Planche sans mots : séparateurs et repères utilisent la même encre. -->
+  <path d="M480 72V488M960 72V488" fill="none" stroke="#191816" stroke-opacity=".16" stroke-width="2"/>
+
+  <!-- I -->
+  <g fill="#191816" color="#191816">
+    <use href="#mark-aftercut" transform="translate(100 103) scale(2.75)"/>
+    <use href="#mark-aftercut" transform="translate(400 442) scale(.16)"/>
+    <path d="M100 472H132V478H100Z"/>
+  </g>
+
+  <!-- II -->
+  <g fill="#191816" color="#191816">
+    <use href="#mark-overrun" transform="translate(580 103) scale(2.75)"/>
+    <use href="#mark-overrun" transform="translate(880 442) scale(.16)"/>
+    <path d="M580 472H612V478H580ZM620 472H652V478H620Z"/>
+  </g>
+
+  <!-- III -->
+  <g fill="#191816" color="#191816">
+    <use href="#mark-restart" transform="translate(1060 103) scale(2.75)"/>
+    <use href="#mark-restart" transform="translate(1360 442) scale(.16)"/>
+    <path d="M1060 472H1092V478H1060ZM1100 472H1132V478H1100ZM1140 472H1172V478H1140Z"/>
+  </g>
+</svg>

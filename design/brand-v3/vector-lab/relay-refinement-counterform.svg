@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 560" role="img" aria-labelledby="title desc">
+  <title id="title">27PM — relais par la contreforme</title>
+  <desc id="desc">Trois symboles monochromes composés de deux masses dont le vide commun franchit une limite.</desc>
+
+  <defs>
+    <!--
+      I — RELAIS DIAGONAL
+      Deux présences différentes, aucun contenant. Leur couture commune monte
+      à 27 degrés et traverse leur silhouette au lieu de s'y terminer. Le petit
+      décalage de sortie vaut 3 pour une portée structurante de 24.
+    -->
+    <g id="relay-vertical">
+      <path d="M8 18L25 5H73L96 27L84 52L59 48L38 62L16 50Z"/>
+      <path d="M17 72L47 58L69 64L91 54L101 79L87 98H37L7 83Z"/>
+    </g>
+
+    <!--
+      II — RELAIS OBLIQUE
+      Une seule échappée traverse deux plans qui n'ont ni bord commun ni cadre.
+      L'ensemble est posé à 27 degrés; le dépassement inférieur vaut 3 pour un
+      corps de 24. La rotation empêche toute lecture en chiffre ou initiale.
+    -->
+    <g id="relay-oblique" transform="translate(8 8) scale(.84) rotate(27 54 54)">
+      <path d="M8 24L25 7H79L99 27V42H71L50 62H22C25 52 19 43 8 41Z"/>
+      <path d="M8 74H44L65 53H99V82L83 98H25L8 82Z"/>
+    </g>
+
+    <!--
+      III — RELAIS CROISÉ
+      Les deux masses se relaient sur une diagonale sans se toucher. La même
+      contreforme entre en bas à gauche et ressort au-dessus de la limite à
+      droite; l'écart final de 3 unités appartient entièrement à leur rapport.
+    -->
+    <g id="relay-soft">
+      <path d="M8 11H52L70 29L58 51L38 64L16 53L7 34Z"/>
+      <path d="M40 72L59 57L77 43L97 56L102 80L88 98H43L25 82Z"/>
+    </g>
+  </defs>
+
+  <rect width="1440" height="560" fill="#F4F0E7"/>
+  <path d="M480 72V488M960 72V488" fill="none" stroke="#191816" stroke-opacity=".16" stroke-width="2"/>
+
+  <g fill="#191816">
+    <use href="#relay-vertical" transform="translate(105 103) scale(2.72)"/>
+    <use href="#relay-vertical" transform="translate(400 442) scale(.16)"/>
+    <path d="M105 472H137V478H105Z"/>
+  </g>
+
+  <g fill="#191816">
+    <use href="#relay-oblique" transform="translate(585 103) scale(2.72)"/>
+    <use href="#relay-oblique" transform="translate(880 442) scale(.16)"/>
+    <path d="M585 472H617V478H585ZM625 472H657V478H625Z"/>
+  </g>
+
+  <g fill="#191816">
+    <use href="#relay-soft" transform="translate(1065 103) scale(2.72)"/>
+    <use href="#relay-soft" transform="translate(1360 442) scale(.16)"/>
+    <path d="M1065 472H1097V478H1065ZM1105 472H1137V478H1105ZM1145 472H1177V478H1145Z"/>
+  </g>
+</svg>

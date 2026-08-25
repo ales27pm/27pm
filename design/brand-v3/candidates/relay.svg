@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 132" role="img" aria-labelledby="title desc">
+  <title id="title">27PM — symbole Relais</title>
+  <desc id="desc">Deux formes complémentaires construisent un signe commun; la seconde continue au-delà de leur limite partagée.</desc>
+  <g fill="#191816">
+    <path d="M14 72V48C14 28 27 15 47 15H79V39H50C42 39 38 43 38 51V72Z"/>
+    <path d="M130 0V84C130 104 117 117 97 117H46V93H94C102 93 106 89 106 81V48H82V72H58V48C58 33 68 24 83 24H106V0Z"/>
+  </g>
+</svg>

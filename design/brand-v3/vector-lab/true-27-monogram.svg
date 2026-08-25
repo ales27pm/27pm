@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="680" viewBox="0 0 1440 680" role="img" aria-labelledby="title desc">
+  <title id="title">27PM — quatre vrais monogrammes 27</title>
+  <desc id="desc">Quatre emblèmes monochromes autonomes où le 2 et le 7 apparaissent seulement en seconde lecture.</desc>
+
+  <defs>
+    <!-- 01 : la courbe externe suggère le 2; le 7 n'existe que dans l'entaille. -->
+    <symbol id="mono-shared" viewBox="0 0 140 128">
+      <path fill="currentColor" fill-rule="evenodd" d="M17 101C15 79 25 53 48 32C65 17 85 9 104 11C117 28 120 47 113 66C104 91 81 111 49 120C33 117 22 111 17 101ZM61 36H102L96 51H86L67 96H49L70 51H61Z"/>
+    </symbol>
+
+    <!-- 02 : deux galets complémentaires; leur vide diagonal porte la ligature. -->
+    <symbol id="mono-counter" viewBox="0 0 140 128">
+      <path fill="currentColor" d="M66 7C39 7 17 26 14 54C12 77 23 98 43 111L58 88C48 81 42 70 42 58C42 42 53 31 69 31H88C98 31 104 25 105 15C94 10 81 7 66 7Z"/>
+      <path fill="currentColor" d="M107 24C117 36 122 51 120 68C118 94 99 112 72 121L57 98L84 78C94 71 99 63 99 54C99 43 93 35 82 31H107Z"/>
+    </symbol>
+
+    <!-- 03 : un geste calligraphique compact; le 7 est une coupe dans son regain. -->
+    <symbol id="mono-fusion" viewBox="0 0 140 128">
+      <path fill="currentColor" fill-rule="evenodd" d="M17 91C17 72 28 58 47 48L75 33C81 30 83 27 80 23C75 17 62 19 52 27L39 39L21 28C38 8 72 2 96 14C114 23 120 43 110 59C102 72 86 79 69 88C59 94 53 103 51 117C30 115 17 105 17 91ZM83 21H116L109 35H101L83 78H68L88 35H83Z"/>
+    </symbol>
+
+    <!-- 04 : un sceau plein traversé par une reprise calligraphique souple. -->
+    <symbol id="mono-seal" viewBox="0 0 140 128">
+      <path fill="currentColor" fill-rule="evenodd" d="M68 7C100 7 121 29 121 58C121 87 101 109 68 121C35 109 15 87 15 58C15 29 36 7 68 7ZM75 17C86 24 90 34 87 44C84 54 75 60 69 68C64 76 66 85 75 94L64 106C48 91 46 74 55 59C62 48 74 42 76 33C77 27 75 22 70 19Z"/>
+    </symbol>
+  </defs>
+
+  <rect width="1440" height="680" fill="#f4f0e7"/>
+  <g fill="#191816" font-family="Arial, Helvetica, sans-serif">
+    <text x="72" y="62" font-size="15" font-weight="700" letter-spacing="2.5">27PM · TRUE MONOGRAM / 27</text>
+    <text x="72" y="107" font-size="32" font-weight="600" letter-spacing="-.8">Un emblème d’abord. Le 27 ensuite.</text>
+    <text x="1368" y="62" text-anchor="end" font-size="12" font-weight="700" letter-spacing="1.7">1 COULEUR · 1–2 FORMES · 16 PX</text>
+  </g>
+  <path d="M72 144H1368" stroke="#191816" stroke-opacity=".17"/>
+
+  <g transform="translate(72 182)">
+    <rect width="304" height="408" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816"><use href="#mono-shared" x="52" y="47" width="200" height="183"/></g>
+    <g transform="translate(24 310)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.45">01 · FEUILLE</text>
+      <text y="30" fill="#191816" fill-opacity=".61" font-size="13">Courbe extérieure, 7 dans la contreforme.</text>
+    </g>
+    <g transform="translate(252 318)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 140 128"><use href="#mono-shared"/></svg>
+      <text x="14" y="48" text-anchor="middle" fill="#191816" fill-opacity=".53" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <g transform="translate(402 182)">
+    <rect width="304" height="408" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816"><use href="#mono-counter" x="52" y="47" width="200" height="183"/></g>
+    <g transform="translate(24 310)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.45">02 · GALETS</text>
+      <text y="30" fill="#191816" fill-opacity=".61" font-size="13">La double lecture appartient à leur couture.</text>
+    </g>
+    <g transform="translate(252 318)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 140 128"><use href="#mono-counter"/></svg>
+      <text x="14" y="48" text-anchor="middle" fill="#191816" fill-opacity=".53" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <g transform="translate(732 182)">
+    <rect width="304" height="408" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816"><use href="#mono-fusion" x="52" y="47" width="200" height="183"/></g>
+    <g transform="translate(24 310)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.45">03 · GESTE</text>
+      <text y="30" fill="#191816" fill-opacity=".61" font-size="13">Un mouvement plein, puis une coupe discrète.</text>
+    </g>
+    <g transform="translate(252 318)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 140 128"><use href="#mono-fusion"/></svg>
+      <text x="14" y="48" text-anchor="middle" fill="#191816" fill-opacity=".53" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <g transform="translate(1062 182)">
+    <rect width="306" height="408" rx="3" fill="#fffdf8" stroke="#191816" stroke-opacity=".16"/>
+    <g color="#191816"><use href="#mono-seal" x="53" y="47" width="200" height="183"/></g>
+    <g transform="translate(24 310)" font-family="Arial, Helvetica, sans-serif">
+      <text fill="#191816" font-size="13" font-weight="700" letter-spacing="1.45">04 · SCEAU</text>
+      <text y="30" fill="#191816" fill-opacity=".61" font-size="13">Un sceau plein traversé par une reprise souple.</text>
+    </g>
+    <g transform="translate(254 318)" color="#191816">
+      <rect width="28" height="28" rx="2" fill="#f4f0e7" stroke="#191816" stroke-opacity=".18"/>
+      <svg x="6" y="6" width="16" height="16" viewBox="0 0 140 128"><use href="#mono-seal"/></svg>
+      <text x="14" y="48" text-anchor="middle" fill="#191816" fill-opacity=".53" font-family="Arial, Helvetica, sans-serif" font-size="10">16 px</text>
+    </g>
+  </g>
+
+  <g transform="translate(72 640)" fill="#191816" font-family="Arial, Helvetica, sans-serif">
+    <text font-size="12" font-weight="700" letter-spacing="1.5">FILTRE</text>
+    <text x="83" font-size="12" fill-opacity=".56">Aucun caractère typographique emprunté; chaque contour est dessiné comme un symbole indépendant.</text>
+  </g>
+</svg>

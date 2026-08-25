@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 132" role="img" aria-labelledby="title desc">
+  <title id="title">Symbole 27PM — Relais</title>
+  <desc id="desc">Deux pièces bâtissent ensemble une enceinte; la seconde dépasse la hauteur commune selon le rapport caché trois sur vingt-quatre.</desc>
+  <g fill="#191816">
+    <path d="M14 72V48C14 28 27 15 47 15H79V39H50C42 39 38 43 38 51V72Z" />
+    <path d="M130 0V84C130 104 117 117 97 117H46V93H94C102 93 106 89 106 81V48H82V72H58V48C58 33 68 24 83 24H106V0Z" />
+  </g>
+</svg>

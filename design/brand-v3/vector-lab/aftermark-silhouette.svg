@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" fill="none">
+  <defs>
+    <!--
+      A — DISPLACED EDGE
+      One compact body reaches a natural end. A substantial piece of its bitten
+      edge exists beyond that end: continuation as displaced matter, not motion.
+      Two forms.
+    -->
+    <symbol id="aftermark-a" viewBox="0 0 120 120">
+      <g transform="rotate(27 60 60)">
+      <path d="M17 33C18 22 28 13 39 11L77 7C90 6 101 14 104 26L108 43L94 40C84 38 76 46 77 56C78 65 87 71 96 68L111 63L110 77C109 88 101 97 90 101L54 113C42 117 29 112 23 101L7 73C1 62 3 48 12 39L17 33Z" fill="currentColor"/>
+      <path d="M111 34L118 37C121 38 122 41 121 44L119 52C118 56 114 58 111 56L108 54C110 47 110 41 111 34Z" fill="currentColor"/>
+      </g>
+    </symbol>
+
+    <!--
+      B — LATE LIP
+      The pebble is already optically complete at its lower shoulder. Its own
+      contour then stays awake for 3/24 more, as one blunt horizontal lip.
+      One form.
+    -->
+    <symbol id="aftermark-b" viewBox="0 0 120 120">
+      <g transform="rotate(-27 60 60)">
+      <path d="M18 24C26 14 39 9 52 10L89 13C102 14 111 24 112 37L113 56C113 68 105 79 94 83L77 90L109 99C115 101 118 107 115 112C112 117 106 118 101 115L63 102L34 110C21 114 9 105 8 91L6 50C5 39 10 30 18 24Z" fill="currentColor"/>
+      </g>
+    </symbol>
+
+    <!--
+      C — MASS EXCHANGE
+      One soft volume is removed from the near shoulder and reappears on the
+      far shoulder. Only the external contour performs the impossible gesture.
+      One form.
+    -->
+    <symbol id="aftermark-c" viewBox="0 0 120 120">
+      <g transform="rotate(27 60 60)">
+      <path d="M20 15C33 7 50 5 64 10L92 21C102 25 108 35 107 46C116 50 120 60 117 70C114 80 104 86 94 84L76 80C69 95 56 106 40 108C27 110 15 104 9 93C3 82 4 68 11 58C19 63 29 62 37 56C45 49 46 38 41 29C36 21 28 16 20 15Z" fill="currentColor"/>
+      </g>
+    </symbol>
+
+    <!--
+      D — SECOND FINISH
+      A simple asymmetric stone finishes on a broad clipped face. After a
+      deliberate gap, the face resumes as a smaller soft facet, 3/24 beyond.
+      Two forms; no point or directional tip.
+    -->
+    <symbol id="aftermark-d" viewBox="0 0 120 120">
+      <g transform="rotate(-27 60 60)">
+      <path d="M17 33C20 19 32 10 46 8H74C87 8 97 17 100 29L107 57C110 71 103 84 91 91L62 109C50 116 34 113 25 102L9 82C1 72 1 58 8 47L17 33Z" fill="currentColor"/>
+      <path d="M102 13L113 18C119 20 122 26 120 32L116 44C114 50 108 53 103 50L100 48C102 36 102 25 102 13Z" fill="currentColor"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="1600" height="620" fill="#F4F1E9"/>
+
+  <path d="M400 46V574M800 46V574M1200 46V574" stroke="#17192E" stroke-opacity="0.12"/>
+
+  <!-- Geometry-only ordinal labels. -->
+  <g fill="#17192E">
+    <path d="M192 55H208V60H192Z"/>
+    <path d="M584 55H596V60H584ZM604 55H616V60H604Z"/>
+    <path d="M983 55H992V60H983ZM999 55H1008V60H999ZM1015 55H1024V60H1015Z"/>
+    <path d="M1377 55H1384V60H1377ZM1390 55H1397V60H1390ZM1403 55H1410V60H1403ZM1416 55H1423V60H1416Z"/>
+  </g>
+
+  <!-- Large silhouette comparison. -->
+  <g color="#17192E">
+    <use href="#aftermark-a" x="104" y="132" width="192" height="192"/>
+    <use href="#aftermark-b" x="504" y="132" width="192" height="192"/>
+    <use href="#aftermark-c" x="904" y="132" width="192" height="192"/>
+    <use href="#aftermark-d" x="1304" y="132" width="192" height="192"/>
+  </g>
+
+  <!-- Exact 16 px checks, without containing shapes. -->
+  <g color="#17192E">
+    <use href="#aftermark-a" x="192" y="403" width="16" height="16"/>
+    <use href="#aftermark-b" x="592" y="403" width="16" height="16"/>
+    <use href="#aftermark-c" x="992" y="403" width="16" height="16"/>
+    <use href="#aftermark-d" x="1392" y="403" width="16" height="16"/>
+  </g>
+
+  <!-- Construction key outside every mark: 24 + 3. -->
+  <g fill="#17192E">
+    <path d="M165 493H213V499H165ZM220 493H226V499H220ZM232 493H238V499H232ZM244 493H250V499H244Z"/>
+    <path d="M565 493H613V499H565ZM620 493H626V499H620ZM632 493H638V499H632ZM644 493H650V499H644Z"/>
+    <path d="M965 493H1013V499H965ZM1020 493H1026V499H1020ZM1032 493H1038V499H1032ZM1044 493H1050V499H1044Z"/>
+    <path d="M1365 493H1413V499H1365ZM1420 493H1426V499H1420ZM1432 493H1438V499H1432ZM1444 493H1450V499H1444Z"/>
+  </g>
+</svg>
