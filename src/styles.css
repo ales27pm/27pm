@@ -433,7 +433,20 @@ img {
   font-weight: 620;
 }
 
-.work-copy > p:not(.work-meta) {
+.work-status {
+  margin: 1rem 0 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--blue);
+  font-size: 0.7rem;
+  font-weight: 720;
+  letter-spacing: 0.055em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.work-copy > p:not(.work-meta):not(.work-status) {
   max-width: 28rem;
   margin: 2rem 0 0;
   font-size: 1.02rem;

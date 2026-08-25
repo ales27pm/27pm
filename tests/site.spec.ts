@@ -7,7 +7,7 @@ test('renders the complete French landing page', async ({ page }) => {
   await expect(page).toHaveTitle('27PM | Sites web et applications sur mesure');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Clair pour\s+vos clients\.\s+Solide pour vous\./);
   await expect(page.getByRole('heading', { name: 'Ce qu’on bâtit, avec vous.' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Du concret, mis en ligne.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Du concret, à explorer.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Portes et Fenêtres Boulet' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Maisons S. Turner' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'De l’idée à l’impact, sans détour.' })).toBeVisible();
@@ -15,20 +15,35 @@ test('renders the complete French landing page', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'On commence par une conversation.' })).toBeVisible();
 });
 
-test('publishes real previews without exposing private portfolio links', async ({ page }) => {
+test('presents both undeployed projects as clearly labelled full demos', async ({ page }) => {
   await page.goto('/');
 
+  await expect(page.getByText('Concept 27PM · Démo non déployée', { exact: true })).toHaveCount(2);
+  await expect(page.getByText(/Ces versions ne sont pas encore déployées sur les domaines officiels/)).toBeVisible();
   await expect(page.locator('a[href*=".ts.net"]')).toHaveCount(0);
 
-  const turnerLinks = page.locator('a[data-public-project][href="https://maisonsturner.ca/"]');
-  await expect(turnerLinks).toHaveCount(2);
-  for (const link of await turnerLinks.all()) {
-    await expect(link).toHaveAttribute('target', '_blank');
-    await expect(link).toHaveAttribute('rel', /noopener/);
+  const demos = [
+    {
+      project: 'boulet',
+      href: 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
+    },
+    {
+      project: 'turner',
+      href: 'https://ales27pm.github.io/s-turner/',
+    },
+  ];
+
+  for (const demo of demos) {
+    const links = page.locator(`a[data-demo-project="${demo.project}"][href="${demo.href}"]`);
+    await expect(links).toHaveCount(2);
+    for (const link of await links.all()) {
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+    }
   }
 
-  await expect(page.getByRole('link', { name: 'Visiter le site public · nouvel onglet' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Parler d’un projet semblable' })).toHaveAttribute('href', '#contact');
+  await expect(page.getByRole('link', { name: 'Explorer la démo complète · nouvel onglet' })).toHaveCount(2);
+  await expect(page.locator('a[href="https://maisonsturner.ca/"]')).toHaveCount(0);
 
   const previews = page.locator('.work-visual img');
   await expect(previews).toHaveCount(2);

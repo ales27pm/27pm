@@ -8,7 +8,10 @@ const pagesHost = process.env.PAGES_HOST ?? '27pm.org';
 const isPreview = pagesHost !== '27pm.org';
 const normalizedPath = (process.env.PAGES_BASE_PATH ?? (isPreview ? '/27pm' : '/')).replace(/^\/+|\/+$/g, '');
 const base = normalizedPath ? `/${normalizedPath}/` : '/';
-const verifiedPublicProjects = new Set(['https://maisonsturner.ca/']);
+const verifiedDemoProjects = new Map([
+  ['boulet', 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/'],
+  ['turner', 'https://ales27pm.github.io/s-turner/'],
+]);
 
 assert.ok(isPreview || base === '/', '27pm.org production builds must use the root base path');
 
@@ -25,17 +28,25 @@ for (const [name, html] of [['home', home], ['privacy', privacy]]) {
   assert.ok(html.includes(`content="${robots}"`), `${name} must use ${robots} on ${pagesHost}`);
 }
 
-assert.doesNotMatch(home, /\.ts\.net/i, 'public builds must not expose private Tailnet URLs');
 assert.doesNotMatch(privacy, /Selon le service d’hébergement retenu/i, 'privacy copy must identify the public host');
 assert.match(privacy, /GitHub Pages/, 'privacy copy must name the public host');
 
-const publicProjectTags = [...home.matchAll(/<a\b[^>]*data-public-project[^>]*>/gi)].map((match) => match[0]);
-assert.ok(publicProjectTags.length > 0, 'at least one verified public project link is required');
-for (const tag of publicProjectTags) {
-  const href = tag.match(/\bhref="([^"]+)"/i)?.[1];
-  assert.ok(href?.startsWith('https://'), `public project link must use HTTPS: ${tag}`);
-  assert.ok(href && verifiedPublicProjects.has(href), `public project link must be independently verified: ${href ?? tag}`);
+const demoProjectTags = [...home.matchAll(/<a\b[^>]*data-demo-project[^>]*>/gi)].map((match) => match[0]);
+assert.equal(demoProjectTags.length, verifiedDemoProjects.size * 2, 'each demo requires a text link and a visual link');
+for (const [project, expectedHref] of verifiedDemoProjects) {
+  const projectTags = demoProjectTags.filter((tag) => tag.includes(`data-demo-project="${project}"`));
+  assert.equal(projectTags.length, 2, `${project} must expose exactly two demo links`);
+
+  for (const tag of projectTags) {
+    const href = tag.match(/\bhref="([^"]+)"/i)?.[1];
+    assert.equal(href, expectedHref, `${project} must use its reviewed demo URL`);
+    assert.match(tag, /\btarget="_blank"/i, `${project} demo links must open in a new tab`);
+    assert.match(tag, /\brel="[^"]*noopener[^"]*"/i, `${project} demo links must isolate the new tab`);
+  }
 }
+
+assert.doesNotMatch(home, /\.ts\.net/i, 'build must not expose private Tailnet URLs');
+assert.match(home, /Concept 27PM · Démo non déployée/, 'demos must be clearly identified as undeployed concepts');
 
 if (isPreview) {
   await assert.rejects(access(resolve(dist, 'CNAME')), 'preview builds must not claim the production domain');

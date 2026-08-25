@@ -2,9 +2,16 @@ import assert from 'node:assert/strict';
 
 const origin = new URL(process.env.PUBLIC_SITE_ORIGIN ?? 'https://27pm.org');
 const timeoutMs = Number(process.env.PUBLIC_SITE_TIMEOUT_MS ?? 12_000);
-const verifiedPublicProjects = new Map([
-  ['maisonsturner.ca', {
-    allowedHosts: new Set(['maisonsturner.ca', 'www.maisonsturner.ca']),
+const verifiedDemoProjects = new Map([
+  ['boulet', {
+    href: 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
+    allowedHosts: new Set(['fenetres-boulet-redesign.ales27pm.chatgpt.site']),
+    marker: 'Portes et Fenêtres Boulet',
+  }],
+  ['turner', {
+    href: 'https://ales27pm.github.io/s-turner/',
+    allowedHosts: new Set(['ales27pm.github.io']),
+    pathname: '/s-turner/',
     marker: 'Maisons S. Turner',
   }],
 ]);
@@ -54,7 +61,8 @@ const requireOk = async (path, markers = []) => {
 const home = await requireOk('/', [
   '<title>27PM | Sites web et applications sur mesure</title>',
   '<link rel="canonical" href="https://27pm.org/"',
-  'https://maisonsturner.ca/',
+  'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
+  'https://ales27pm.github.io/s-turner/',
 ]);
 assert.doesNotMatch(home, /\.ts\.net/i, 'deployed home must not expose private Tailnet URLs');
 
@@ -79,18 +87,19 @@ if (origin.hostname === '27pm.org') {
   assert.equal(new URL(response.headers.get('location') ?? '', wwwUrl).href, 'https://27pm.org/', `${wwwUrl}: redirect must target the canonical root`);
 }
 
-const projectLinks = [...home.matchAll(/<a\b[^>]*data-public-project[^>]*>/gi)]
-  .map((match) => match[0].match(/\bhref="([^"]+)"/i)?.[1])
-  .filter((href) => href !== undefined);
-const uniqueProjectLinks = [...new Set(projectLinks)];
-assert.ok(uniqueProjectLinks.length > 0, 'deployed home must expose at least one verified public project link');
+const projectTags = [...home.matchAll(/<a\b[^>]*data-demo-project="([^"]+)"[^>]*>/gi)];
+assert.equal(projectTags.length, verifiedDemoProjects.size * 2, 'deployed home must expose two links for each verified demo');
 
-for (const href of uniqueProjectLinks) {
-  const url = new URL(href);
+for (const [project, verifiedProject] of verifiedDemoProjects) {
+  const projectHrefs = projectTags
+    .filter((match) => match[1] === project)
+    .map((match) => match[0].match(/\bhref="([^"]+)"/i)?.[1]);
+  assert.deepEqual(projectHrefs, [verifiedProject.href, verifiedProject.href], `${project}: deployed links must use the reviewed URL`);
+
+  const href = verifiedProject.href;
+  const url = new URL(verifiedProject.href);
   assert.equal(url.protocol, 'https:', `${href}: public project links must use HTTPS`);
   assert.doesNotMatch(url.hostname, /\.ts\.net$/i, `${href}: private Tailnet destinations are forbidden`);
-  const verifiedProject = verifiedPublicProjects.get(url.hostname);
-  assert.ok(verifiedProject, `${href}: public project host is not in the verified allowlist`);
 
   const response = await get(url);
   assert.ok(response.ok, `${href}: expected 2xx, received ${response.status}`);
@@ -98,6 +107,7 @@ for (const href of uniqueProjectLinks) {
   assert.equal(finalUrl.protocol, 'https:', `${href}: final project URL must use HTTPS`);
   assert.doesNotMatch(finalUrl.hostname, /\.ts\.net$/i, `${href}: final project URL must not enter a private Tailnet`);
   assert.ok(verifiedProject.allowedHosts.has(finalUrl.hostname), `${href}: final project host ${finalUrl.hostname} is not verified`);
+  if (verifiedProject.pathname) assert.equal(finalUrl.pathname, verifiedProject.pathname, `${href}: final project path is not verified`);
   assert.ok((await response.text()).includes(verifiedProject.marker), `${href}: final page does not identify the verified project`);
 }
 
