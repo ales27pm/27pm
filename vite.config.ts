@@ -1,3 +1,4 @@
+import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 
@@ -5,6 +6,10 @@ const pagesPreviewPlugin = (): Plugin => ({
   name: '27pm-pages-preview',
   transformIndexHtml(html) {
     return html.replaceAll('content="index, follow"', 'content="noindex, nofollow"');
+  },
+  writeBundle(options) {
+    const outDir = resolve(process.cwd(), options.dir ?? 'dist');
+    rmSync(resolve(outDir, 'CNAME'), { force: true });
   },
 });
 

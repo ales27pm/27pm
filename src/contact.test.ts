@@ -6,13 +6,32 @@ describe('project contact link', () => {
     const link = buildProjectMailto('application');
 
     expect(link).toContain('mailto:bonjour@27pm.org');
-    expect(decodeURIComponent(link)).toContain('[Projet 27PM] Une application');
-    expect(decodeURIComponent(link)).toContain('une application');
+    expect(decodeURIComponent(link)).toContain('[Projet 27PM] Une application sur mesure');
+    expect(decodeURIComponent(link)).toContain('une application sur mesure');
+    expect(decodeURIComponent(link)).toContain('[À compléter]');
+  });
+
+  it('includes the optional brief without keeping surrounding whitespace', () => {
+    const link = buildProjectMailto('automation', {
+      context: '  Automatiser la qualification des demandes.  ',
+      name: '  Alexis  ',
+      replyEmail: '  alexis@example.test  ',
+    });
+    const decoded = decodeURIComponent(link);
+
+    expect(decoded).toContain('[Projet 27PM] Une automatisation ou un outil d’IA');
+    expect(decoded).toContain('Automatiser la qualification des demandes.');
+    expect(decoded).toContain('Nom : Alexis');
+    expect(decoded).toContain('Courriel de retour : alexis@example.test');
+    expect(decoded).not.toContain('  Alexis  ');
   });
 
   it('accepts only the supported project values', () => {
     expect(isProjectKind('site')).toBe(true);
     expect(isProjectKind('application')).toBe(true);
+    expect(isProjectKind('automation')).toBe(true);
+    expect(isProjectKind('unsure')).toBe(true);
+    expect(isProjectKind('produit')).toBe(false);
     expect(isProjectKind('autre')).toBe(false);
   });
 

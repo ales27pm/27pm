@@ -1,0 +1,110 @@
+.legal-page {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+}
+
+.legal-header {
+  width: 100%;
+  border-bottom: 2px solid var(--blue);
+}
+
+.text-link {
+  color: var(--blue);
+  font-weight: 620;
+  text-underline-offset: 0.25em;
+}
+
+.legal-main {
+  display: grid;
+  width: min(100%, var(--shell));
+  min-height: 72vh;
+  grid-template-columns: minmax(14rem, 0.34fr) minmax(0, 0.66fr);
+  margin-inline: auto;
+  padding: clamp(4rem, 6vw, 6rem) var(--page-gutter) clamp(6rem, 9vw, 9rem);
+}
+
+.legal-aside {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  padding-right: clamp(2rem, 6vw, 7rem);
+  flex-direction: column;
+}
+
+.legal-date {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.legal-aside img {
+  width: clamp(7rem, 12vw, 12rem);
+  margin-top: 28rem;
+  opacity: 0.08;
+}
+
+.legal-main article {
+  width: min(100%, 58rem);
+  min-width: 0;
+}
+
+.legal-main h1 {
+  max-width: 12ch;
+  font-size: clamp(4rem, 6.6vw, 7rem);
+  line-height: 0.9;
+  overflow-wrap: anywhere;
+}
+
+.legal-lead {
+  max-width: 50rem;
+  margin: 2.25rem 0 3rem;
+  font-size: clamp(1.15rem, 1.55vw, 1.4rem);
+  line-height: 1.6;
+}
+
+.legal-main section {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.legal-main h2 {
+  margin-bottom: 1.15rem;
+  font-size: clamp(2rem, 3.1vw, 3.2rem);
+  line-height: 1.06;
+  overflow-wrap: anywhere;
+}
+
+.legal-main section p {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.72;
+}
+
+.legal-main section a {
+  color: var(--blue-deep);
+  text-underline-offset: 0.25em;
+}
+
+.not-found-main {
+  align-items: center;
+}
+
+.not-found-main article {
+  padding-block: 2rem;
+}
+
+.not-found-main .legal-lead {
+  max-width: 38rem;
+}
+
+.legal-footer {
+  --focus: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 2.5rem var(--page-gutter);
+  background: var(--ink);
+  color: var(--ivory);
+  font-size: 0.86rem;
+}

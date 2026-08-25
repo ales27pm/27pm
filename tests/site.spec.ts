@@ -1,25 +1,98 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-test('renders the complete French landing page', async ({ page }) => {
+test('renders the complete French v5 landing page', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page).toHaveTitle('27PM | Sites web et applications sur mesure');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Clair pour\s+vos clients\.\s+Solide pour vous\./);
-  await expect(page.getByRole('heading', { name: 'Ce qu’on bâtit, avec vous.' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Du concret, à explorer.' })).toBeVisible();
+  await expect(page).toHaveTitle('27PM | Sites web, applications et IA sur mesure');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    /Clair pour\s+vos clients\.\s+Solide pour vous\./,
+  );
+  await expect(page.getByRole('heading', { name: 'Une idée. Plusieurs métiers.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Pas des promesses. Des systèmes à essayer.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Portes et Fenêtres Boulet' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Maisons S. Turner' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Et si on bâtissait le vôtre?' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'De l’idée à l’impact, sans détour.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Petit studio. Grande attention.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'On commence par une conversation.' })).toBeVisible();
 });
 
-test('presents both undeployed projects as clearly labelled full demos', async ({ page }) => {
+test('switches capability proof with pointer and keyboard controls', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByText('Concept 27PM · Démo non déployée', { exact: true })).toHaveCount(2);
-  await expect(page.getByText(/Ces versions ne sont pas encore déployées sur les domaines officiels/)).toBeVisible();
+  const convince = page.locator('[data-capability="convaincre"]');
+  const simplify = page.locator('[data-capability="simplifier"]');
+  const invent = page.locator('[data-capability="inventer"]');
+  const proof = page.locator('[data-capability-proof]');
+  const proofImage = page.locator('[data-proof-image]');
+  const proofPrototype = page.locator('[data-proof-prototype]');
+
+  await expect(convince).toHaveAttribute('aria-pressed', 'true');
+  await expect(proof).toHaveAttribute('data-proof-mode', 'convaincre');
+  await expect(page.locator('[data-proof-title]')).toHaveText('Offre complexe');
+  await expect(proofImage).toHaveAttribute('src', /portes-fenetres-boulet\.webp$/);
+  await expect(proofImage).toBeVisible();
+  await expect(proofPrototype).toBeHidden();
+
+  await simplify.click();
+  await expect(convince).toHaveAttribute('aria-pressed', 'false');
+  await expect(simplify).toHaveAttribute('aria-pressed', 'true');
+  await expect(proof).toHaveAttribute('data-proof-mode', 'simplifier');
+  await expect(page.locator('[data-proof-title]')).toHaveText('Opération fragmentée');
+  await expect(proofImage).toHaveAttribute('src', /maisons-s-turner\.webp$/);
+  await expect(page.locator('[data-proof-summary]')).toHaveText(
+    'Un système relie les choix, les données et le suivi au même endroit.',
+  );
+
+  await simplify.press('ArrowRight');
+  await expect(invent).toBeFocused();
+  await expect(invent).toHaveAttribute('aria-pressed', 'true');
+  await expect(proof).toHaveAttribute('data-proof-mode', 'inventer');
+  await expect(page.locator('[data-proof-title]')).toHaveText('Possibilité à valider');
+  await expect(proofImage).toBeHidden();
+  await expect(proofPrototype).toBeVisible();
+});
+
+test('composes the scenario locally without navigation or submission', async ({ page }) => {
+  await page.goto('/#lab');
+
+  const scenarioForm = page.locator('[data-scenario-form]');
+  const scenarioTitle = page.locator('[data-scenario-title]');
+  const scenarioPoints = page.locator('[data-scenario-points] li');
+  const originalUrl = page.url();
+
+  await expect(scenarioForm).not.toHaveAttribute('action');
+  await expect(scenarioTitle).toHaveText(
+    'Un site éditorial qui transforme les visiteurs en demandes qualifiées et recommande le bon parcours.',
+  );
+
+  await page.getByLabel('Simplifier un processus interne').check();
+  await page.getByLabel('Tableau de bord').check();
+  await page.getByLabel('Règles métier, sans IA').check();
+
+  await expect(scenarioTitle).toHaveText(
+    'Un tableau de bord qui réunit les étapes d’un processus interne avec des règles métier explicites, sans IA superflue.',
+  );
+  await expect(scenarioPoints).toHaveText([
+    'Vue opérationnelle',
+    'Opérations simplifiées',
+    'Règles métier vérifiables',
+    'Suivi structuré',
+  ]);
+
+  expect(page.url()).toBe(originalUrl);
+  await expect(scenarioForm.getByRole('button')).toHaveCount(0);
+  await expect(page.getByText(/Aucune donnée n’est envoyée/)).toBeVisible();
+});
+
+test('presents both independent projects as clearly labelled full demos', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('Concept indépendant 27PM', { exact: true })).toHaveCount(2);
+  await expect(page.getByText('Démo complète', { exact: true })).toHaveCount(2);
+  await expect(page.getByText('Non officiel et non déployé', { exact: true })).toHaveCount(2);
+  await expect(page.getByText(/ni présentés,\s+ni approuvés,\s+ni déployés/)).toBeVisible();
   await expect(page.locator('a[href*=".ts.net"]')).toHaveCount(0);
 
   const demos = [
@@ -38,14 +111,16 @@ test('presents both undeployed projects as clearly labelled full demos', async (
     await expect(links).toHaveCount(2);
     for (const link of await links.all()) {
       await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /nofollow/);
       await expect(link).toHaveAttribute('rel', /noopener/);
+      await expect(link).toHaveAttribute('rel', /noreferrer/);
     }
   }
 
-  await expect(page.getByRole('link', { name: 'Explorer la démo complète · nouvel onglet' })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: /Entrer dans la démo.*nouvel onglet/ })).toHaveCount(4);
   await expect(page.locator('a[href="https://maisonsturner.ca/"]')).toHaveCount(0);
 
-  const previews = page.locator('.work-visual img');
+  const previews = page.locator('.case-visual img');
   await expect(previews).toHaveCount(2);
   await previews.last().scrollIntoViewIfNeeded();
   for (let index = 0; index < 2; index += 1) {
@@ -56,29 +131,52 @@ test('presents both undeployed projects as clearly labelled full demos', async (
   }
 });
 
-test('updates the contact action from the selected project', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('Une application').check();
+test('validates the project brief and keeps the contextual mail action current', async ({ page }) => {
+  await page.goto('/#contact');
 
-  const mailLink = page.getByRole('link', { name: /Ouvrir mon courriel/ });
-  await expect(mailLink).toHaveAttribute('href', /Une%20application/);
+  const mailLink = page.getByRole('link', { name: 'Préparer mon courriel' });
+  const context = page.getByLabel('Votre projet');
+  const name = page.getByLabel(/Votre nom/);
+  const email = page.getByLabel(/Votre courriel/);
+  const status = page.locator('[data-project-status]');
 
-  await page.locator('[data-select-project="produit"]').click();
-  await expect(page.getByLabel('Un produit à clarifier')).toBeChecked();
-  await expect(mailLink).toHaveAttribute('href', /Un%20produit%20%C3%A0%20clarifier/);
+  await mailLink.click();
+  await expect(context).toBeFocused();
+  await expect(context).toHaveAttribute('aria-invalid', 'true');
+  await expect(status).toHaveText('Décrivez brièvement votre projet avant de préparer le courriel.');
+
+  await context.fill('Automatiser la qualification de nos demandes.');
+  await name.fill('Alexis');
+  await email.fill('adresse-invalide');
+  await mailLink.click();
+  await expect(email).toBeFocused();
+  await expect(email).toHaveAttribute('aria-invalid', 'true');
+  await expect(status).toHaveText('Vérifiez le format du courriel indiqué.');
+
+  await email.fill('alexis@example.test');
+  await page.getByLabel('Automatisation ou IA').check();
+
+  const decodedHref = decodeURIComponent((await mailLink.getAttribute('href')) ?? '');
+  expect(decodedHref).toContain('[Projet 27PM] Une automatisation ou un outil d’IA');
+  expect(decodedHref).toContain('Automatiser la qualification de nos demandes.');
+  expect(decodedHref).toContain('Nom : Alexis');
+  expect(decodedHref).toContain('Courriel de retour : alexis@example.test');
 });
 
-test('supports keyboard selection and announces the chosen project', async ({ page }) => {
-  await page.goto('/');
-  const siteOption = page.getByLabel('Un site web');
-  const applicationOption = page.getByLabel('Une application');
+test('supports keyboard project selection and announces the chosen project', async ({ page }) => {
+  await page.goto('/#contact');
+  const siteOption = page.getByLabel('Un site web', { exact: true });
+  const applicationOption = page.getByLabel('Une application', { exact: true });
   const status = page.locator('[data-project-status]');
 
   await siteOption.focus();
   await page.keyboard.press('ArrowDown');
   await expect(applicationOption).toBeChecked();
-  await expect(status).toHaveText('Choix sélectionné : Une application.');
-  await expect(page.getByRole('link', { name: 'Ouvrir mon courriel' })).toHaveAttribute('href', /Une%20application/);
+  await expect(status).toHaveText('Choix sélectionné : Une application sur mesure.');
+  await expect(page.getByRole('link', { name: 'Préparer mon courriel' })).toHaveAttribute(
+    'href',
+    /Une%20application%20sur%20mesure/,
+  );
 });
 
 test('explains the email handoff and copies the visible fallback address', async ({ page }) => {
@@ -90,14 +188,16 @@ test('explains the email handoff and copies the visible fallback address', async
       },
     });
   });
-  await page.goto('/');
+  await page.goto('/#contact');
 
-  await expect(page.getByText('Quel type de projet souhaitez-vous réaliser?')).toBeVisible();
-  await expect(page.getByText('Le bouton ouvre votre application de courriel avec un message préparé.')).toBeVisible();
+  await expect(page.getByText('De quoi voulez-vous parler?')).toBeVisible();
+  await expect(page.getByText(/aucune donnée n’est recueillie sur ce site/)).toBeVisible();
   await expect(page.locator('[data-contact-email]')).toBeVisible();
 
   await page.getByRole('button', { name: 'Copier l’adresse' }).click();
-  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('copied-email'))).toBe('bonjour@27pm.org');
+  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('copied-email'))).toBe(
+    'bonjour@27pm.org',
+  );
   await expect(page.locator('[data-copy-email-status]')).toHaveText('Adresse copiée.');
 });
 
@@ -108,11 +208,13 @@ test('keeps the address usable when clipboard access fails', async ({ page }) =>
       value: { writeText: async () => Promise.reject(new Error('denied')) },
     });
   });
-  await page.goto('/');
+  await page.goto('/#contact');
 
   const fallback = page.locator('[data-contact-email]');
   await page.getByRole('button', { name: 'Copier l’adresse' }).click();
-  await expect(page.locator('[data-copy-email-status]')).toHaveText('Copie impossible. Sélectionnez l’adresse affichée.');
+  await expect(page.locator('[data-copy-email-status]')).toHaveText(
+    'Copie impossible. Sélectionnez l’adresse affichée.',
+  );
   await expect(fallback).toBeFocused();
 });
 
@@ -122,9 +224,18 @@ test('has no automatically detectable accessibility violations on public pages',
   for (const path of ['/', '/confidentialite/', '/404.html']) {
     await page.goto(path, { waitUntil: 'networkidle' });
     const results = await new AxeBuilder({ page }).analyze();
-
     expect(results.violations, `Accessibility violations on ${path}`).toEqual([]);
   }
+});
+
+test('has no accessibility violations in interactive v5 states', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('[data-capability="inventer"]').click();
+  await page.getByLabel('Assistant conversationnel').check();
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
 });
 
 test('has no automatically detectable accessibility violations with the mobile menu open', async ({ page, isMobile }) => {
@@ -137,20 +248,20 @@ test('has no automatically detectable accessibility violations with the mobile m
   expect(results.violations).toEqual([]);
 });
 
-test('loads the selected brand mark and keeps a keyboard skip link', async ({ page }) => {
+test('loads the selected brand mark, hero field and keyboard skip link', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Aller au contenu' })).toBeFocused();
 
-  const mark = page.locator('.studio-symbol img');
-  await mark.scrollIntoViewIfNeeded();
+  const mark = page.locator('.hero-visual > img');
   await expect.poll(() => mark.evaluate((image) => {
     const element = image as HTMLImageElement;
     return element.complete && element.naturalWidth === 1024 && element.naturalHeight === 1024;
   })).toBe(true);
+  await expect(page.locator('[data-hero-field] line')).toHaveCount(782);
 });
 
-test('publishes the complete v4 brand asset set', async ({ page, request }) => {
+test('publishes the selected brand asset set', async ({ page, request }) => {
   const assets = [
     '/assets/brand-v4/27pm-mark-1024.webp',
     '/favicon-64.png',
@@ -165,8 +276,10 @@ test('publishes the complete v4 brand asset set', async ({ page, request }) => {
   }
 
   await page.goto('/');
-  const ogImage = page.locator('meta[property="og:image"]');
-  await expect(ogImage).toHaveAttribute('content', 'https://27pm.org/assets/og-27pm-1200x630.png');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://27pm.org/assets/og-27pm-1200x630.png',
+  );
 });
 
 test('publishes a reachable privacy page', async ({ page }) => {
@@ -194,8 +307,15 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://27pm.org/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://27pm.org/assets/og-27pm-1200x630.png');
-  await expect(page.getByRole('link', { name: 'Confidentialité' })).toHaveAttribute('href', '/confidentialite/');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /systèmes propulsés par l’IA/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://27pm.org/assets/og-27pm-1200x630.png',
+  );
+  await expect(page.getByRole('link', { name: 'Confidentialité' })).toHaveAttribute(
+    'href',
+    '/confidentialite/',
+  );
 
   const organization = await page.locator('script[type="application/ld+json"]').textContent();
   expect(organization).not.toBeNull();
@@ -203,6 +323,12 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
     '@type': 'Organization',
     url: 'https://27pm.org/',
     email: 'bonjour@27pm.org',
+    knowsAbout: expect.arrayContaining([
+      'Sites web',
+      'Applications sur mesure',
+      'Intelligence artificielle appliquée',
+      'Accessibilité web',
+    ]),
   });
 
   const robots = await request.get('/robots.txt');
@@ -214,18 +340,20 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
   expect(await sitemap.text()).toContain('<loc>https://27pm.org/confidentialite/</loc>');
 });
 
-test('keeps the page inside the mobile viewport', async ({ page, isMobile }) => {
+test('keeps all public routes inside the mobile viewport', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Mobile-only assertion');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 320, height: 844 });
 
   for (const path of ['/', '/confidentialite/', '/404.html']) {
     await page.goto(path);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
     expect(overflow, `Horizontal overflow on ${path}`).toBeLessThanOrEqual(1);
   }
 
   await page.goto('/');
-
   const menu = page.locator('[data-menu-button]');
   await menu.click();
   await expect(menu).toHaveAttribute('aria-expanded', 'true');
@@ -245,7 +373,7 @@ test('keeps the mobile menu out of the tab order when closed and traps focus whe
 
   await menu.focus();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: /Parler de votre projet/ })).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Voir 27PM en action' })).toBeFocused();
 
   await menu.click();
   await expect(navigation).not.toHaveAttribute('inert', '');
@@ -256,7 +384,7 @@ test('keeps the mobile menu out of the tab order when closed and traps focus whe
 
   await menu.focus();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: 'Expertise' })).toBeFocused();
+  await expect(navigation.getByRole('link', { name: 'Capacités' })).toBeFocused();
   await menu.focus();
   await page.keyboard.press('Shift+Tab');
   await expect(navigation.getByRole('link', { name: 'bonjour@27pm.org' })).toBeFocused();
@@ -272,67 +400,80 @@ test('keeps the mobile menu out of the tab order when closed and traps focus whe
   await expect(page.locator('footer')).not.toHaveAttribute('inert', '');
 });
 
-test('switches to the compact navigation before the desktop hero becomes crowded', async ({ page }) => {
+test('keeps primary navigation available on mobile without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 },
+  });
+  const page = await context.newPage();
+
+  await page.goto('/');
+
+  await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Capacités' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Démarrer un projet' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
+
+  await context.close();
+});
+
+test('switches to compact navigation before the desktop hero becomes crowded', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 900 });
   await page.goto('/');
 
   await expect(page.getByRole('button', { name: /Menu/ })).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
-test('keeps the alternating portfolio composition at the approved 971px reference width', async ({ page }) => {
+test('keeps the two-column case-study composition at the 971px reference width', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 971, height: 1000 });
-  await page.goto('/');
+  await page.goto('/#realisations');
 
-  const firstCard = page.locator('.work-card').first();
-  const secondCard = page.locator('.work-card').nth(1);
-  const firstCopy = await firstCard.locator('.work-copy').boundingBox();
-  const firstVisual = await firstCard.locator('.work-visual').boundingBox();
-  const secondCopy = await secondCard.locator('.work-copy').boundingBox();
-  const secondVisual = await secondCard.locator('.work-visual').boundingBox();
+  for (const card of await page.locator('.case-study').all()) {
+    const copy = await card.locator('.case-copy').boundingBox();
+    const visual = await card.locator('.case-visual').boundingBox();
+    const status = await card.locator('.case-status').boundingBox();
 
-  expect(firstCopy).not.toBeNull();
-  expect(firstVisual).not.toBeNull();
-  expect(secondCopy).not.toBeNull();
-  expect(secondVisual).not.toBeNull();
-  expect(firstCopy!.x).toBeLessThan(firstVisual!.x);
-  expect(secondVisual!.x).toBeLessThan(secondCopy!.x);
+    expect(copy).not.toBeNull();
+    expect(visual).not.toBeNull();
+    expect(status).not.toBeNull();
+    expect(copy!.x).toBeLessThan(visual!.x);
+    expect(status!.y).toBeGreaterThanOrEqual(
+      Math.max(copy!.y + copy!.height, visual!.y + visual!.height) - 1,
+    );
+  }
 });
 
-test('keeps the contact heading clear of the project choices at intermediate widths', async ({ page }) => {
-  for (const width of [987, 1100, 1101, 1374]) {
-    await page.setViewportSize({ width, height: 700 });
-    await page.goto('/#contact');
+test('switches the closing composition at the approved 900px breakpoint', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
 
-    const geometry = await page.evaluate(() => {
-      const heading = document.querySelector('.contact h2');
-      const selector = document.querySelector('.project-selector');
-      const lines = [...document.querySelectorAll('.contact h2 span')];
+  for (const [width, expectedColumns] of [[1440, 2], [901, 2], [900, 1], [390, 1]] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#studio');
 
-      if (!(heading instanceof HTMLElement) || !(selector instanceof HTMLElement) || lines.length === 0) {
-        throw new Error('Contact geometry is unavailable');
-      }
+    const result = await page.locator('.closing').evaluate((element) => ({
+      columns: getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
 
-      const headingRect = heading.getBoundingClientRect();
-      const selectorRect = selector.getBoundingClientRect();
-      const textRight = Math.max(...lines.map((line) => {
-        const range = document.createRange();
-        range.selectNodeContents(line);
-        return range.getBoundingClientRect().right;
-      }));
-
-      return {
-        horizontalOverlap: selectorRect.top < headingRect.bottom
-          ? Math.max(0, textRight - selectorRect.left)
-          : 0,
-        verticalOverlap: selectorRect.top >= headingRect.bottom
-          ? Math.max(0, headingRect.bottom - selectorRect.top)
-          : 0,
-      };
-    });
-
-    expect(geometry.horizontalOverlap, `Horizontal contact overlap at ${width}px`).toBeLessThanOrEqual(1);
-    expect(geometry.verticalOverlap, `Vertical contact overlap at ${width}px`).toBeLessThanOrEqual(1);
+    expect(result.columns, `Closing columns at ${width}px`).toBe(expectedColumns);
+    expect(result.overflow, `Horizontal overflow at ${width}px`).toBeLessThanOrEqual(1);
   }
+});
+
+test('keeps every reveal section visible in print media', async ({ page }) => {
+  await page.emulateMedia({ media: 'print', reducedMotion: 'no-preference' });
+  await page.goto('/');
+
+  const hiddenItems = await page.locator('[data-reveal]').evaluateAll((items) =>
+    items.filter((item) => {
+      const style = getComputedStyle(item);
+      return style.opacity !== '1' || style.transform !== 'none';
+    }).length,
+  );
+  expect(hiddenItems).toBe(0);
 });

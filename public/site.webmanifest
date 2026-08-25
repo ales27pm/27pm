@@ -1,7 +1,7 @@
 {
   "name": "27PM",
   "short_name": "27PM",
-  "description": "Sites web et applications sur mesure.",
+  "description": "Sites web, applications sur mesure et systèmes propulsés par l’IA.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#F4F0E7",

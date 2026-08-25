@@ -1,0 +1,247 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 20rem;
+  background: var(--ivory);
+  color: var(--ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-width: 20rem;
+  margin: 0;
+  overflow-x: clip;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 480;
+  letter-spacing: -0.045em;
+}
+
+ul,
+ol {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--blue);
+  color: var(--ivory);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.7rem 1rem;
+  background: var(--ink);
+  color: var(--ivory);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.section-shell {
+  width: min(100%, var(--shell));
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+.button {
+  --focus: var(--ink);
+  display: inline-flex;
+  min-height: 4rem;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 0.95rem 1.7rem;
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  background: var(--blue);
+  color: var(--ivory);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.1;
+  text-decoration: none;
+  transition:
+    background 180ms var(--ease),
+    color 180ms var(--ease),
+    border-color 180ms var(--ease);
+}
+
+.button svg,
+.text-arrow svg,
+.case-link svg,
+.scenario-compose svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  transition: transform 180ms var(--ease);
+}
+
+.button:hover,
+.button:focus-visible {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--ivory);
+}
+
+.button:hover svg,
+.button:focus-visible svg,
+.text-arrow:hover svg,
+.text-arrow:focus-visible svg,
+.case-link:hover svg,
+.case-link:focus-visible svg {
+  transform: translateX(0.35rem);
+}
+
+.button--small {
+  min-height: 3.5rem;
+  padding-inline: 1.45rem;
+  font-size: 0.94rem;
+}
+
+.text-arrow {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--blue);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.js.reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity 620ms var(--ease),
+    transform 620ms var(--ease);
+}
+
+.js.reveal-ready [data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .js.reveal-ready [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .site-header {
+    position: static !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .js.reveal-ready [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,6 +1,6 @@
 # 27PM.org
 
-Site vitrine de 27PM, studio montréalais de sites web et d’applications sur mesure.
+Site vitrine de 27PM, studio québécois de sites web, d’applications sur mesure et de systèmes propulsés par l’IA.
 
 ## Démarrage
 
@@ -20,7 +20,7 @@ npm run test:e2e
 npm run check:release
 ```
 
-`npm run check` exécute le lint, les tests unitaires, le contrôle TypeScript et le build de production. Les tests de navigateur utilisent Chromium géré par Playwright.
+`npm run check` exécute le lint, les tests unitaires, le contrôle TypeScript et le build de production. Les tests de navigateur utilisent Chromium géré par Playwright et couvrent aussi les états interactifs, l’accessibilité et les largeurs de 320 à 1440 px.
 
 ## Déploiement
 
@@ -39,7 +39,7 @@ Après une publication, `npm run check:public` contrôle HTTPS, les routes canon
 - `public/assets/` : actifs de marque, images optimisées et aperçus des réalisations.
 - `design/` : concepts visuels et sources de génération.
 
-Le bouton de contact ouvre le logiciel de courriel avec un sujet et un message adaptés au type de projet sélectionné. L’adresse demeure visible et peut être copiée si aucune application de courriel n’est configurée.
+Le laboratoire compose localement une piste de solution à partir de trois choix et n’envoie aucune donnée. Le brief de contact prépare ensuite un courriel à partir du type de projet et du contexte saisi. L’adresse demeure visible et peut être copiée si aucune application de courriel n’est configurée.
 
 ## Avant la mise en ligne
 

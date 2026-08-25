@@ -30,6 +30,11 @@ for (const [name, html] of [['home', home], ['privacy', privacy]]) {
 
 assert.doesNotMatch(privacy, /Selon le service d’hébergement retenu/i, 'privacy copy must identify the public host');
 assert.match(privacy, /GitHub Pages/, 'privacy copy must name the public host');
+assert.match(home, /<title>27PM \| Sites web, applications et IA sur mesure<\/title>/, 'home must publish the v5 title');
+assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
+assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
+assert.match(home, /data-contact-form/, 'home must publish the contextual contact brief');
+assert.match(home, /Aucune donnée n’est envoyée/, 'scenario builder must disclose its local-only behavior');
 
 const demoProjectTags = [...home.matchAll(/<a\b[^>]*data-demo-project[^>]*>/gi)].map((match) => match[0]);
 assert.equal(demoProjectTags.length, verifiedDemoProjects.size * 2, 'each demo requires a text link and a visual link');
@@ -41,12 +46,31 @@ for (const [project, expectedHref] of verifiedDemoProjects) {
     const href = tag.match(/\bhref="([^"]+)"/i)?.[1];
     assert.equal(href, expectedHref, `${project} must use its reviewed demo URL`);
     assert.match(tag, /\btarget="_blank"/i, `${project} demo links must open in a new tab`);
+    assert.match(tag, /\brel="[^"]*nofollow[^"]*"/i, `${project} demo links must not endorse an unofficial destination`);
     assert.match(tag, /\brel="[^"]*noopener[^"]*"/i, `${project} demo links must isolate the new tab`);
+    assert.match(tag, /\brel="[^"]*noreferrer[^"]*"/i, `${project} demo links must suppress referrer data`);
   }
 }
 
 assert.doesNotMatch(home, /\.ts\.net/i, 'build must not expose private Tailnet URLs');
-assert.match(home, /Concept 27PM · Démo non déployée/, 'demos must be clearly identified as undeployed concepts');
+for (const [marker, message] of [
+  ['Concept indépendant 27PM', 'each demo must be identified as an independent 27PM concept'],
+  ['Démo complète', 'each demo must be identified as a complete demo'],
+  ['Non officiel et non déployé', 'each demo must be identified as unofficial and undeployed'],
+]) {
+  assert.equal(home.split(marker).length - 1, verifiedDemoProjects.size, message);
+}
+assert.match(
+  home,
+  /ni présentés,\s*ni approuvés,\s*ni déployés/i,
+  'portfolio disclosure must state that the companies have not presented, approved or deployed the concepts',
+);
+
+for (const marker of ['data-scenario-form', 'data-contact-form']) {
+  const formTag = home.match(new RegExp(`<form\\b[^>]*${marker}[^>]*>`, 'i'))?.[0];
+  assert.ok(formTag, `${marker} form must exist`);
+  assert.doesNotMatch(formTag, /\baction\s*=/i, `${marker} must not submit visitor data to a remote endpoint`);
+}
 
 if (isPreview) {
   await assert.rejects(access(resolve(dist, 'CNAME')), 'preview builds must not claim the production domain');

@@ -1,0 +1,21 @@
+:root {
+  color-scheme: light;
+  --ivory: #f4f0e7;
+  --ivory-raised: #fbf8f1;
+  --ink: #171714;
+  --blue: #2846b8;
+  --blue-deep: #1d3697;
+  --muted: #5f5c55;
+  --muted-inverse: rgb(244 240 231 / 72%);
+  --line: rgb(23 23 20 / 18%);
+  --line-strong: rgb(23 23 20 / 34%);
+  --line-inverse: rgb(244 240 231 / 26%);
+  --serif: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'Instrument Sans Variable', 'Helvetica Neue', Arial, sans-serif;
+  --page-gutter: clamp(1.5rem, 4vw, 4.5rem);
+  --section-y: clamp(5rem, 6.5vw, 7.25rem);
+  --shell: 106rem;
+  --header-height: 6.5rem;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --focus: var(--blue);
+}

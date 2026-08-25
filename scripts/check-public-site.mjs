@@ -59,8 +59,13 @@ const requireOk = async (path, markers = []) => {
 };
 
 const home = await requireOk('/', [
-  '<title>27PM | Sites web et applications sur mesure</title>',
+  '<title>27PM | Sites web, applications et IA sur mesure</title>',
   '<link rel="canonical" href="https://27pm.org/"',
+  'Une idée. Plusieurs métiers.',
+  'data-scenario-form',
+  'Aucune donnée n’est envoyée',
+  'Concept indépendant 27PM',
+  'Non officiel et non déployé',
   'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
   'https://ales27pm.github.io/s-turner/',
 ]);
