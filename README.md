@@ -24,7 +24,9 @@ npm run check:pages
 
 ## Déploiement
 
-Le workflow GitHub Pages construit et publie automatiquement `dist/` depuis `main`. Il reprend le chemin de base fourni par GitHub : l’URL temporaire `ales27pm.github.io/27pm/` reste en `noindex`, puis le même build repasse à la racine et en `index, follow` lorsque le domaine `27pm.org` est configuré dans Pages.
+GitHub Pages publie le contenu validé de la branche `gh-pages`. `npm run build:pages` prépare l’URL temporaire `ales27pm.github.io/27pm/` en `noindex`; `npm run check:pages` vérifie son chemin de base, ses liens, ses manifestes et ses icônes avant publication.
+
+Lorsque `27pm.org` sera configuré dans Pages, fournir `PAGES_BASE_PATH=""` et `PAGES_HOST="27pm.org"` au build repassera automatiquement à la racine et en `index, follow`.
 
 ## Structure
 
