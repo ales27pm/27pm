@@ -1,0 +1,17 @@
+{
+  "name": "27PM",
+  "short_name": "27PM",
+  "description": "Sites web et applications sur mesure.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff4d00",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
