@@ -16,9 +16,15 @@ npm run dev
 ```bash
 npm run check
 npm run test:e2e
+npm run build:pages
+npm run check:pages
 ```
 
 `npm run check` exécute le lint, les tests unitaires, le contrôle TypeScript et le build de production. Les tests de navigateur utilisent le canal Chrome installé sur la machine.
+
+## Déploiement
+
+Le workflow GitHub Pages construit et publie automatiquement `dist/` depuis `main`. Il reprend le chemin de base fourni par GitHub : l’URL temporaire `ales27pm.github.io/27pm/` reste en `noindex`, puis le même build repasse à la racine et en `index, follow` lorsque le domaine `27pm.org` est configuré dans Pages.
 
 ## Structure
 

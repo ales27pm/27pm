@@ -9,10 +9,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:pages": "tsc --noEmit && vite build --mode github-pages",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "test:e2e": "npm run build && playwright test",
+    "check:pages": "node scripts/check-pages-build.mjs",
     "check": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {

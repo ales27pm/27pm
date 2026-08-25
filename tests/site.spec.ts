@@ -125,6 +125,7 @@ test('publishes a reachable privacy page', async ({ page }) => {
   await expect(page).toHaveTitle('Confidentialité | 27PM');
   await expect(page.getByRole('heading', { level: 1, name: 'Politique de confidentialité' })).toBeVisible();
   await expect(page.getByText('Responsable de la protection des renseignements personnels', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Retour au site' })).toHaveAttribute('href', '/');
 });
 
 test('provides a branded, non-indexable 404 document', async ({ page }) => {
@@ -133,6 +134,7 @@ test('provides a branded, non-indexable 404 document', async ({ page }) => {
   await expect(page).toHaveTitle('Page introuvable | 27PM');
   await expect(page.getByRole('heading', { level: 1, name: 'Cette page est hors cadre.' })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  await expect(page.getByRole('link', { name: 'Retourner à l’accueil' })).toHaveAttribute('href', '/');
 });
 
 test('publishes coherent production metadata and crawler files', async ({ page, request }) => {
@@ -141,6 +143,7 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://27pm.org/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://27pm.org/assets/og-27pm-1200x630.png');
+  await expect(page.getByRole('link', { name: 'Confidentialité' })).toHaveAttribute('href', '/confidentialite/');
 
   const organization = await page.locator('script[type="application/ld+json"]').textContent();
   expect(organization).not.toBeNull();

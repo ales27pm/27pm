@@ -15,7 +15,7 @@ export default [
     },
   },
   {
-    files: ['tests/**/*.ts', '*.config.ts'],
+    files: ['tests/**/*.ts', 'scripts/**/*.mjs', '*.config.ts'],
     languageOptions: {
       globals: globals.node,
     },

@@ -518,31 +518,31 @@ private func encodeWebP(input: URL, output: URL) throws {
     }
 }
 
-private func writeManifest(to url: URL) throws {
+private func writeManifest(to url: URL, startURL: String, iconPrefix: String) throws {
     let manifest = """
     {
       "name": "27PM",
       "short_name": "27PM",
       "description": "Sites web et applications sur mesure.",
-      "start_url": "/",
+      "start_url": "\(startURL)",
       "display": "standalone",
       "background_color": "#F4F0E7",
       "theme_color": "#2846B8",
       "icons": [
         {
-          "src": "/assets/brand-v4/icon-192.png",
+          "src": "\(iconPrefix)icon-192.png",
           "sizes": "192x192",
           "type": "image/png",
           "purpose": "any"
         },
         {
-          "src": "/assets/brand-v4/icon-512.png",
+          "src": "\(iconPrefix)icon-512.png",
           "sizes": "512x512",
           "type": "image/png",
           "purpose": "any"
         },
         {
-          "src": "/assets/brand-v4/icon-maskable-512.png",
+          "src": "\(iconPrefix)icon-maskable-512.png",
           "sizes": "512x512",
           "type": "image/png",
           "purpose": "maskable"
@@ -621,7 +621,7 @@ private func exportAssets() throws {
         opaque: true
     )
     let manifestURL = publicDirectory.appendingPathComponent("site.webmanifest")
-    try writeManifest(to: manifestURL)
+    try writeManifest(to: manifestURL, startURL: "../../", iconPrefix: "")
 
     let socialURL = publicDirectory.appendingPathComponent("social-27pm-square-1254.png")
     try writePNG(try socialSquare(mark: master), to: socialURL, opaque: true)
@@ -672,16 +672,22 @@ private func exportAssets() throws {
             root.appendingPathComponent("public/assets/og-27pm-1200x630.png"),
             legacyDirectory.appendingPathComponent("og-27pm-1200x630.png")
         ),
-        (
-            manifestURL,
-            root.appendingPathComponent("public/site.webmanifest"),
-            legacyDirectory.appendingPathComponent("site.webmanifest")
-        ),
     ]
     for cutover in cutovers {
         try archiveIfNeeded(source: cutover.canonical, destination: cutover.legacy)
         try atomicCopy(from: cutover.versioned, to: cutover.canonical)
     }
+
+    let rootManifestURL = root.appendingPathComponent("public/site.webmanifest")
+    try archiveIfNeeded(
+        source: rootManifestURL,
+        destination: legacyDirectory.appendingPathComponent("site.webmanifest")
+    )
+    try writeManifest(
+        to: rootManifestURL,
+        startURL: ".",
+        iconPrefix: "assets/brand-v4/"
+    )
 
     print("Exported 27PM v4 assets from \(sourceURL.path)")
 }
