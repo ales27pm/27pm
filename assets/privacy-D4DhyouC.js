@@ -1,1 +1,0 @@
-import"./styles-Bi1tpMvW.js";document.documentElement.classList.add(`js`),document.querySelectorAll(`[data-year]`).forEach(e=>{e.textContent=String(new Date().getFullYear())});
