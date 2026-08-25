@@ -1,4 +1,4 @@
-export const projectKinds = ['site', 'application', 'produit'] as const;
+const projectKinds = ['site', 'application', 'produit'] as const;
 
 export type ProjectKind = (typeof projectKinds)[number];
 
@@ -27,4 +27,18 @@ export function buildProjectMailto(project: ProjectKind): string {
   ].join('\n');
 
   return `mailto:bonjour@27pm.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export async function copyEmailAddress(
+  email: string,
+  writeText: ((value: string) => Promise<void>) | undefined,
+): Promise<boolean> {
+  if (!email || !writeText) return false;
+
+  try {
+    await writeText(email);
+    return true;
+  } catch {
+    return false;
+  }
 }

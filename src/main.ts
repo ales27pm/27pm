@@ -1,7 +1,7 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader';
 import './styles.css';
-import { buildProjectMailto, isProjectKind, type ProjectKind } from './contact';
+import { buildProjectMailto, copyEmailAddress, isProjectKind, type ProjectKind } from './contact';
 
 document.documentElement.classList.add('js');
 
@@ -110,6 +110,26 @@ document.querySelectorAll<HTMLElement>('[data-select-project]').forEach((trigger
 });
 
 selectProject('site');
+
+const contactEmail = document.querySelector<HTMLAnchorElement>('[data-contact-email]');
+const copyEmailButton = document.querySelector<HTMLButtonElement>('[data-copy-email]');
+const copyEmailStatus = document.querySelector<HTMLElement>('[data-copy-email-status]');
+
+if (contactEmail && copyEmailButton && copyEmailStatus) {
+  const emailLink = contactEmail;
+  const statusMessage = copyEmailStatus;
+
+  copyEmailButton.addEventListener('click', async () => {
+    const email = (emailLink.textContent ?? '').trim();
+    const writeText = navigator.clipboard?.writeText.bind(navigator.clipboard);
+    const copied = await copyEmailAddress(email, writeText);
+
+    statusMessage.textContent = copied
+      ? 'Adresse copiée.'
+      : 'Copie impossible. Sélectionnez l’adresse affichée.';
+    if (!copied) emailLink.focus();
+  });
+}
 
 const sectionLinks = [...document.querySelectorAll<HTMLAnchorElement>('.site-nav > a[href^="#"]:not(.button)')];
 const observedSections = sectionLinks

@@ -15,18 +15,20 @@ npm run dev
 
 ```bash
 npm run check
+npx playwright install chromium
 npm run test:e2e
-npm run build:pages
-npm run check:pages
+npm run check:release
 ```
 
-`npm run check` exécute le lint, les tests unitaires, le contrôle TypeScript et le build de production. Les tests de navigateur utilisent le canal Chrome installé sur la machine.
+`npm run check` exécute le lint, les tests unitaires, le contrôle TypeScript et le build de production. Les tests de navigateur utilisent Chromium géré par Playwright.
 
 ## Déploiement
 
-GitHub Pages publie le contenu validé de la branche `gh-pages`. `npm run build:pages` prépare l’URL temporaire `ales27pm.github.io/27pm/` en `noindex`; `npm run check:pages` vérifie son chemin de base, ses liens, ses manifestes et ses icônes avant publication.
+GitHub Pages publie le contenu validé de la branche `gh-pages`. `npm run check:release` produit par défaut le site `https://27pm.org/`, génère `CNAME` et `.nojekyll`, puis vérifie le chemin de base, les liens publics, les manifestes et les icônes avant publication.
 
-Lorsque `27pm.org` sera configuré dans Pages, fournir `PAGES_BASE_PATH=""` et `PAGES_HOST="27pm.org"` au build repassera automatiquement à la racine et en `index, follow`.
+Pour inspecter une variante locale correspondant à `ales27pm.github.io/27pm/`, utiliser `npm run build:pages:preview && npm run check:pages:preview`. Cette variante est en `noindex` et n’émet pas de `CNAME`; elle ne doit pas remplacer la branche de production.
+
+Après une publication, `npm run check:public` contrôle HTTPS, les routes canoniques, la redirection `www` et les destinations de portfolio marquées comme publiques. Ce contrôle réseau reste séparé de `npm run check` afin que la validation locale demeure déterministe.
 
 ## Structure
 
@@ -37,11 +39,11 @@ Lorsque `27pm.org` sera configuré dans Pages, fournir `PAGES_BASE_PATH=""` et `
 - `public/assets/` : actifs de marque, images optimisées et aperçus des réalisations.
 - `design/` : concepts visuels et sources de génération.
 
-Le bouton de contact ouvre le logiciel de courriel avec un sujet et un message adaptés au type de projet sélectionné.
+Le bouton de contact ouvre le logiciel de courriel avec un sujet et un message adaptés au type de projet sélectionné. L’adresse demeure visible et peut être copiée si aucune application de courriel n’est configurée.
 
 ## Avant la mise en ligne
 
+- Dans les réglages Pages, confirmer la branche `gh-pages`, le domaine `27pm.org`, le certificat puis activer **Enforce HTTPS**. Les enregistrements DNS doivent suivre la [configuration officielle de GitHub Pages](https://docs.github.com/fr/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
 - Configurer l’hébergeur pour servir `404.html` avec un véritable statut HTTP `404`.
-- Réserver `index, follow` à la production et envoyer `X-Robots-Tag: noindex, nofollow` sur les previews.
-- Rediriger `www.27pm.org` vers `https://27pm.org/` en `301`, puis vérifier `robots.txt`, `sitemap.xml`, l’image Open Graph et les URL canoniques.
-- Remplacer les mentions provisoires de la politique de confidentialité par les fournisseurs, territoires et durées de conservation réellement retenus.
+- Rediriger `www.27pm.org` vers `https://27pm.org/` de façon permanente, puis exécuter `npm run check:public`.
+- Faire confirmer par la direction les territoires de traitement, les durées de conservation, le fournisseur de courriel, l’identité légale de l’entreprise et la personne responsable avant de présenter la politique comme une attestation juridique complète.

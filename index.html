@@ -126,14 +126,14 @@
                   <li>Soumission sur mesure</li>
                   <li>SEO</li>
                 </ul>
-                <a class="work-link" href="https://ales27pm-system-product-name.tail7ee921.ts.net/" target="_blank" rel="noopener noreferrer">
-                  <span>Voir la réalisation</span>
+                <a class="work-link" href="#contact" data-select-project="site">
+                  <span>Parler d’un projet semblable</span>
                   <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M1 12h43M34 2l10 10-10 10" /></svg>
                 </a>
               </div>
-              <a class="work-visual" href="https://ales27pm-system-product-name.tail7ee921.ts.net/" target="_blank" rel="noopener noreferrer" aria-label="Voir Portes et Fenêtres Boulet dans un nouvel onglet">
+              <div class="work-visual">
                 <img src="/assets/projects/portes-fenetres-boulet.webp" width="1440" height="900" alt="Page d’accueil de Portes et Fenêtres Boulet, avec une maison contemporaine et le message Pensées ici, fabriquées ici, installées pour durer" loading="lazy" decoding="async" fetchpriority="low" />
-              </a>
+              </div>
             </article>
 
             <article class="work-card">
@@ -147,12 +147,12 @@
                   <li>Comparaison</li>
                   <li>Budget de projet</li>
                 </ul>
-                <a class="work-link" href="https://alexiss-imac.tail7ee921.ts.net/" target="_blank" rel="noopener noreferrer">
-                  <span>Voir la réalisation</span>
+                <a class="work-link" href="https://maisonsturner.ca/" target="_blank" rel="noopener noreferrer" data-public-project>
+                  <span>Visiter le site public · nouvel onglet</span>
                   <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M1 12h43M34 2l10 10-10 10" /></svg>
                 </a>
               </div>
-              <a class="work-visual" href="https://alexiss-imac.tail7ee921.ts.net/" target="_blank" rel="noopener noreferrer" aria-label="Voir Maisons S. Turner dans un nouvel onglet">
+              <a class="work-visual" href="https://maisonsturner.ca/" target="_blank" rel="noopener noreferrer" data-public-project aria-label="Visiter Maisons S. Turner dans un nouvel onglet">
                 <img src="/assets/projects/maisons-s-turner.webp" width="1440" height="900" alt="Page d’accueil de Maisons S. Turner, avec une maison usinée contemporaine et un outil pour trouver son modèle" loading="lazy" decoding="async" fetchpriority="low" />
               </a>
             </article>
@@ -217,7 +217,7 @@
 
           <div class="project-selector">
             <fieldset>
-              <legend id="project-legend" class="sr-only">Quel type de projet souhaitez-vous réaliser?</legend>
+              <legend id="project-legend" class="project-legend">Quel type de projet souhaitez-vous réaliser?</legend>
               <label class="project-option" data-project-option="site">
                 <input type="radio" name="project" value="site" data-label="Un site web" checked />
                 <span class="radio-mark" aria-hidden="true"></span>
@@ -234,7 +234,14 @@
                 <span>Un produit à clarifier</span>
               </label>
             </fieldset>
-            <a class="button project-mail" href="mailto:bonjour@27pm.org" data-project-mail>Écrire à 27PM</a>
+            <p class="project-mail-note" id="project-mail-note">Le bouton ouvre votre application de courriel avec un message préparé.</p>
+            <a class="button project-mail" href="mailto:bonjour@27pm.org" data-project-mail aria-describedby="project-mail-note">Ouvrir mon courriel</a>
+            <div class="contact-fallback">
+              <span>Ou écrivez directement à</span>
+              <a href="mailto:bonjour@27pm.org" data-contact-email>bonjour@27pm.org</a>
+              <button type="button" class="copy-email" data-copy-email>Copier l’adresse</button>
+            </div>
+            <p class="copy-email-status" role="status" aria-live="polite" data-copy-email-status></p>
             <p class="sr-only" role="status" aria-live="polite" data-project-status></p>
           </div>
         </div>

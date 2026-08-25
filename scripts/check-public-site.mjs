@@ -1,0 +1,104 @@
+import assert from 'node:assert/strict';
+
+const origin = new URL(process.env.PUBLIC_SITE_ORIGIN ?? 'https://27pm.org');
+const timeoutMs = Number(process.env.PUBLIC_SITE_TIMEOUT_MS ?? 12_000);
+const verifiedPublicProjects = new Map([
+  ['maisonsturner.ca', {
+    allowedHosts: new Set(['maisonsturner.ca', 'www.maisonsturner.ca']),
+    marker: 'Maisons S. Turner',
+  }],
+]);
+
+assert.equal(origin.protocol, 'https:', 'PUBLIC_SITE_ORIGIN must use HTTPS');
+
+const describeError = (error) => {
+  if (!(error instanceof Error)) return String(error);
+  const cause = error.cause instanceof Error ? ` (${error.cause.message})` : '';
+  return `${error.message}${cause}`;
+};
+
+const get = async (url, options = {}) => {
+  try {
+    return await fetch(url, {
+      redirect: 'follow',
+      ...options,
+      headers: {
+        accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
+        'user-agent': '27PM-public-site-check/1.0',
+        ...options.headers,
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    throw new Error(`${url}: ${describeError(error)}`, { cause: error });
+  }
+};
+
+const requireOk = async (path, markers = []) => {
+  const url = new URL(path, origin);
+  const response = await get(url);
+  const body = await response.text();
+  const responseSummary = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
+  assert.ok(response.ok, `${url}: expected 2xx, received ${response.status}${responseSummary ? ` — ${responseSummary}` : ''}`);
+  const finalUrl = new URL(response.url);
+  assert.equal(finalUrl.protocol, 'https:', `${url}: final URL must use HTTPS`);
+  assert.equal(finalUrl.origin, origin.origin, `${url}: final URL must stay on the canonical origin`);
+  assert.equal(finalUrl.pathname, url.pathname, `${url}: final URL must preserve the canonical path`);
+
+  for (const marker of markers) {
+    assert.ok(body.includes(marker), `${url}: missing expected marker ${JSON.stringify(marker)}`);
+  }
+  return body;
+};
+
+const home = await requireOk('/', [
+  '<title>27PM | Sites web et applications sur mesure</title>',
+  '<link rel="canonical" href="https://27pm.org/"',
+  'https://maisonsturner.ca/',
+]);
+assert.doesNotMatch(home, /\.ts\.net/i, 'deployed home must not expose private Tailnet URLs');
+
+await requireOk('/confidentialite/', [
+  'Politique de confidentialité',
+  '<link rel="canonical" href="https://27pm.org/confidentialite/"',
+  'GitHub Pages',
+]);
+await requireOk('/robots.txt', ['Sitemap: https://27pm.org/sitemap.xml']);
+await requireOk('/sitemap.xml', ['https://27pm.org/confidentialite/']);
+
+const missingUrl = new URL('/__27pm-public-check-missing__', origin);
+const missingResponse = await get(missingUrl);
+const missingBody = await missingResponse.text();
+assert.equal(missingResponse.status, 404, `${missingUrl}: missing routes must return HTTP 404`);
+assert.ok(missingBody.includes('Cette page est hors cadre.'), `${missingUrl}: missing routes must use the branded 404 document`);
+
+if (origin.hostname === '27pm.org') {
+  const wwwUrl = 'https://www.27pm.org/';
+  const response = await get(wwwUrl, { redirect: 'manual' });
+  assert.ok([301, 308].includes(response.status), `${wwwUrl}: expected a permanent redirect, received ${response.status}`);
+  assert.equal(new URL(response.headers.get('location') ?? '', wwwUrl).href, 'https://27pm.org/', `${wwwUrl}: redirect must target the canonical root`);
+}
+
+const projectLinks = [...home.matchAll(/<a\b[^>]*data-public-project[^>]*>/gi)]
+  .map((match) => match[0].match(/\bhref="([^"]+)"/i)?.[1])
+  .filter((href) => href !== undefined);
+const uniqueProjectLinks = [...new Set(projectLinks)];
+assert.ok(uniqueProjectLinks.length > 0, 'deployed home must expose at least one verified public project link');
+
+for (const href of uniqueProjectLinks) {
+  const url = new URL(href);
+  assert.equal(url.protocol, 'https:', `${href}: public project links must use HTTPS`);
+  assert.doesNotMatch(url.hostname, /\.ts\.net$/i, `${href}: private Tailnet destinations are forbidden`);
+  const verifiedProject = verifiedPublicProjects.get(url.hostname);
+  assert.ok(verifiedProject, `${href}: public project host is not in the verified allowlist`);
+
+  const response = await get(url);
+  assert.ok(response.ok, `${href}: expected 2xx, received ${response.status}`);
+  const finalUrl = new URL(response.url);
+  assert.equal(finalUrl.protocol, 'https:', `${href}: final project URL must use HTTPS`);
+  assert.doesNotMatch(finalUrl.hostname, /\.ts\.net$/i, `${href}: final project URL must not enter a private Tailnet`);
+  assert.ok(verifiedProject.allowedHosts.has(finalUrl.hostname), `${href}: final project host ${finalUrl.hostname} is not verified`);
+  assert.ok((await response.text()).includes(verifiedProject.marker), `${href}: final page does not identify the verified project`);
+}
+
+console.log(`Public site contract passed for ${origin.href}`);

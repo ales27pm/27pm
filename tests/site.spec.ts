@@ -15,20 +15,20 @@ test('renders the complete French landing page', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'On commence par une conversation.' })).toBeVisible();
 });
 
-test('publishes both portfolio projects with real previews and safe external links', async ({ page }) => {
+test('publishes real previews without exposing private portfolio links', async ({ page }) => {
   await page.goto('/');
 
-  const projectLinks = [
-    ['Voir Portes et Fenêtres Boulet dans un nouvel onglet', 'https://ales27pm-system-product-name.tail7ee921.ts.net/'],
-    ['Voir Maisons S. Turner dans un nouvel onglet', 'https://alexiss-imac.tail7ee921.ts.net/'],
-  ] as const;
+  await expect(page.locator('a[href*=".ts.net"]')).toHaveCount(0);
 
-  for (const [name, href] of projectLinks) {
-    const link = page.getByRole('link', { name });
-    await expect(link).toHaveAttribute('href', href);
+  const turnerLinks = page.locator('a[data-public-project][href="https://maisonsturner.ca/"]');
+  await expect(turnerLinks).toHaveCount(2);
+  for (const link of await turnerLinks.all()) {
     await expect(link).toHaveAttribute('target', '_blank');
     await expect(link).toHaveAttribute('rel', /noopener/);
   }
+
+  await expect(page.getByRole('link', { name: 'Visiter le site public · nouvel onglet' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Parler d’un projet semblable' })).toHaveAttribute('href', '#contact');
 
   const previews = page.locator('.work-visual img');
   await expect(previews).toHaveCount(2);
@@ -45,7 +45,7 @@ test('updates the contact action from the selected project', async ({ page }) =>
   await page.goto('/');
   await page.getByLabel('Une application').check();
 
-  const mailLink = page.getByRole('link', { name: /Écrire à 27PM/ });
+  const mailLink = page.getByRole('link', { name: /Ouvrir mon courriel/ });
   await expect(mailLink).toHaveAttribute('href', /Une%20application/);
 
   await page.locator('[data-select-project="produit"]').click();
@@ -63,7 +63,42 @@ test('supports keyboard selection and announces the chosen project', async ({ pa
   await page.keyboard.press('ArrowDown');
   await expect(applicationOption).toBeChecked();
   await expect(status).toHaveText('Choix sélectionné : Une application.');
-  await expect(page.getByRole('link', { name: 'Écrire à 27PM' })).toHaveAttribute('href', /Une%20application/);
+  await expect(page.getByRole('link', { name: 'Ouvrir mon courriel' })).toHaveAttribute('href', /Une%20application/);
+});
+
+test('explains the email handoff and copies the visible fallback address', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => window.localStorage.setItem('copied-email', value),
+      },
+    });
+  });
+  await page.goto('/');
+
+  await expect(page.getByText('Quel type de projet souhaitez-vous réaliser?')).toBeVisible();
+  await expect(page.getByText('Le bouton ouvre votre application de courriel avec un message préparé.')).toBeVisible();
+  await expect(page.locator('[data-contact-email]')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Copier l’adresse' }).click();
+  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('copied-email'))).toBe('bonjour@27pm.org');
+  await expect(page.locator('[data-copy-email-status]')).toHaveText('Adresse copiée.');
+});
+
+test('keeps the address usable when clipboard access fails', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async () => Promise.reject(new Error('denied')) },
+    });
+  });
+  await page.goto('/');
+
+  const fallback = page.locator('[data-contact-email]');
+  await page.getByRole('button', { name: 'Copier l’adresse' }).click();
+  await expect(page.locator('[data-copy-email-status]')).toHaveText('Copie impossible. Sélectionnez l’adresse affichée.');
+  await expect(fallback).toBeFocused();
 });
 
 test('has no automatically detectable accessibility violations on public pages', async ({ page }) => {
@@ -125,6 +160,8 @@ test('publishes a reachable privacy page', async ({ page }) => {
   await expect(page).toHaveTitle('Confidentialité | 27PM');
   await expect(page.getByRole('heading', { level: 1, name: 'Politique de confidentialité' })).toBeVisible();
   await expect(page.getByText('Responsable de la protection des renseignements personnels', { exact: true })).toBeVisible();
+  await expect(page.getByText('GitHub Pages', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Selon le service d’hébergement retenu/)).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Retour au site' })).toHaveAttribute('href', '/');
 });
 

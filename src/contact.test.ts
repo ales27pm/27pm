@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildProjectMailto, isProjectKind } from './contact';
+import { buildProjectMailto, copyEmailAddress, isProjectKind } from './contact';
 
 describe('project contact link', () => {
   it('encodes the selected project in the subject and body', () => {
@@ -14,5 +14,20 @@ describe('project contact link', () => {
     expect(isProjectKind('site')).toBe(true);
     expect(isProjectKind('application')).toBe(true);
     expect(isProjectKind('autre')).toBe(false);
+  });
+
+  it('copies the visible address through the provided clipboard seam', async () => {
+    let copied = '';
+
+    await expect(copyEmailAddress('bonjour@27pm.org', async (value) => {
+      copied = value;
+    })).resolves.toBe(true);
+    expect(copied).toBe('bonjour@27pm.org');
+  });
+
+  it('reports unavailable or rejected clipboard access without throwing', async () => {
+    await expect(copyEmailAddress('', async () => undefined)).resolves.toBe(false);
+    await expect(copyEmailAddress('bonjour@27pm.org', undefined)).resolves.toBe(false);
+    await expect(copyEmailAddress('bonjour@27pm.org', async () => Promise.reject(new Error('denied')))).resolves.toBe(false);
   });
 });

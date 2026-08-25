@@ -8,19 +8,46 @@ const pagesPreviewPlugin = (): Plugin => ({
   },
 });
 
+const pagesDomainPlugin = (): Plugin => ({
+  name: '27pm-pages-domain',
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'CNAME', source: '27pm.org\n' });
+    this.emitFile({ type: 'asset', fileName: '.nojekyll', source: '' });
+  },
+});
+
 const normalizeBasePath = (basePath: string) => {
   const path = basePath.replace(/^\/+|\/+$/g, '');
   return path ? `/${path}/` : '/';
 };
 
+const productionPagesConfig = () => {
+  const base = normalizeBasePath(process.env.PAGES_BASE_PATH ?? '/');
+  if (base !== '/') {
+    throw new Error('GitHub Pages production builds for 27pm.org must use PAGES_BASE_PATH=/');
+  }
+
+  return { base, plugins: [pagesDomainPlugin()] };
+};
+
+const previewPagesConfig = () => ({
+  base: normalizeBasePath(process.env.PAGES_BASE_PATH ?? '/27pm'),
+  plugins: [pagesPreviewPlugin()],
+});
+
+const resolvePagesConfig = (mode: string) => {
+  if (mode !== 'github-pages') return { base: '/', plugins: [] };
+  return (process.env.PAGES_HOST ?? '27pm.org') === '27pm.org'
+    ? productionPagesConfig()
+    : previewPagesConfig();
+};
+
 export default defineConfig(({ mode }) => {
-  const isPagesBuild = mode === 'github-pages';
-  const pagesBasePath = normalizeBasePath(process.env.PAGES_BASE_PATH ?? '/27pm');
-  const isPagesPreview = isPagesBuild && (process.env.PAGES_HOST ?? 'ales27pm.github.io') !== '27pm.org';
+  const pages = resolvePagesConfig(mode);
 
   return {
-    base: isPagesBuild ? pagesBasePath : '/',
-    plugins: isPagesPreview ? [pagesPreviewPlugin()] : [],
+    base: pages.base,
+    plugins: pages.plugins,
     build: {
       rollupOptions: {
         input: {
