@@ -14,6 +14,7 @@ describe('project contact link', () => {
   it('includes the optional brief without keeping surrounding whitespace', () => {
     const link = buildProjectMailto('automation', {
       context: '  Automatiser la qualification des demandes.  ',
+      organization: '  Atelier Exemple  ',
       name: '  Alexis  ',
       replyEmail: '  alexis@example.test  ',
     });
@@ -21,6 +22,7 @@ describe('project contact link', () => {
 
     expect(decoded).toContain('[Projet 27PM] Une automatisation ou un outil d’IA');
     expect(decoded).toContain('Automatiser la qualification des demandes.');
+    expect(decoded).toContain('Organisation : Atelier Exemple');
     expect(decoded).toContain('Nom : Alexis');
     expect(decoded).toContain('Courriel de retour : alexis@example.test');
     expect(decoded).not.toContain('  Alexis  ');

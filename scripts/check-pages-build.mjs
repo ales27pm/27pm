@@ -24,6 +24,11 @@ const [home, privacy, notFound, manifestText, nestedManifestText] = await Promis
   read('site.webmanifest'),
   read('assets/brand-v4/site.webmanifest'),
 ]);
+const [crmSource, clientSource] = await Promise.all([
+  readFile(resolve(process.cwd(), 'src/crm-intake.ts'), 'utf8'),
+  readFile(resolve(process.cwd(), 'src/main.ts'), 'utf8'),
+]);
+const crmClientSource = `${crmSource}\n${clientSource}`;
 
 for (const [name, html] of [['home', home], ['privacy', privacy]]) {
   const robots = isPreview ? 'noindex, nofollow' : 'index, follow';
@@ -33,11 +38,20 @@ for (const [name, html] of [['home', home], ['privacy', privacy]]) {
 assert.doesNotMatch(privacy, /Selon le service d’hébergement retenu/i, 'privacy copy must identify the public host');
 assert.match(privacy, /Vercel/, 'privacy copy must name the public host');
 assert.doesNotMatch(privacy, /GitHub Pages/, 'privacy copy must not name the former public host');
+assert.match(privacy, /Cloudflare Turnstile/, 'privacy copy must disclose the anti-bot provider');
+assert.match(privacy, /file d’examen/, 'privacy copy must describe CRM review queueing');
 assert.match(home, /<title>27PM \| Sites web, applications et IA sur mesure<\/title>/, 'home must publish the v5 title');
 assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
 assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
 assert.match(home, /data-contact-form/, 'home must publish the contextual contact brief');
 assert.match(home, /Les choix saisis.+ne sont pas transmis à 27PM/, 'scenario builder must disclose its local-only behavior');
+assert.match(home, /data-crm-intake/, 'home must publish the progressively enhanced CRM controls');
+assert.match(home, /data-crm-unavailable/, 'home must preserve the no-configuration fallback');
+assert.match(home, /name="website"/, 'home must publish the empty honeypot field');
+assert.match(home, /data-crm-submit[^>]*>/, 'home must publish the guarded CRM submit control');
+assert.match(crmClientSource, /https:\/\/crm\.27pm\.org\/api\/public\/intake/, 'client must target the public CRM intake endpoint');
+assert.match(crmClientSource, /crm_intake/, 'client must request the expected Turnstile action');
+assert.match(crmClientSource, /Idempotency-Key/, 'client must send an idempotency key');
 
 for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
   assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
