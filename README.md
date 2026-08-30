@@ -43,13 +43,13 @@ Le laboratoire compose localement une piste de solution à partir de trois choix
 
 ### Configuration du formulaire CRM
 
-La seule variable cliente requise est une clé **publique** de site Turnstile :
+La seule variable cliente requise est une clé **publique** de site Turnstile. Le build `github-pages` la charge de façon déterministe depuis `.env.github-pages`; le build preview la neutralise explicitement afin de conserver le fallback hors de `27pm.org`.
 
 ```bash
-VITE_TURNSTILE_SITE_KEY="<site-key-publique-pour-27pm.org>" npm run build:pages
+npm run check:release
 ```
 
-Ne jamais placer la clé secrète Turnstile dans Vite, le dépôt ou le navigateur. Le widget doit autoriser l’hôte `27pm.org` et le backend doit valider l’action `crm_intake`. Une réponse HTTP `202` indique seulement la mise en file d’examen. Si la variable manque, si Turnstile ne charge pas ou si le CRM refuse la demande, le site conserve le fallback `mailto:`.
+Ne jamais placer une clé secrète Turnstile dans Vite, le dépôt ou le navigateur. Le widget doit autoriser l’hôte `27pm.org` et le backend doit valider l’action `crm_intake`. Une réponse HTTP `202` indique seulement la mise en file d’examen. Si la variable manque, si Turnstile ne charge pas ou si le CRM refuse la demande, le site conserve le fallback `mailto:`.
 
 ## Avant la mise en ligne
 

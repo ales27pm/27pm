@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const dist = resolve(process.cwd(), 'dist');
@@ -8,6 +8,7 @@ const pagesHost = process.env.PAGES_HOST ?? '27pm.org';
 const isPreview = pagesHost !== '27pm.org';
 const normalizedPath = (process.env.PAGES_BASE_PATH ?? (isPreview ? '/27pm' : '/')).replace(/^\/+|\/+$/g, '');
 const base = normalizedPath ? `/${normalizedPath}/` : '/';
+const publicTurnstileSiteKey = '0x4AAAAAAEhozc0Mxhb3yUyb';
 const verifiedDemoProjects = new Map([
   ['boulet', 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/'],
   ['turner', 'https://ales27pm.github.io/s-turner/'],
@@ -27,6 +28,13 @@ const [crmSource, clientSource] = await Promise.all([
   readFile(resolve(process.cwd(), 'src/main.ts'), 'utf8'),
 ]);
 const crmClientSource = `${crmSource}\n${clientSource}`;
+const clientCode = (
+  await Promise.all(
+    (await readdir(resolve(dist, 'assets')))
+      .filter((name) => name.endsWith('.js'))
+      .map((name) => read(`assets/${name}`)),
+  )
+).join('\n');
 
 for (const [name, html] of [['home', home], ['privacy', privacy]]) {
   const robots = isPreview ? 'noindex, nofollow' : 'index, follow';
@@ -87,8 +95,18 @@ for (const marker of ['data-scenario-form', 'data-contact-form']) {
 }
 
 if (isPreview) {
+  assert.doesNotMatch(
+    clientCode,
+    new RegExp(publicTurnstileSiteKey),
+    'preview builds must keep the production Turnstile sitekey disabled',
+  );
   await assert.rejects(access(resolve(dist, 'CNAME')), 'preview builds must not claim the production domain');
 } else {
+  assert.match(
+    clientCode,
+    new RegExp(publicTurnstileSiteKey),
+    'production builds must include the configured public Turnstile sitekey',
+  );
   assert.equal(await read('CNAME'), '27pm.org\n', 'production Pages builds must preserve the custom domain');
   assert.equal(await read('.nojekyll'), '', 'production Pages builds must disable Jekyll processing');
 }
