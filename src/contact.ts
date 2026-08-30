@@ -11,6 +11,7 @@ const projectLabels: Record<ProjectKind, string> = {
 
 export interface ProjectBrief {
   context?: string;
+  organization?: string;
   name?: string;
   replyEmail?: string;
 }
@@ -26,6 +27,7 @@ export function buildProjectMailto(project: ProjectKind, brief: ProjectBrief = {
   const label = projectLabels[project];
   const subject = `[Projet 27PM] ${label}`;
   const context = clean(brief.context, 5_000);
+  const organization = clean(brief.organization, 200);
   const name = clean(brief.name, 120);
   const replyEmail = clean(brief.replyEmail, 320);
   const body = [
@@ -35,6 +37,7 @@ export function buildProjectMailto(project: ProjectKind, brief: ProjectBrief = {
     '',
     'Voici un peu de contexte :',
     context || '[À compléter]',
+    ...(organization ? ['', `Organisation : ${organization}`] : []),
     ...(name ? ['', `Nom : ${name}`] : []),
     ...(replyEmail ? [`Courriel de retour : ${replyEmail}`] : []),
     '',

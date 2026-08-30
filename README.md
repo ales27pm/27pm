@@ -39,7 +39,17 @@ Après une publication, `npm run check:public` contrôle HTTPS, les routes canon
 - `public/assets/` : actifs de marque, images optimisées et aperçus des réalisations.
 - `design/` : concepts visuels et sources de génération.
 
-Le laboratoire compose localement une piste de solution à partir de trois choix et n’envoie aucune donnée. Le brief de contact prépare ensuite un courriel à partir du type de projet et du contexte saisi. L’adresse demeure visible et peut être copiée si aucune application de courriel n’est configurée.
+Le laboratoire compose localement une piste de solution à partir de trois choix et n’envoie aucune donnée. Le formulaire de contact peut transmettre une demande au CRM public lorsqu’une clé de site Cloudflare Turnstile est fournie au build. Sans cette configuration, l’envoi direct reste désactivé. Le courriel préparé, l’adresse visible et la copie de l’adresse demeurent disponibles dans tous les cas.
+
+### Configuration du formulaire CRM
+
+La seule variable cliente requise est une clé **publique** de site Turnstile :
+
+```bash
+VITE_TURNSTILE_SITE_KEY="<site-key-publique-pour-27pm.org>" npm run build:pages
+```
+
+Ne jamais placer la clé secrète Turnstile dans Vite, le dépôt ou le navigateur. Le widget doit autoriser l’hôte `27pm.org` et le backend doit valider l’action `crm_intake`. Une réponse HTTP `202` indique seulement la mise en file d’examen. Si la variable manque, si Turnstile ne charge pas ou si le CRM refuse la demande, le site conserve le fallback `mailto:`.
 
 ## Avant la mise en ligne
 

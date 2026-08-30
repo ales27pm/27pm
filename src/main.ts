@@ -8,6 +8,14 @@ import {
   type ProjectBrief,
   type ProjectKind,
 } from './contact';
+import {
+  createIdempotencyKey,
+  createPublicIntakePayload,
+  submitPublicIntake,
+  TURNSTILE_ACTION,
+  validatePublicIntakeDraft,
+  type PublicIntakeDraft,
+} from './crm-intake';
 
 document.documentElement.classList.add('js');
 
@@ -288,13 +296,22 @@ const mailLink = document.querySelector<HTMLAnchorElement>('[data-project-mail]'
 const projectStatus = document.querySelector<HTMLElement>('[data-project-status]');
 const contactForm = document.querySelector<HTMLFormElement>('[data-contact-form]');
 const contactContext = document.querySelector<HTMLTextAreaElement>('[data-contact-context]');
+const contactOrganization = document.querySelector<HTMLInputElement>('[data-contact-organization]');
 const contactName = document.querySelector<HTMLInputElement>('[data-contact-name]');
 const contactReply = document.querySelector<HTMLInputElement>('[data-contact-reply]');
+const contactWebsite = document.querySelector<HTMLInputElement>('[data-contact-website]');
+const contactPrivacy = document.querySelector<HTMLInputElement>('[data-contact-privacy]');
+const crmIntake = document.querySelector<HTMLElement>('[data-crm-intake]');
+const crmUnavailable = document.querySelector<HTMLElement>('[data-crm-unavailable]');
+const crmSubmit = document.querySelector<HTMLButtonElement>('[data-crm-submit]');
+const crmSubmitLabel = document.querySelector<HTMLElement>('[data-crm-submit-label]');
+const turnstileContainer = document.querySelector<HTMLElement>('[data-turnstile-widget]');
 let selectedProject: ProjectKind = 'site';
 
 function currentBrief(): ProjectBrief {
   return {
     context: contactContext?.value,
+    organization: contactOrganization?.value,
     name: contactName?.value,
     replyEmail: contactReply?.value,
   };
@@ -326,7 +343,7 @@ projectOptions.forEach((option) => {
   });
 });
 
-[contactContext, contactName, contactReply].forEach((input) => {
+[contactContext, contactOrganization, contactName, contactReply].forEach((input) => {
   input?.addEventListener('input', () => {
     input.removeAttribute('aria-invalid');
     syncMailLink();
@@ -354,12 +371,224 @@ mailLink?.addEventListener('click', (event) => {
   if (projectStatus) projectStatus.textContent = 'Le courriel est prêt à ouvrir.';
 });
 
-contactForm?.addEventListener('submit', (event) => {
-  event.preventDefault();
-  mailLink?.click();
+selectProject('site');
+
+interface TurnstileApi {
+  render: (
+    container: HTMLElement,
+    options: {
+      sitekey: string;
+      action: string;
+      theme: 'light';
+      size: 'flexible';
+      language: 'fr';
+      'response-field': false;
+      callback: (token: string) => void;
+      'error-callback': () => boolean;
+      'expired-callback': () => void;
+      'timeout-callback': () => void;
+    },
+  ) => string;
+  reset: (widgetId: string) => void;
+}
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? '';
+let turnstileApi: TurnstileApi | undefined;
+let turnstileWidgetId: string | undefined;
+let turnstileToken = '';
+let submissionKey: string | undefined;
+let submissionAccepted = false;
+let submissionInFlight = false;
+let preserveTurnstileStatus = false;
+
+function setContactStatus(message: string, state: 'idle' | 'loading' | 'success' | 'error' = 'idle'): void {
+  if (!projectStatus) return;
+  projectStatus.textContent = message;
+  projectStatus.dataset.state = state;
+}
+
+function updateCrmSubmitAvailability(): void {
+  if (!crmSubmit) return;
+  crmSubmit.disabled = !turnstileToken || submissionInFlight || submissionAccepted;
+}
+
+function clearIntakeInvalidState(): void {
+  [contactOrganization, contactName, contactReply, contactContext, contactPrivacy].forEach((input) => {
+    input?.removeAttribute('aria-invalid');
+  });
+}
+
+function publicIntakeDraft(): PublicIntakeDraft {
+  return {
+    organizationName: contactOrganization?.value ?? '',
+    contactName: contactName?.value ?? '',
+    contactEmail: contactReply?.value ?? '',
+    projectType: selectedProject,
+    message: contactContext?.value ?? '',
+    privacyAcknowledged: contactPrivacy?.checked ?? false,
+    turnstileToken,
+    website: contactWebsite?.value ?? '',
+  };
+}
+
+function resetTurnstileToken(
+  message: string,
+  resetWidget = true,
+  preserveMessageAfterRenewal = true,
+): void {
+  turnstileToken = '';
+  preserveTurnstileStatus = preserveMessageAfterRenewal;
+  updateCrmSubmitAvailability();
+  if (resetWidget && turnstileApi && turnstileWidgetId) turnstileApi.reset(turnstileWidgetId);
+  setContactStatus(message, 'error');
+}
+
+function loadTurnstile(): Promise<TurnstileApi> {
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.dataset.turnstileScript = 'true';
+    script.addEventListener('load', () => {
+      if (window.turnstile) resolve(window.turnstile);
+      else reject(new Error('Turnstile API unavailable'));
+    });
+    script.addEventListener('error', () => reject(new Error('Turnstile script unavailable')));
+    document.head.append(script);
+  });
+}
+
+async function enableCrmIntake(): Promise<void> {
+  if (!turnstileSiteKey || !crmIntake || !crmUnavailable || !crmSubmit || !turnstileContainer) {
+    document.documentElement.dataset.crmIntake = 'disabled';
+    return;
+  }
+
+  try {
+    turnstileApi = await loadTurnstile();
+    crmIntake.hidden = false;
+    crmUnavailable.hidden = true;
+    crmSubmit.type = 'submit';
+    document.documentElement.dataset.crmIntake = 'enabled';
+    turnstileWidgetId = turnstileApi.render(turnstileContainer, {
+      sitekey: turnstileSiteKey,
+      action: TURNSTILE_ACTION,
+      theme: 'light',
+      size: 'flexible',
+      language: 'fr',
+      'response-field': false,
+      callback: (token) => {
+        turnstileToken = token;
+        updateCrmSubmitAvailability();
+        if (!submissionAccepted && !preserveTurnstileStatus) {
+          setContactStatus('Vérification antirobot complétée. Le formulaire peut être envoyé.');
+        }
+      },
+      'error-callback': () => {
+        resetTurnstileToken(
+          'La vérification antirobot est indisponible. Utilisez le courriel préparé.',
+          false,
+        );
+        return true;
+      },
+      'expired-callback': () =>
+        resetTurnstileToken('La vérification a expiré. Complétez-la de nouveau.', true, false),
+      'timeout-callback': () =>
+        resetTurnstileToken('La vérification a expiré. Complétez-la de nouveau.', true, false),
+    });
+  } catch {
+    crmIntake.hidden = true;
+    crmUnavailable.hidden = false;
+    document.documentElement.dataset.crmIntake = 'disabled';
+    setContactStatus('La vérification sécurisée ne peut pas être chargée. Utilisez le courriel préparé.', 'error');
+  }
+}
+
+contactForm?.addEventListener('input', (event) => {
+  if (event.target instanceof HTMLElement) event.target.removeAttribute('aria-invalid');
+  if (submissionInFlight) return;
+  submissionKey = undefined;
+  if (submissionAccepted) {
+    submissionAccepted = false;
+    resetTurnstileToken(
+      'Le formulaire a changé. Complétez de nouveau la vérification antirobot.',
+      true,
+      false,
+    );
+  }
+  updateCrmSubmitAvailability();
 });
 
-selectProject('site');
+contactForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  if (!turnstileSiteKey || document.documentElement.dataset.crmIntake !== 'enabled') {
+    mailLink?.click();
+    return;
+  }
+  if (submissionInFlight || submissionAccepted) return;
+
+  clearIntakeInvalidState();
+  const draft = publicIntakeDraft();
+  const errors = validatePublicIntakeDraft(draft);
+  const firstError = Object.keys(errors)[0] as keyof PublicIntakeDraft | undefined;
+  if (firstError) {
+    const fields: Partial<Record<keyof PublicIntakeDraft, HTMLElement | null>> = {
+      organizationName: contactOrganization,
+      contactName,
+      contactEmail: contactReply,
+      message: contactContext,
+      privacyAcknowledged: contactPrivacy,
+      turnstileToken: turnstileContainer,
+      website: contactWebsite,
+    };
+    const field = fields[firstError];
+    field?.setAttribute('aria-invalid', 'true');
+    field?.focus();
+    setContactStatus(errors[firstError] ?? 'Vérifiez les renseignements fournis.', 'error');
+    return;
+  }
+
+  submissionKey ??= createIdempotencyKey();
+  submissionInFlight = true;
+  if (contactForm) contactForm.setAttribute('aria-busy', 'true');
+  if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoi en cours…';
+  setContactStatus('Envoi sécurisé en cours…', 'loading');
+  updateCrmSubmitAvailability();
+
+  const result = await submitPublicIntake(createPublicIntakePayload(draft), submissionKey);
+  submissionInFlight = false;
+  contactForm?.removeAttribute('aria-busy');
+  if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoyer pour examen';
+
+  if (result.accepted) {
+    submissionAccepted = true;
+    turnstileToken = '';
+    updateCrmSubmitAvailability();
+    setContactStatus(
+      'Demande reçue et placée dans la file d’examen. Aucun message ni suivi n’est envoyé automatiquement.',
+      'success',
+    );
+    return;
+  }
+
+  resetTurnstileToken(
+    result.status === 429
+      ? 'Trop de tentatives ont été reçues. Réessayez plus tard ou utilisez le courriel préparé.'
+      : 'L’envoi direct n’a pas abouti. Réessayez ou utilisez le courriel préparé.',
+  );
+});
+
+void enableCrmIntake();
 
 const contactEmail = document.querySelector<HTMLAnchorElement>('[data-contact-email]');
 const copyEmailButton = document.querySelector<HTMLButtonElement>('[data-copy-email]');

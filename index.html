@@ -486,21 +486,48 @@
 
             <label class="contact-field contact-field--message">
               <span>Votre projet</span>
-              <textarea name="context" rows="4" placeholder="Ce que vous voulez bâtir, améliorer ou débloquer…" required data-contact-context></textarea>
+              <textarea name="message" rows="4" maxlength="5000" placeholder="Ce que vous voulez bâtir, améliorer ou débloquer…" required data-contact-context></textarea>
             </label>
             <div class="contact-field-row">
               <label class="contact-field">
-                <span>Votre nom <small>(facultatif)</small></span>
-                <input type="text" name="name" autocomplete="name" data-contact-name />
+                <span>Votre organisation</span>
+                <input type="text" name="organizationName" autocomplete="organization" maxlength="200" required data-contact-organization />
               </label>
               <label class="contact-field">
-                <span>Votre courriel <small>(facultatif)</small></span>
-                <input type="email" name="email" autocomplete="email" inputmode="email" data-contact-reply />
+                <span>Votre nom</span>
+                <input type="text" name="contactName" autocomplete="name" maxlength="120" required data-contact-name />
               </label>
             </div>
+            <label class="contact-field">
+              <span>Votre courriel</span>
+              <input type="email" name="contactEmail" autocomplete="email" inputmode="email" maxlength="320" required data-contact-reply />
+            </label>
+
+            <div class="contact-honeypot" aria-hidden="true">
+              <label>Votre site web <input type="text" name="website" autocomplete="off" tabindex="-1" data-contact-website /></label>
+            </div>
+
+            <div class="crm-intake" hidden data-crm-intake>
+              <label class="privacy-acknowledgement">
+                <input type="checkbox" name="privacyAcknowledged" required data-contact-privacy />
+                <span>J’ai pris connaissance de la <a href="%BASE_URL%confidentialite/">politique de confidentialité</a> et je consens à transmettre ces renseignements pour l’examen de ma demande.</span>
+              </label>
+              <div class="turnstile-widget" data-turnstile-widget role="group" aria-label="Vérification antirobot"></div>
+              <p class="crm-intake-note">
+                Un statut « reçu » signifie uniquement que la demande est placée dans une file d’examen; aucun message ni suivi n’est envoyé automatiquement.
+              </p>
+              <button class="button crm-submit" type="button" disabled data-crm-submit>
+                <span data-crm-submit-label>Envoyer pour examen</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+              </button>
+            </div>
+
+            <p class="crm-unavailable" data-crm-unavailable>
+              L’envoi direct est indisponible tant que la vérification sécurisée n’est pas configurée. Utilisez le courriel préparé ci-dessous.
+            </p>
 
             <p class="project-mail-note" id="project-mail-note">
-              Le bouton ouvre votre application de courriel avec un message préparé; aucune donnée n’est recueillie sur ce site.
+              Le courriel préparé reste disponible si l’envoi direct ou le service CRM ne fonctionne pas.
             </p>
             <a
               class="button project-mail"
@@ -508,7 +535,7 @@
               data-project-mail
               aria-describedby="project-mail-note"
             >
-              <span>Préparer mon courriel</span>
+              <span>Préparer un courriel</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
             </a>
             <div class="contact-fallback">
