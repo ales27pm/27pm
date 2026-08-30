@@ -6,7 +6,7 @@
 | Service évalué | Site public `https://27pm.org/` |
 | Fournisseur | Google LLC — Google Analytics 4 |
 | Identifiant public de mesure | `G-S0SKT2CTV0` |
-| Version du rapport | 0.4 |
+| Version du rapport | 0.5 |
 | Date de l’évaluation | 29–30 août 2026 |
 | Responsable de l’évaluation | Direction de 27PM — à confirmer lors de l’approbation |
 | Statut | Préparé; décision conditionnelle à approuver |
@@ -27,7 +27,7 @@ Le projet est **acceptable uniquement sous les conditions cumulatives suivantes*
 6. les accès à la propriété sont limités, protégés par l’authentification multifacteur et revus périodiquement;
 7. la présente EFVP est approuvée et ses risques résiduels sont acceptés par la direction.
 
-**Décision au 30 août 2026 : NE PAS ACTIVER EN PRODUCTION.** L’implémentation locale du consentement est prête et testée, et les réglages minimaux de la propriété GA4 ont été appliqués et relus dans l’interface Google. Une garde de compilation fermée par défaut empêche l’activation tant que `VITE_ANALYTICS_APPROVED` ne vaut pas exactement `true`. L’avenant de traitement est accepté dans le compte, mais l’autorité juridique de la personne qui l’a accepté n’est pas documentée. La page d’administration du DPA ne contient aucune entité juridique ni aucun contact, et le compte Google authentifié indique que la validation en deux étapes est désactivée. La liste datée des sous-traitants est annexée, mais l’approbation finale, la MFA et la preuve après déploiement restent à compléter.
+**Décision au 30 août 2026 : NE PAS ACTIVER EN PRODUCTION.** L’implémentation locale du consentement est prête et testée, et les réglages minimaux de la propriété GA4 ont été appliqués et relus dans l’interface Google. Une garde de compilation fermée par défaut empêche l’activation tant que `VITE_ANALYTICS_APPROVED` ne vaut pas exactement `true`. L’avenant de traitement est accepté dans le compte, mais l’autorité juridique de la personne qui l’a accepté n’est pas documentée. La page d’administration du DPA ne contient toujours aucune entité juridique ni aucun contact. La validation en deux étapes est maintenant activée et vérifiée. La liste datée des sous-traitants est annexée, mais l’approbation finale, les détails du DPA et la preuve après déploiement restent à compléter.
 
 ## 2. Motif et portée de l’EFVP
 
@@ -169,7 +169,7 @@ Ces mesures sont présentes dans le dépôt de travail. Elles doivent encore êt
 - collecte granulaire de localisation et d’appareil : **désactivée**;
 - rédaction automatique des adresses courriel : **active**;
 - rédaction de clés de paramètres d’URL dans l’administration : **inactive**. Le code local limite `page_location` aux routes canoniques, classe les routes inconnues comme 404, retire toutes les requêtes et tous les fragments et réduit `page_referrer` à son origine; aucune exception ne doit être ajoutée sans réviser l’EFVP et les tests.
-- accès au compte : **un administrateur vérifié**; le 30 août 2026, la validation en deux étapes du compte Google authentifié était **désactivée**. L’activation de la MFA exige une nouvelle authentification et demeure une condition préalable bloquante.
+- accès au compte : **un administrateur vérifié**; le 30 août 2026, la validation en deux étapes du compte Google authentifié a été **activée et vérifiée**, avec une application d’authentification configurée. Une revue périodique des méthodes et des accès demeure requise.
 
 Google indique qu’une modification de la conservation peut prendre jusqu’à 24 heures avant de s’appliquer. Les valeurs ci-dessus décrivent les réglages enregistrés dans l’administration; elles ne constituent pas encore une preuve de collecte en production.
 
@@ -184,7 +184,7 @@ Google indique qu’une modification de la conservation peut prendre jusqu’à 
 | Profilage, enrichissement ou réutilisation publicitaire | 3 × 2 = 6, modéré | Signaux, personnalisation, consentements Ads et liaisons désactivés | 3 × 1 = 3, faible | Code et propriété vérifiés; audit périodique requis |
 | Réidentification à partir d’un identifiant, du parcours ou de la localisation | 3 × 2 = 6, modéré | Durée courte, données minimales, granularité réduite, rapports agrégés | 3 × 1 = 3, faible | Réglages de granularité et de durée vérifiés; preuve live à faire |
 | Accès étranger légal ou sous-traitant hors Québec | 3 × 2 = 6, modéré | Contrat, chiffrement, minimisation, revue des pays et sous-traitants | 3 × 2 = 6, modéré | Preuves contractuelles à faire approuver |
-| Compromission du compte GA4 | 3 × 2 = 6, modéré | MFA, moindre privilège, revue trimestrielle des accès et historique des changements | 3 × 1 = 3, faible | Bloquant : validation en deux étapes désactivée le 30 août 2026 |
+| Compromission du compte GA4 | 3 × 2 = 6, modéré | MFA, moindre privilège, revue trimestrielle des accès et historique des changements | 3 × 1 = 3, faible | MFA activée et vérifiée le 30 août 2026; revue périodique requise |
 | Conservation supérieure à la décision | 2 × 3 = 6, modéré | 2 mois, reset désactivé, 60 jours côté navigateur, audit périodique | 2 × 1 = 2, faible | Code et propriété vérifiés; audit périodique requis |
 | Consentement local devenu périmé après un changement important | 2 × 3 = 6, modéré | Clé de consentement versionnée, nouvelle demande après modification de finalité ou de politique, revue annuelle | 2 × 1 = 2, faible | Version technique présente; processus à instaurer |
 | Changement silencieux de fournisseur ou de configuration | 3 × 2 = 6, modéré | Notifications contractuelles, revue annuelle et avant tout changement, tests automatisés | 3 × 1 = 3, faible | Processus à instaurer |
@@ -200,7 +200,7 @@ Le risque résiduel de traitement hors Québec demeure modéré et doit être ex
 | Appliquer tous les réglages GA4 de la section 8 | Direction / Technique | Avant activation | Relecture datée de chaque réglage | Fait le 29 août 2026; mesure améliorée limitée aux pages vues; rétention possiblement en propagation pendant 24 h |
 | Confirmer les conditions de traitement et documenter les sous-traitants | Direction / Vie privée | Avant activation | Version, date, entités et contacts du DPA, liste annexée | Acceptation datée du 29 août 2026 vérifiée; liste datée annexée; entité juridique, contacts et autorité de l’accepteur à compléter |
 | Vérifier l’absence de liens Ads et de destinations de balise | Direction / Technique | Avant activation | Écrans des associations et destinations | Fait le 29 août 2026 : 0 lien Google Ads et 0 balise associée |
-| Vérifier MFA et limiter les utilisateurs de la propriété | Direction | Avant activation | Liste des accès, rôles et confirmation MFA | Un administrateur vérifié; MFA désactivée le 30 août 2026 et à activer par le titulaire du compte |
+| Vérifier MFA et limiter les utilisateurs de la propriété | Direction | Avant activation | Liste des accès, rôles et confirmation MFA | Fait le 30 août 2026 : un administrateur et validation en deux étapes active |
 | Approuver l’EFVP et accepter le risque résiduel hors Québec | Direction | Avant activation | Section 12 signée | À faire |
 | Ouvrir la garde de production | Technique | Après signature, avant déploiement | `VITE_ANALYTICS_APPROVED=true` dans l’environnement Vercel approuvé | Bloquée par défaut |
 | Publier puis effectuer un test réseau sans envoyer de données sentinelles à Google | Technique | Après approbation | Zéro requête avant opt-in; requêtes prévues après opt-in; aucune valeur de formulaire | À faire |
@@ -243,6 +243,7 @@ En signant, la personne autorisée confirme avoir examiné la nécessité, la pr
 | 0.2 | 29 août 2026 | 27PM / configuration technique | Réglages GA4 minimaux appliqués et état de preuve consigné | En attente |
 | 0.3 | 30 août 2026 | 27PM / configuration technique | Garde de production fermée par défaut, URLs analytiques minimisées et portée des événements précisée | En attente |
 | 0.4 | 30 août 2026 | 27PM / vérification contractuelle et sécurité | État DPA, liste datée des sous-traitants et MFA désactivée consignés; garde maintenue fermée | En attente |
+| 0.5 | 30 août 2026 | 27PM / vérification de sécurité | Validation en deux étapes activée et vérifiée; absence d’entité et de contact DPA reconfirmée | En attente |
 
 ## 14. Références officielles consultées
 
