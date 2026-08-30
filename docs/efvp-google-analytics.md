@@ -8,10 +8,10 @@
 | Identifiant public de mesure | `G-S0SKT2CTV0` |
 | Version du rapport | 0.5 |
 | Date de l’évaluation | 29–30 août 2026 |
-| Responsable de l’évaluation | Direction de 27PM — à confirmer lors de l’approbation |
-| Statut | Préparé; décision conditionnelle à approuver |
+| Responsable de l’évaluation | Alexis Boulet, président de 27pm |
+| Statut | Version 0.5 approuvée le 30 août 2026; activation conditionnelle à la complétion du DPA |
 
-> Ce rapport documente une évaluation opérationnelle adaptée à un site vitrine. Il ne constitue pas un avis juridique. Tant que les conditions préalables et l’approbation finale ne sont pas complétées, il ne faut pas activer Google Analytics en production.
+> Ce rapport documente une évaluation opérationnelle adaptée à un site vitrine. Il ne constitue pas un avis juridique. Tant que l’entité juridique et le contact DPA ne sont pas complétés dans l’administration Google, il ne faut pas activer Google Analytics en production.
 
 ## 1. Résumé de la décision
 
@@ -27,7 +27,7 @@ Le projet est **acceptable uniquement sous les conditions cumulatives suivantes*
 6. les accès à la propriété sont limités, protégés par l’authentification multifacteur et revus périodiquement;
 7. la présente EFVP est approuvée et ses risques résiduels sont acceptés par la direction.
 
-**Décision au 30 août 2026 : NE PAS ACTIVER EN PRODUCTION.** L’implémentation locale du consentement est prête et testée, et les réglages minimaux de la propriété GA4 ont été appliqués et relus dans l’interface Google. Une garde de compilation fermée par défaut empêche l’activation tant que `VITE_ANALYTICS_APPROVED` ne vaut pas exactement `true`. L’avenant de traitement est accepté dans le compte, mais l’autorité juridique de la personne qui l’a accepté n’est pas documentée. La page d’administration du DPA ne contient toujours aucune entité juridique ni aucun contact. La validation en deux étapes est maintenant activée et vérifiée. La liste datée des sous-traitants est annexée, mais l’approbation finale, les détails du DPA et la preuve après déploiement restent à compléter.
+**Décision au 30 août 2026 : APPROUVÉE, MAIS NE PAS ACTIVER AVANT LA COMPLÉTION DU DPA.** L’implémentation locale du consentement est prête et testée, et les réglages minimaux de la propriété GA4 ont été appliqués et relus dans l’interface Google. Une garde de compilation fermée par défaut empêche l’activation tant que `VITE_ANALYTICS_APPROVED` ne vaut pas exactement `true`. Alexis Boulet, président et autorisé à engager 27pm, a approuvé la présente EFVP et accepté explicitement le risque résiduel documenté lié au traitement hors Québec. L’avenant de traitement est accepté dans le compte et la liste datée des sous-traitants est annexée. La page d’administration du DPA ne contient toutefois toujours aucune entité juridique ni aucun contact. La validation en deux étapes est activée et vérifiée. La complétion du DPA demeure la seule condition préalable documentaire identifiée; l’activation, le déploiement et les preuves réseau suivront.
 
 ## 2. Motif et portée de l’EFVP
 
@@ -198,10 +198,10 @@ Le risque résiduel de traitement hors Québec demeure modéré et doit être ex
 | Valider le consentement basique et l’arrêt après retrait | Technique | Avant déploiement | Tests automatisés et revue du code | Fait localement |
 | Ouvrir la bonne propriété `G-S0SKT2CTV0` avec un rôle Éditeur | Direction | Avant réglages | Compte, propriété et flux relus dans l’administration | Fait le 29 août 2026 |
 | Appliquer tous les réglages GA4 de la section 8 | Direction / Technique | Avant activation | Relecture datée de chaque réglage | Fait le 29 août 2026; mesure améliorée limitée aux pages vues; rétention possiblement en propagation pendant 24 h |
-| Confirmer les conditions de traitement et documenter les sous-traitants | Direction / Vie privée | Avant activation | Version, date, entités et contacts du DPA, liste annexée | Acceptation datée du 29 août 2026 vérifiée; liste datée annexée; entité juridique, contacts et autorité de l’accepteur à compléter |
+| Confirmer les conditions de traitement et documenter les sous-traitants | Direction / Vie privée | Avant activation | Version, date, entités et contacts du DPA, liste annexée | Acceptation datée du 29 août 2026 vérifiée; liste datée annexée; autorité et approbation consignées le 30 août 2026; entité juridique et contact DPA à compléter |
 | Vérifier l’absence de liens Ads et de destinations de balise | Direction / Technique | Avant activation | Écrans des associations et destinations | Fait le 29 août 2026 : 0 lien Google Ads et 0 balise associée |
 | Vérifier MFA et limiter les utilisateurs de la propriété | Direction | Avant activation | Liste des accès, rôles et confirmation MFA | Fait le 30 août 2026 : un administrateur et validation en deux étapes active |
-| Approuver l’EFVP et accepter le risque résiduel hors Québec | Direction | Avant activation | Section 12 signée | À faire |
+| Approuver l’EFVP et accepter le risque résiduel hors Québec | Direction | Avant activation | Section 12 signée | Fait le 30 août 2026 — attestation écrite consignée à la section 12 |
 | Ouvrir la garde de production | Technique | Après signature, avant déploiement | `VITE_ANALYTICS_APPROVED=true` dans l’environnement Vercel approuvé | Bloquée par défaut |
 | Publier puis effectuer un test réseau sans envoyer de données sentinelles à Google | Technique | Après approbation | Zéro requête avant opt-in; requêtes prévues après opt-in; aucune valeur de formulaire | À faire |
 | Vérifier Realtime, la rétention et les événements effectivement reçus | Technique / Vie privée | Après déploiement | Journal de vérification daté | À faire |
@@ -226,12 +226,12 @@ En signant, la personne autorisée confirme avoir examiné la nécessité, la pr
 
 | Champ | À compléter |
 |---|---|
-| Décision | ☐ Approuvé sous conditions remplies ☐ Refusé ☐ À réviser |
-| Nom | |
-| Titre et autorité | |
-| Signature | |
-| Date | |
-| Motifs ou conditions supplémentaires | |
+| Décision | ☒ Approuvé sous réserve de la condition préalable indiquée ci-dessous ☐ Refusé ☐ À réviser |
+| Nom | Alexis Boulet |
+| Titre et autorité | Président de 27pm; autorisé à engager 27pm |
+| Signature | Alexis Boulet — attestation écrite transmise le 30 août 2026 : « Je suis Alexis Boulet, président, autorisé(e) à engager 27pm. J’approuve l’EFVP Google Analytics v0.5 datée du 30 août 2026 et j’accepte le risque résiduel documenté lié au traitement hors Québec. » |
+| Date | 30 août 2026 |
+| Motifs ou conditions supplémentaires | Risque résiduel documenté lié au traitement hors Québec explicitement accepté. Activation interdite jusqu’à la complétion ou confirmation de l’entité juridique et d’au moins un contact DPA dans l’administration Google. |
 
 **L’absence de signature vaut absence d’autorisation de mise en production.**
 
@@ -243,7 +243,7 @@ En signant, la personne autorisée confirme avoir examiné la nécessité, la pr
 | 0.2 | 29 août 2026 | 27PM / configuration technique | Réglages GA4 minimaux appliqués et état de preuve consigné | En attente |
 | 0.3 | 30 août 2026 | 27PM / configuration technique | Garde de production fermée par défaut, URLs analytiques minimisées et portée des événements précisée | En attente |
 | 0.4 | 30 août 2026 | 27PM / vérification contractuelle et sécurité | État DPA, liste datée des sous-traitants et MFA désactivée consignés; garde maintenue fermée | En attente |
-| 0.5 | 30 août 2026 | 27PM / vérification de sécurité | Validation en deux étapes activée et vérifiée; absence d’entité et de contact DPA reconfirmée | En attente |
+| 0.5 | 30 août 2026 | 27PM / vérification de sécurité | Validation en deux étapes activée et vérifiée; absence d’entité et de contact DPA reconfirmée | Approuvée le 30 août 2026 par Alexis Boulet, président de 27pm; activation conditionnelle à la complétion du DPA |
 
 ## 14. Références officielles consultées
 
