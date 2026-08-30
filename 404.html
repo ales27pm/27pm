@@ -34,8 +34,41 @@
 
     <footer class="legal-footer">
       <span>© <span data-year>2026</span> 27PM</span>
-      <a href="mailto:bonjour@27pm.org">bonjour@27pm.org</a>
+      <div class="legal-footer__links">
+        <a href="%BASE_URL%confidentialite/">Confidentialité</a>
+        <button class="analytics-preferences" type="button" data-analytics-preferences hidden>
+          Préférences de mesure
+        </button>
+        <a href="mailto:bonjour@27pm.org">bonjour@27pm.org</a>
+      </div>
     </footer>
+    <div
+      class="analytics-consent"
+      role="dialog"
+      aria-labelledby="analytics-consent-title"
+      aria-describedby="analytics-consent-description"
+      data-analytics-consent
+      hidden
+    >
+      <div>
+        <p class="analytics-consent__eyebrow">Mesure d’audience facultative</p>
+        <h2 id="analytics-consent-title" data-analytics-consent-title tabindex="-1">
+          Votre choix, avant toute mesure.
+        </h2>
+        <p class="analytics-consent__description" id="analytics-consent-description">
+          Avec votre accord, 27PM utilise Google Analytics 4 pour comprendre les visites et améliorer le site.
+          Avant votre acceptation, aucun script Google n’est chargé et aucune mesure n’est transmise.
+          <a href="%BASE_URL%confidentialite/#mesure-audience">En savoir plus</a>
+        </p>
+      </div>
+      <div class="analytics-consent__actions">
+        <button class="analytics-consent__button" type="button" data-analytics-deny>Refuser</button>
+        <button class="analytics-consent__button analytics-consent__button--accept" type="button" data-analytics-accept>
+          Accepter
+        </button>
+      </div>
+      <p class="analytics-consent__status" role="status" aria-live="polite" data-analytics-status></p>
+    </div>
     <script type="module" src="/src/privacy.ts"></script>
   </body>
 </html>

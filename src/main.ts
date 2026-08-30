@@ -1,6 +1,7 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader';
 import './styles.css';
+import { initializeInactiveAnalyticsControls } from './analytics-inactive';
 import {
   buildProjectMailto,
   copyEmailAddress,
@@ -10,6 +11,13 @@ import {
 } from './contact';
 
 document.documentElement.classList.add('js');
+if (import.meta.env.VITE_ANALYTICS_APPROVED === 'true') {
+  void import('./analytics').then(({ initializeAnalyticsConsent }) => {
+    initializeAnalyticsConsent({ enabled: true });
+  });
+} else {
+  initializeInactiveAnalyticsControls();
+}
 
 const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-button]');
 const menuLabel = document.querySelector<HTMLElement>('[data-menu-label]');

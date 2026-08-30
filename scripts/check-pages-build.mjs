@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const dist = resolve(process.cwd(), 'dist');
 const read = (path) => readFile(resolve(dist, path), 'utf8');
 const pagesHost = process.env.PAGES_HOST ?? '27pm.org';
 const isPreview = pagesHost !== '27pm.org';
+const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
 const normalizedPath = (process.env.PAGES_BASE_PATH ?? (isPreview ? '/27pm' : '/')).replace(/^\/+|\/+$/g, '');
 const base = normalizedPath ? `/${normalizedPath}/` : '/';
 const verifiedDemoProjects = new Map([
   ['boulet', 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/'],
   ['turner', 'https://ales27pm.github.io/s-turner/'],
 ]);
+const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 
 assert.ok(isPreview || base === '/', '27pm.org production builds must use the root base path');
 
@@ -35,7 +37,37 @@ assert.match(home, /<title>27PM \| Sites web, applications et IA sur mesure<\/ti
 assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
 assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
 assert.match(home, /data-contact-form/, 'home must publish the contextual contact brief');
-assert.match(home, /Aucune donnée n’est envoyée/, 'scenario builder must disclose its local-only behavior');
+assert.match(home, /Les choix saisis.+ne sont pas transmis à 27PM/, 'scenario builder must disclose its local-only behavior');
+
+for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
+  assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
+  assert.match(html, /data-analytics-preferences/, `${name} must expose persistent analytics preferences`);
+  assert.doesNotMatch(html, directGoogleResource, `${name} must not embed a pre-consent Google resource`);
+}
+
+const assetFiles = await readdir(resolve(dist, 'assets'));
+const compiledJavascript = (
+  await Promise.all(
+    assetFiles
+      .filter((file) => file.endsWith('.js'))
+      .map((file) => read(`assets/${file}`)),
+  )
+).join('\n');
+if (analyticsApproved) {
+  assert.match(compiledJavascript, /G-S0SKT2CTV0/, 'approved assets must contain the GA4 measurement ID');
+  assert.match(
+    compiledJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'approved assets must contain the consent-gated Google tag loader',
+  );
+} else {
+  assert.doesNotMatch(compiledJavascript, /G-S0SKT2CTV0/, 'unapproved assets must exclude the GA4 measurement ID');
+  assert.doesNotMatch(
+    compiledJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'unapproved assets must exclude the Google tag loader',
+  );
+}
 
 const demoProjectTags = [...home.matchAll(/<a\b[^>]*data-demo-project[^>]*>/gi)].map((match) => match[0]);
 assert.equal(demoProjectTags.length, verifiedDemoProjects.size * 2, 'each demo requires a text link and a visual link');

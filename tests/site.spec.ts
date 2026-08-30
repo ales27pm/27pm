@@ -1,8 +1,22 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+const analyticsMeasurementId = 'G-S0SKT2CTV0';
+const analyticsConsentStorageKey = '27pm.analytics-consent.v1';
+const googleTagSource = `https://www.googletagmanager.com/gtag/js?id=${analyticsMeasurementId}`;
+const isHostOrSubdomain = (hostname: string, base: string) =>
+  hostname === base || hostname.endsWith(`.${base}`);
+const isAnalyticsRequest = (url: string) => {
+  const hostname = new URL(url).hostname;
+  return isHostOrSubdomain(hostname, 'googletagmanager.com')
+    || isHostOrSubdomain(hostname, 'google-analytics.com')
+    || isHostOrSubdomain(hostname, 'analytics.google.com')
+    || isHostOrSubdomain(hostname, 'doubleclick.net')
+    || hostname === 'www.google.com';
+};
+
 test('renders the complete French v5 landing page', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'networkidle' });
 
   await expect(page).toHaveTitle('27PM | Sites web, applications et IA sur mesure');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -83,7 +97,7 @@ test('composes the scenario locally without navigation or submission', async ({ 
 
   expect(page.url()).toBe(originalUrl);
   await expect(scenarioForm.getByRole('button')).toHaveCount(0);
-  await expect(page.getByText(/Aucune donnée n’est envoyée/)).toBeVisible();
+  await expect(page.getByText(/Les choix saisis.+ne sont pas transmis à 27PM/)).toBeVisible();
 });
 
 test('presents both independent projects as clearly labelled full demos', async ({ page }) => {
@@ -191,7 +205,7 @@ test('explains the email handoff and copies the visible fallback address', async
   await page.goto('/#contact');
 
   await expect(page.getByText('De quoi voulez-vous parler?')).toBeVisible();
-  await expect(page.getByText(/aucune donnée n’est recueillie sur ce site/)).toBeVisible();
+  await expect(page.getByText(/Le site ne transmet pas à 27PM les champs saisis/)).toBeVisible();
   await expect(page.locator('[data-contact-email]')).toBeVisible();
 
   await page.getByRole('button', { name: 'Copier l’adresse' }).click();
@@ -216,6 +230,260 @@ test('keeps the address usable when clipboard access fails', async ({ page }) =>
     'Copie impossible. Sélectionnez l’adresse affichée.',
   );
   await expect(fallback).toBeFocused();
+});
+
+test('keeps Google Analytics blocked until the visitor explicitly accepts it', async ({ page }) => {
+  const analyticsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (isAnalyticsRequest(request.url())) analyticsRequests.push(request.url());
+  });
+
+  await page.goto('/');
+
+  const consent = page.getByRole('dialog', { name: 'Votre choix, avant toute mesure.' });
+  await expect(consent).toBeVisible();
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  expect(analyticsRequests).toEqual([]);
+
+  await consent.getByRole('button', { name: 'Refuser' }).click();
+  await expect(consent).toBeHidden();
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBe('denied');
+  expect(analyticsRequests).toEqual([]);
+
+  await page.goto('/confidentialite/', { waitUntil: 'networkidle' });
+  await expect(consent).toBeHidden();
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Préférences de mesure' })).toBeVisible();
+  expect(
+    await page.evaluate(
+      (measurementId) => (window as unknown as Record<string, unknown>)[`ga-disable-${measurementId}`],
+      analyticsMeasurementId,
+    ),
+  ).toBe(true);
+  expect(analyticsRequests).toEqual([]);
+
+  const preferences = page.getByRole('button', { name: 'Préférences de mesure' });
+  await preferences.click();
+  await expect(consent).toBeVisible();
+  await expect(consent.getByRole('heading')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(consent).toBeHidden();
+  await expect(preferences).toBeFocused();
+});
+
+test('keeps unapproved analytics dormant while preserving its preference control', async ({ page }) => {
+  test.skip(process.env.ANALYTICS_TEST_APPROVED === 'true', 'Unapproved-build assertion');
+  await page.addInitScript((storageKey) => {
+    window.localStorage.setItem(storageKey, 'granted');
+    document.cookie = '_ga=stale-client; Path=/';
+  }, analyticsConsentStorageKey);
+
+  await page.goto('/');
+
+  const dialog = page.getByRole('dialog', { name: 'Votre choix, avant toute mesure.' });
+  const preferences = page.getByRole('button', { name: 'Préférences de mesure' });
+  await expect(dialog).toBeHidden();
+  await expect(preferences).toBeVisible();
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBeNull();
+  expect(await page.context().cookies()).not.toEqual(
+    expect.arrayContaining([expect.objectContaining({ name: expect.stringMatching(/^_ga(?:_|$)/) })]),
+  );
+
+  await preferences.click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Accepter' })).toBeHidden();
+  await expect(dialog.getByRole('status')).toHaveText(/n’est pas activée/);
+  await dialog.getByRole('button', { name: 'Fermer' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(preferences).toBeFocused();
+});
+
+test('loads and revokes the Google tag on the simulated canonical production origin', async ({ page, request: apiRequest }) => {
+  await page.route('https://27pm.org/**', async (route) => {
+    const publicUrl = new URL(route.request().url());
+    const localUrl = new URL(`${publicUrl.pathname}${publicUrl.search}`, 'http://127.0.0.1:4174');
+    const response = await apiRequest.get(localUrl.href);
+    await route.fulfill({
+      status: response.status(),
+      headers: response.headers(),
+      body: await response.body(),
+    });
+  });
+
+  const analyticsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (isAnalyticsRequest(request.url())) analyticsRequests.push(request.url());
+  });
+  const googleTagRequests: string[] = [];
+  await page.route('https://www.googletagmanager.com/gtag/js**', async (route) => {
+    googleTagRequests.push(route.request().url());
+    await route.fulfill({ status: 200, contentType: 'application/javascript', body: '' });
+  });
+
+  await page.goto(
+    'https://27pm.org/brief-client-alexis?name=Alexis&email=alexis%40example.test#contact',
+    { waitUntil: 'networkidle' },
+  );
+  expect(googleTagRequests).toEqual([]);
+  expect(analyticsRequests).toEqual([]);
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+
+  await page.getByRole('dialog').getByRole('button', { name: 'Accepter' }).click();
+  await expect.poll(() => googleTagRequests).toHaveLength(1);
+  expect(analyticsRequests).toEqual([googleTagSource]);
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(1);
+
+  const queuedCommands = await page.evaluate(() => {
+    const dataLayer = (window as unknown as { dataLayer?: Array<ArrayLike<unknown>> }).dataLayer ?? [];
+    return dataLayer.map((entry) => ({
+      isArguments: Object.prototype.toString.call(entry) === '[object Arguments]',
+      values: Array.from(entry),
+    }));
+  });
+  expect(queuedCommands.map(({ isArguments, values }) => ({
+    isArguments,
+    command: values[0],
+  }))).toEqual([
+    { isArguments: true, command: 'consent' },
+    { isArguments: true, command: 'consent' },
+    { isArguments: true, command: 'set' },
+    { isArguments: true, command: 'js' },
+    { isArguments: true, command: 'config' },
+  ]);
+  const configCommand = queuedCommands.at(-1)?.values;
+  expect(configCommand?.[2]).toEqual(expect.objectContaining({
+    page_location: 'https://27pm.org/404.html',
+    page_referrer: '',
+    send_page_view: true,
+  }));
+  expect(JSON.stringify(queuedCommands)).not.toContain('Alexis');
+  expect(JSON.stringify(queuedCommands)).not.toContain('alexis@example.test');
+
+  await page.evaluate(() => {
+    document.cookie = '_ga=test-client; Path=/';
+    document.cookie = '_ga_S0SKT2CTV0=test-session; Path=/';
+  });
+  await page.getByRole('button', { name: 'Préférences de mesure' }).click();
+  const reloaded = page.waitForEvent('domcontentloaded');
+  await page.getByRole('dialog').getByRole('button', { name: 'Refuser' }).click();
+  await reloaded;
+
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBe('denied');
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  expect(googleTagRequests).toHaveLength(1);
+  expect(analyticsRequests).toHaveLength(1);
+  expect(await page.context().cookies()).not.toEqual(
+    expect.arrayContaining([expect.objectContaining({ name: expect.stringMatching(/^_ga(?:_|$)/) })]),
+  );
+});
+
+test('keeps measurement disabled when the browser cannot persist an acceptance', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate((storageKey) => {
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function setItem(key, value) {
+      if (key === storageKey) throw new DOMException('blocked', 'SecurityError');
+      originalSetItem.call(this, key, value);
+    };
+  }, analyticsConsentStorageKey);
+
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Accepter' }).click();
+
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('status')).toHaveText(/La mesure demeure désactivée/);
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBeNull();
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+});
+
+test('fails closed when a withdrawal cannot replace or remove an old grant', async ({ page }) => {
+  await page.addInitScript((storageKey) => {
+    window.localStorage.setItem(storageKey, 'granted');
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function setItem(key, value) {
+      if (key === storageKey) throw new DOMException('blocked', 'SecurityError');
+      originalSetItem.call(this, key, value);
+    };
+    const originalRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.removeItem = function removeItem(key) {
+      if (key === storageKey) throw new DOMException('blocked', 'SecurityError');
+      originalRemoveItem.call(this, key);
+    };
+  }, analyticsConsentStorageKey);
+  await page.goto('/');
+  await page.evaluate(() => {
+    const script = document.createElement('script');
+    script.dataset.googleTag = 'analytics';
+    document.head.append(script);
+  });
+
+  await page.getByRole('button', { name: 'Préférences de mesure' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Refuser' }).click();
+
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('status')).toHaveText(/n’a pas permis d’enregistrer le refus/);
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBe('granted');
+  expect(
+    await page.evaluate(
+      (measurementId) => (window as unknown as Record<string, unknown>)[`ga-disable-${measurementId}`],
+      analyticsMeasurementId,
+    ),
+  ).toBe(true);
+  await expect(page.locator('script[data-google-tag="analytics"]')).toHaveCount(0);
+});
+
+test('remembers consent locally without polluting Analytics from non-production origins', async ({ page }) => {
+  const analyticsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (isAnalyticsRequest(request.url())) analyticsRequests.push(request.url());
+  });
+
+  await page.goto('/');
+  await page.getByRole('dialog').getByRole('button', { name: 'Accepter' }).click();
+
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBe('granted');
+  expect(
+    await page.evaluate(
+      (measurementId) => (window as unknown as Record<string, unknown>)[`ga-disable-${measurementId}`],
+      analyticsMeasurementId,
+    ),
+  ).toBe(false);
+  expect(analyticsRequests).toEqual([]);
+
+  await page.evaluate(() => {
+    document.cookie = '_ga=test-client; Path=/';
+    document.cookie = '_ga_S0SKT2CTV0=test-session; Path=/';
+  });
+  await page.getByRole('button', { name: 'Préférences de mesure' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Refuser' }).click();
+  await page.waitForLoadState('domcontentloaded');
+
+  expect(await page.evaluate((key) => localStorage.getItem(key), analyticsConsentStorageKey)).toBe('denied');
+  expect(
+    await page.evaluate(
+      (measurementId) => (window as unknown as Record<string, unknown>)[`ga-disable-${measurementId}`],
+      analyticsMeasurementId,
+    ),
+  ).toBe(true);
+  await expect(page.locator(`script[src="${googleTagSource}"]`)).toHaveCount(0);
+  expect(analyticsRequests).toEqual([]);
+  expect(await page.context().cookies()).not.toEqual(
+    expect.arrayContaining([expect.objectContaining({ name: expect.stringMatching(/^_ga(?:_|$)/) })]),
+  );
+});
+
+test('offers analytics consent controls on every public document', async ({ page }) => {
+  for (const path of ['/', '/confidentialite/', '/404.html']) {
+    await page.goto(path);
+    await page.evaluate((key) => localStorage.removeItem(key), analyticsConsentStorageKey);
+    await page.reload();
+
+    await expect(page.getByRole('dialog', { name: 'Votre choix, avant toute mesure.' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Préférences de mesure' })).toBeVisible();
+  }
 });
 
 test('has no automatically detectable accessibility violations on public pages', async ({ page }) => {
@@ -292,11 +560,18 @@ test('publishes a complete privacy SEO contract', async ({ page }) => {
     'href',
     'https://vercel.com/legal/privacy-notice',
   );
+  await expect(page.getByRole('heading', { name: 'Mesure d’audience facultative' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Règles de confidentialité de Google' })).toHaveAttribute(
+    'href',
+    'https://policies.google.com/privacy?hl=fr-CA',
+  );
+  await expect(page.getByText(/aucun script Google Analytics n’est chargé/i)).toBeVisible();
+  await expect(page.getByText('_ga', { exact: true })).toBeVisible();
   await expect(page.getByText('GitHub Pages', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Retour au site' })).toHaveAttribute('href', '/');
 
   const description =
-    'Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web.';
+    'Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement.';
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
   expect(description.length).toBeGreaterThanOrEqual(120);
   expect(description.length).toBeLessThanOrEqual(170);

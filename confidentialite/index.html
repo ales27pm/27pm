@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#F4F0E7" />
     <meta
       name="description"
-      content="Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web."
+      content="Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement."
     />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://27pm.org/confidentialite/" />
@@ -20,7 +20,7 @@
     <meta property="og:title" content="Politique de confidentialité | 27PM" />
     <meta
       property="og:description"
-      content="Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web."
+      content="Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement."
     />
     <meta property="og:image" content="https://27pm.org/assets/og-27pm-1200x630.png" />
     <meta property="og:image:width" content="1200" />
@@ -34,9 +34,9 @@
         "@type": "WebPage",
         "name": "Politique de confidentialité | 27PM",
         "url": "https://27pm.org/confidentialite/",
-        "description": "Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web.",
+        "description": "Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement.",
         "inLanguage": "fr-CA",
-        "dateModified": "2026-08-29",
+        "dateModified": "2026-08-30",
         "isPartOf": {
           "@type": "WebSite",
           "name": "27PM",
@@ -64,21 +64,30 @@
 
     <main class="legal-main" id="contenu">
       <aside class="legal-aside" aria-label="Information sur la mise à jour">
-        <p class="legal-date">Mise à jour · 29 août 2026</p>
+        <p class="legal-date">Mise à jour · 30 août 2026</p>
         <img src="/assets/brand-v4/27pm-mark-1024.webp" width="1024" height="1024" alt="" aria-hidden="true" />
       </aside>
       <article>
         <h1>Politique de confidentialité</h1>
-        <p class="legal-lead">27PM limite la collecte de renseignements personnels à ce qui est nécessaire pour répondre aux demandes qui lui sont adressées.</p>
+        <p class="legal-lead">27PM limite la collecte de renseignements personnels et n’active la mesure d’audience qu’après un accord explicite.</p>
 
         <section>
           <h2>Renseignements transmis par courriel</h2>
           <p>Le site n’utilise pas de formulaire qui enregistre vos renseignements. Lorsque vous choisissez d’écrire à 27PM, votre logiciel de courriel s’ouvre. Les renseignements que vous transmettez alors sont utilisés pour comprendre votre demande, vous répondre et assurer le suivi de la relation d’affaires.</p>
         </section>
 
+        <section id="mesure-audience">
+          <h2>Mesure d’audience facultative</h2>
+          <p>Avec votre consentement, 27PM utilise Google Analytics 4, fourni par Google LLC, uniquement pour produire des statistiques de fréquentation et améliorer le site. Avant votre acceptation, aucun script Google Analytics n’est chargé et aucune donnée analytique n’est transmise à Google.</p>
+          <p>Après acceptation, Google peut recevoir un identifiant aléatoire, les pages consultées, la provenance de la visite, la date et l’heure, ainsi que des renseignements sur le navigateur, l’appareil et la localisation approximative. La mesure améliorée est limitée aux pages vues; les clics sortants, défilements, recherches, formulaires, vidéos, téléchargements et données fournies par les utilisateurs sont désactivés. GA4 génère aussi les événements techniques automatiques nécessaires pour établir la première visite, la session et l’engagement. Avant de configurer la balise, le site limite l’adresse de page aux routes canoniques publiées, classe toute route inconnue comme page 404, retire les paramètres et fragments, puis réduit le référent à son origine. La balise installée par 27PM ne définit aucun événement destiné à transmettre à Analytics votre nom, votre adresse courriel ou le contenu saisi dans le brief de projet. Les fonctions publicitaires, la personnalisation publicitaire et Google Signals sont désactivés.</p>
+          <p>Google Analytics peut déposer les témoins <code>_ga</code> et <code>_ga_&lt;identifiant&gt;</code>. Le site les configure pour expirer après un maximum de deux mois, sans prolonger cette échéance à chaque visite. Les renseignements peuvent être traités à l’extérieur du Québec par Google et ses fournisseurs.</p>
+          <p>Vous pouvez refuser sans perdre aucune fonctionnalité et modifier votre choix en tout temps au moyen du bouton « Préférences de mesure » au bas de chaque page. Votre choix est conservé dans le stockage local jusqu’à ce que vous le modifiiez ou effaciez les données du navigateur. Le retrait bloque les mesures futures et supprime les témoins analytiques de ce navigateur; il n’efface pas automatiquement les données déjà recueillies.</p>
+          <p><a href="https://policies.google.com/privacy?hl=fr-CA">Règles de confidentialité de Google</a></p>
+        </section>
+
         <section>
           <h2>Données techniques</h2>
-          <p>Le site n’intègre ni outil publicitaire, ni profilage, ni témoin de suivi. Le site public est hébergé par <a href="https://vercel.com/legal/privacy-notice">Vercel</a>. Comme tout service web, l’hébergeur peut traiter l’adresse IP et des journaux techniques nécessaires à la sécurité, à la disponibilité et au diagnostic du service, conformément à sa propre politique de confidentialité.</p>
+          <p>En dehors de la mesure facultative décrite ci-dessus, le site n’intègre ni outil publicitaire ni profilage. Le site public est hébergé par <a href="https://vercel.com/legal/privacy-notice">Vercel</a>. Comme tout service web, l’hébergeur peut traiter l’adresse IP et des journaux techniques nécessaires à la sécurité, à la disponibilité et au diagnostic du service, conformément à sa propre politique de confidentialité.</p>
         </section>
 
         <section>
@@ -100,8 +109,40 @@
 
     <footer class="legal-footer">
       <span>© <span data-year>2026</span> 27PM</span>
-      <a href="mailto:bonjour@27pm.org">bonjour@27pm.org</a>
+      <div class="legal-footer__links">
+        <button class="analytics-preferences" type="button" data-analytics-preferences hidden>
+          Préférences de mesure
+        </button>
+        <a href="mailto:bonjour@27pm.org">bonjour@27pm.org</a>
+      </div>
     </footer>
+    <div
+      class="analytics-consent"
+      role="dialog"
+      aria-labelledby="analytics-consent-title"
+      aria-describedby="analytics-consent-description"
+      data-analytics-consent
+      hidden
+    >
+      <div>
+        <p class="analytics-consent__eyebrow">Mesure d’audience facultative</p>
+        <h2 id="analytics-consent-title" data-analytics-consent-title tabindex="-1">
+          Votre choix, avant toute mesure.
+        </h2>
+        <p class="analytics-consent__description" id="analytics-consent-description">
+          Avec votre accord, 27PM utilise Google Analytics 4 pour comprendre les visites et améliorer le site.
+          Avant votre acceptation, aucun script Google n’est chargé et aucune mesure n’est transmise.
+          <a href="%BASE_URL%confidentialite/#mesure-audience">En savoir plus</a>
+        </p>
+      </div>
+      <div class="analytics-consent__actions">
+        <button class="analytics-consent__button" type="button" data-analytics-deny>Refuser</button>
+        <button class="analytics-consent__button analytics-consent__button--accept" type="button" data-analytics-accept>
+          Accepter
+        </button>
+      </div>
+      <p class="analytics-consent__status" role="status" aria-live="polite" data-analytics-status></p>
+    </div>
     <script type="module" src="/src/privacy.ts"></script>
   </body>
 </html>

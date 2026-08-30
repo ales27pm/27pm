@@ -80,6 +80,15 @@
   line-height: 1.72;
 }
 
+.legal-main section p + p {
+  margin-top: 1rem;
+}
+
+.legal-main code {
+  color: var(--ink);
+  font-size: 0.92em;
+}
+
 .legal-main section a {
   color: var(--blue-deep);
   text-underline-offset: 0.25em;

@@ -385,7 +385,7 @@
             </form>
 
             <p class="scenario-note">
-              Cette démonstration s’exécute dans votre navigateur. Aucune donnée n’est envoyée et le résultat ne constitue pas une estimation de projet.
+              Cette démonstration s’exécute dans votre navigateur. Les choix saisis servent uniquement au résultat affiché et ne sont pas transmis à 27PM. Le résultat ne constitue pas une estimation de projet.
             </p>
           </div>
 
@@ -499,7 +499,7 @@
             </div>
 
             <p class="project-mail-note" id="project-mail-note">
-              Le bouton ouvre votre application de courriel avec un message préparé; aucune donnée n’est recueillie sur ce site.
+              Le bouton ouvre votre application de courriel avec un message préparé. Le site ne transmet pas à 27PM les champs saisis; leur envoi dépend uniquement de votre application de courriel.
             </p>
             <a
               class="button project-mail"
@@ -554,9 +554,40 @@
         <a href="mailto:bonjour@27pm.org">bonjour@27pm.org</a>
         <span>Québec, Canada</span>
         <a href="%BASE_URL%confidentialite/">Confidentialité</a>
+        <button class="analytics-preferences" type="button" data-analytics-preferences hidden>
+          Préférences de mesure
+        </button>
         <span>© <span data-year>2026</span> 27PM</span>
       </div>
     </footer>
+
+    <div
+      class="analytics-consent"
+      role="dialog"
+      aria-labelledby="analytics-consent-title"
+      aria-describedby="analytics-consent-description"
+      data-analytics-consent
+      hidden
+    >
+      <div>
+        <p class="analytics-consent__eyebrow">Mesure d’audience facultative</p>
+        <h2 id="analytics-consent-title" data-analytics-consent-title tabindex="-1">
+          Votre choix, avant toute mesure.
+        </h2>
+        <p class="analytics-consent__description" id="analytics-consent-description">
+          Avec votre accord, 27PM utilise Google Analytics 4 pour comprendre les visites et améliorer le site.
+          Avant votre acceptation, aucun script Google n’est chargé et aucune mesure n’est transmise.
+          <a href="%BASE_URL%confidentialite/#mesure-audience">En savoir plus</a>
+        </p>
+      </div>
+      <div class="analytics-consent__actions">
+        <button class="analytics-consent__button" type="button" data-analytics-deny>Refuser</button>
+        <button class="analytics-consent__button analytics-consent__button--accept" type="button" data-analytics-accept>
+          Accepter
+        </button>
+      </div>
+      <p class="analytics-consent__status" role="status" aria-live="polite" data-analytics-status></p>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

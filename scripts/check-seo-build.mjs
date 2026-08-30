@@ -1,15 +1,18 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
 const readDist = (path) => readFile(resolve(root, 'dist', path), 'utf8');
+const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
 const description =
-  'Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web.';
+  'Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement.';
+const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 
-const [home, privacy, robots, sitemap, vercelConfigText] = await Promise.all([
+const [home, privacy, notFound, robots, sitemap, vercelConfigText] = await Promise.all([
   readDist('index.html'),
   readDist('confidentialite/index.html'),
+  readDist('404.html'),
   readDist('robots.txt'),
   readDist('sitemap.xml'),
   readFile(resolve(root, 'vercel.json'), 'utf8'),
@@ -23,6 +26,36 @@ const metaContent = (html, attribute, value) => {
 
 assert.match(home, /<meta\s+name="robots"\s+content="index, follow"/i, 'home must remain indexable');
 assert.match(home, /<link\s+rel="canonical"\s+href="https:\/\/27pm\.org\/"/i, 'home canonical must remain stable');
+
+for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
+  assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
+  assert.match(html, /data-analytics-preferences/, `${name} must expose persistent analytics preferences`);
+  assert.doesNotMatch(html, directGoogleResource, `${name} must not embed a pre-consent Google resource`);
+}
+
+const assetFiles = await readdir(resolve(root, 'dist', 'assets'));
+const compiledJavascript = (
+  await Promise.all(
+    assetFiles
+      .filter((file) => file.endsWith('.js'))
+      .map((file) => readDist(`assets/${file}`)),
+  )
+).join('\n');
+if (analyticsApproved) {
+  assert.match(compiledJavascript, /G-S0SKT2CTV0/, 'approved assets must contain the GA4 measurement ID');
+  assert.match(
+    compiledJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'approved assets must contain the consent-gated Google tag loader',
+  );
+} else {
+  assert.doesNotMatch(compiledJavascript, /G-S0SKT2CTV0/, 'unapproved assets must exclude the GA4 measurement ID');
+  assert.doesNotMatch(
+    compiledJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'unapproved assets must exclude the Google tag loader',
+  );
+}
 
 assert.equal(metaContent(privacy, 'name', 'description'), description, 'privacy description must match approved copy');
 assert.ok(description.length >= 120 && description.length <= 170, 'privacy description must contain 120–170 characters');
@@ -72,6 +105,8 @@ assert.deepEqual(
   'privacy JSON-LD must describe the visible page',
 );
 assert.match(privacy, /href="https:\/\/vercel\.com\/legal\/privacy-notice">Vercel<\/a>/, 'privacy copy must name Vercel');
+assert.match(privacy, /Google Analytics 4/, 'privacy copy must identify the audience measurement provider');
+assert.match(privacy, /aucun script Google Analytics n’est chargé/i, 'privacy copy must disclose pre-consent blocking');
 assert.doesNotMatch(privacy, /GitHub Pages/i, 'privacy copy must not name the former host');
 
 assert.match(robots, /Sitemap: https:\/\/27pm\.org\/sitemap\.xml/, 'robots must advertise the canonical sitemap');

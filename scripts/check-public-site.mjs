@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 
 const origin = new URL(process.env.PUBLIC_SITE_ORIGIN ?? 'https://27pm.org');
 const timeoutMs = Number(process.env.PUBLIC_SITE_TIMEOUT_MS ?? 12_000);
+const analyticsApproved = process.env.PUBLIC_SITE_ANALYTICS_APPROVED === 'true';
+const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 const verifiedDemoProjects = new Map([
   ['boulet', {
     href: 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
@@ -99,7 +101,9 @@ const { body: home, response: homeResponse } = await requireOk('/', [
   '<link rel="canonical" href="https://27pm.org/"',
   'Une idée. Plusieurs métiers.',
   'data-scenario-form',
-  'Aucune donnée n’est envoyée',
+  'Les choix saisis servent uniquement au résultat affiché',
+  'data-analytics-consent',
+  'data-analytics-preferences',
   'Concept indépendant 27PM',
   'Non officiel et non déployé',
   'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
@@ -107,17 +111,64 @@ const { body: home, response: homeResponse } = await requireOk('/', [
 ]);
 requireProductionHeaders('/', homeResponse);
 assert.doesNotMatch(home, /\.ts\.net/i, 'deployed home must not expose private Tailnet URLs');
+assert.doesNotMatch(home, directGoogleResource, 'deployed home must not embed a pre-consent Google resource');
 
 const { body: privacy, response: privacyResponse } = await requireOk('/confidentialite/', [
   'Politique de confidentialité',
   '<link rel="canonical" href="https://27pm.org/confidentialite/"',
-  'Découvrez comment 27PM limite la collecte, l’utilisation et la conservation',
+  'Découvrez comment 27PM protège les renseignements transmis par courriel',
   '<meta property="og:url" content="https://27pm.org/confidentialite/"',
   '"@type": "WebPage"',
+  'Google Analytics 4',
+  'data-analytics-consent',
+  'data-analytics-preferences',
   'https://vercel.com/legal/privacy-notice',
 ]);
 requireProductionHeaders('/confidentialite/', privacyResponse);
 assert.doesNotMatch(privacy, /GitHub Pages/i, 'deployed privacy copy must not name the former host');
+assert.doesNotMatch(privacy, directGoogleResource, 'deployed privacy page must not embed a pre-consent Google resource');
+
+const javascriptAssetUrls = new Set(
+  [home, privacy].flatMap((html) =>
+    [...html.matchAll(/(?:src|href)="([^"]+\.js)"/gi)].map(
+      (match) => new URL(match[1], origin).href,
+    ),
+  ),
+);
+assert.ok(javascriptAssetUrls.size > 0, 'deployed pages must reference their JavaScript assets');
+const deployedJavascriptParts = [];
+for (const href of javascriptAssetUrls) {
+  const url = new URL(href);
+  assert.equal(url.origin, origin.origin, `${url}: JavaScript asset must stay on the canonical origin`);
+  const response = await get(url, { headers: { accept: 'application/javascript,*/*;q=0.8' } });
+  assert.ok(response.ok, `${url}: expected JavaScript asset, received ${response.status}`);
+  assert.equal(new URL(response.url).origin, origin.origin, `${url}: JavaScript asset must not redirect off-site`);
+  const source = await response.text();
+  deployedJavascriptParts.push(source);
+
+  for (const match of source.matchAll(/(?:from\s*|import\s*\(\s*)["']([^"']+\.js(?:\?[^"']*)?)["']/g)) {
+    const dependency = new URL(match[1], url);
+    assert.equal(dependency.origin, origin.origin, `${dependency}: JavaScript dependency must stay on the canonical origin`);
+    javascriptAssetUrls.add(dependency.href);
+  }
+}
+const deployedJavascript = deployedJavascriptParts.join('\n');
+if (analyticsApproved) {
+  assert.match(deployedJavascript, /G-S0SKT2CTV0/, 'approved deployed assets must contain the GA4 measurement ID');
+  assert.match(
+    deployedJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'approved deployed assets must contain the consent-gated Google tag loader',
+  );
+} else {
+  assert.doesNotMatch(deployedJavascript, /G-S0SKT2CTV0/, 'unapproved deployed assets must exclude the GA4 measurement ID');
+  assert.doesNotMatch(
+    deployedJavascript,
+    /www\.googletagmanager\.com\/gtag\/js/,
+    'unapproved deployed assets must exclude the Google tag loader',
+  );
+}
+
 await requirePermanentRedirect('/confidentialite', '/confidentialite/');
 await requirePermanentRedirect('/index.html', '/');
 await requirePermanentRedirect('/confidentialite/index.html', '/confidentialite/');
@@ -129,6 +180,8 @@ const missingResponse = await get(missingUrl);
 const missingBody = await missingResponse.text();
 assert.equal(missingResponse.status, 404, `${missingUrl}: missing routes must return HTTP 404`);
 assert.ok(missingBody.includes('Cette page est hors cadre.'), `${missingUrl}: missing routes must use the branded 404 document`);
+assert.ok(missingBody.includes('data-analytics-consent'), `${missingUrl}: 404 must expose analytics consent controls`);
+assert.doesNotMatch(missingBody, directGoogleResource, `${missingUrl}: 404 must not embed a pre-consent Google resource`);
 
 if (origin.hostname === '27pm.org') {
   const wwwUrl = 'https://www.27pm.org/';
