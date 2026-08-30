@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:pages": "tsc --noEmit && vite build --mode github-pages",
-    "build:pages:preview": "PAGES_BASE_PATH=/27pm PAGES_HOST=ales27pm.github.io npm run build:pages",
+    "build:pages:preview": "VITE_TURNSTILE_SITE_KEY= PAGES_BASE_PATH=/27pm PAGES_HOST=ales27pm.github.io npm run build:pages",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",

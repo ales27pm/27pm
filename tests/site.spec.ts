@@ -14,6 +14,7 @@ const isAnalyticsRequest = (url: string) => {
     || isHostOrSubdomain(hostname, 'doubleclick.net')
     || hostname === 'www.google.com';
 };
+const expectedTurnstileSiteKey = process.env.EXPECTED_TURNSTILE_SITE_KEY;
 
 test.beforeEach(async ({ page }) => {
   await page.route(
@@ -264,9 +265,14 @@ test('submits the exact queued CRM contract once with Turnstile enabled', async 
 
   await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'enabled');
   await expect.poll(() => page.evaluate(() => {
-    const options = (window as typeof window & { __turnstileOptions?: { action?: string } }).__turnstileOptions;
-    return options?.action;
-  })).toBe('crm_intake');
+    const options = (
+      window as typeof window & { __turnstileOptions?: { action?: string; sitekey?: string } }
+    ).__turnstileOptions;
+    return options ? { action: options.action, sitekey: options.sitekey } : undefined;
+  })).toMatchObject({
+    action: 'crm_intake',
+    ...(expectedTurnstileSiteKey ? { sitekey: expectedTurnstileSiteKey } : {}),
+  });
 
   await page.getByLabel('Votre projet').fill('Créer un portail client accessible.');
   await page.getByLabel('Votre organisation').fill('Atelier Exemple');

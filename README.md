@@ -43,7 +43,7 @@ Le laboratoire compose localement une piste de solution à partir de trois choix
 
 ### Configuration du formulaire CRM
 
-La seule variable cliente requise est une clé **publique** de site Turnstile :
+La seule variable cliente requise est une clé **publique** de site Turnstile. L’ancien build `github-pages` la charge de façon déterministe depuis `.env.github-pages`; son build preview la neutralise explicitement afin de conserver le fallback hors de `27pm.org`.
 
 ```bash
 VITE_TURNSTILE_SITE_KEY="<site-key-publique-pour-27pm.org>" npm run build
