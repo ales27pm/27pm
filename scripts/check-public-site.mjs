@@ -55,10 +55,46 @@ const requireOk = async (path, markers = []) => {
   for (const marker of markers) {
     assert.ok(body.includes(marker), `${url}: missing expected marker ${JSON.stringify(marker)}`);
   }
-  return body;
+  return { body, response };
 };
 
-const home = await requireOk('/', [
+const requireProductionHeaders = (path, response) => {
+  const expectedHeaders = new Map([
+    ['x-content-type-options', 'nosniff'],
+    ['referrer-policy', 'strict-origin-when-cross-origin'],
+    ['x-frame-options', 'DENY'],
+    ['permissions-policy', 'camera=(), microphone=(), geolocation=()'],
+  ]);
+
+  for (const [header, expectedValue] of expectedHeaders) {
+    assert.equal(
+      response.headers.get(header),
+      expectedValue,
+      `${new URL(path, origin)}: expected ${header}: ${expectedValue}`,
+    );
+  }
+  assert.equal(
+    response.headers.get('x-robots-tag'),
+    null,
+    `${new URL(path, origin)}: must not emit X-Robots-Tag`,
+  );
+};
+
+const requirePermanentRedirect = async (path, destination) => {
+  const url = new URL(path, origin);
+  const response = await get(url, { redirect: 'manual' });
+  assert.ok(
+    [301, 308].includes(response.status),
+    `${url}: expected a permanent redirect, received ${response.status}`,
+  );
+  assert.equal(
+    new URL(response.headers.get('location') ?? '', url).href,
+    new URL(destination, origin).href,
+    `${url}: redirect must target the canonical URL`,
+  );
+};
+
+const { body: home, response: homeResponse } = await requireOk('/', [
   '<title>27PM | Sites web, applications et IA sur mesure</title>',
   '<link rel="canonical" href="https://27pm.org/"',
   'Une idée. Plusieurs métiers.',
@@ -69,13 +105,22 @@ const home = await requireOk('/', [
   'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
   'https://ales27pm.github.io/s-turner/',
 ]);
+requireProductionHeaders('/', homeResponse);
 assert.doesNotMatch(home, /\.ts\.net/i, 'deployed home must not expose private Tailnet URLs');
 
-await requireOk('/confidentialite/', [
+const { body: privacy, response: privacyResponse } = await requireOk('/confidentialite/', [
   'Politique de confidentialité',
   '<link rel="canonical" href="https://27pm.org/confidentialite/"',
-  'GitHub Pages',
+  'Découvrez comment 27PM limite la collecte, l’utilisation et la conservation',
+  '<meta property="og:url" content="https://27pm.org/confidentialite/"',
+  '"@type": "WebPage"',
+  'https://vercel.com/legal/privacy-notice',
 ]);
+requireProductionHeaders('/confidentialite/', privacyResponse);
+assert.doesNotMatch(privacy, /GitHub Pages/i, 'deployed privacy copy must not name the former host');
+await requirePermanentRedirect('/confidentialite', '/confidentialite/');
+await requirePermanentRedirect('/index.html', '/');
+await requirePermanentRedirect('/confidentialite/index.html', '/confidentialite/');
 await requireOk('/robots.txt', ['Sitemap: https://27pm.org/sitemap.xml']);
 await requireOk('/sitemap.xml', ['https://27pm.org/confidentialite/']);
 

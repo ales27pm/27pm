@@ -17,9 +17,10 @@
     "test:e2e": "npm run build && playwright test",
     "check:pages": "node scripts/check-pages-build.mjs",
     "check:pages:preview": "PAGES_BASE_PATH=/27pm PAGES_HOST=ales27pm.github.io npm run check:pages",
-    "check:release": "npm run build:pages && npm run check:pages",
+    "check:seo": "node scripts/check-seo-build.mjs",
+    "check:release": "npm run build && npm run check:seo",
     "check:public": "node scripts/check-public-site.mjs",
-    "check": "npm run lint && npm run test && npm run build"
+    "check": "npm run lint && npm run test && npm run build && npm run check:seo"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.3.0",

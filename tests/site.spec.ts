@@ -282,15 +282,64 @@ test('publishes the selected brand asset set', async ({ page, request }) => {
   );
 });
 
-test('publishes a reachable privacy page', async ({ page }) => {
+test('publishes a complete privacy SEO contract', async ({ page }) => {
   await page.goto('/confidentialite/');
 
-  await expect(page).toHaveTitle('Confidentialité | 27PM');
+  await expect(page).toHaveTitle('Politique de confidentialité | 27PM');
   await expect(page.getByRole('heading', { level: 1, name: 'Politique de confidentialité' })).toBeVisible();
   await expect(page.getByText('Responsable de la protection des renseignements personnels', { exact: true })).toBeVisible();
-  await expect(page.getByText('GitHub Pages', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Selon le service d’hébergement retenu/)).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Vercel' })).toHaveAttribute(
+    'href',
+    'https://vercel.com/legal/privacy-notice',
+  );
+  await expect(page.getByText('GitHub Pages', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Retour au site' })).toHaveAttribute('href', '/');
+
+  const description =
+    'Découvrez comment 27PM limite la collecte, l’utilisation et la conservation des renseignements personnels transmis par courriel sur son site web.';
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
+  expect(description.length).toBeGreaterThanOrEqual(120);
+  expect(description.length).toBeLessThanOrEqual(170);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://27pm.org/confidentialite/',
+  );
+
+  for (const [property, content] of [
+    ['og:type', 'website'],
+    ['og:locale', 'fr_CA'],
+    ['og:site_name', '27PM'],
+    ['og:url', 'https://27pm.org/confidentialite/'],
+    ['og:title', 'Politique de confidentialité | 27PM'],
+    ['og:description', description],
+    ['og:image', 'https://27pm.org/assets/og-27pm-1200x630.png'],
+    ['og:image:width', '1200'],
+    ['og:image:height', '630'],
+    ['og:image:alt', '27PM — Politique de confidentialité'],
+  ] as const) {
+    await expect(page.locator(`meta[property="${property}"]`)).toHaveAttribute('content', content);
+  }
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    'content',
+    'summary_large_image',
+  );
+
+  const webPage = await page.locator('script[type="application/ld+json"]').textContent();
+  expect(webPage).not.toBeNull();
+  expect(JSON.parse(webPage ?? '{}')).toMatchObject({
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Politique de confidentialité | 27PM',
+    url: 'https://27pm.org/confidentialite/',
+    description,
+    inLanguage: 'fr-CA',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: '27PM',
+      url: 'https://27pm.org/',
+    },
+  });
 });
 
 test('provides a branded, non-indexable 404 document', async ({ page }) => {

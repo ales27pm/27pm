@@ -24,11 +24,11 @@ npm run check:release
 
 ## Déploiement
 
-GitHub Pages publie le contenu validé de la branche `gh-pages`. `npm run check:release` produit par défaut le site `https://27pm.org/`, génère `CNAME` et `.nojekyll`, puis vérifie le chemin de base, les liens publics, les manifestes et les icônes avant publication.
+Vercel publie `https://27pm.org/` à partir de la branche `main`. La commande `npm run check:release` construit le site avec Vite, puis vérifie les métadonnées, les données structurées, les fichiers destinés aux moteurs de recherche et la configuration de canonicalisation Vercel.
 
-Pour inspecter une variante locale correspondant à `ales27pm.github.io/27pm/`, utiliser `npm run build:pages:preview && npm run check:pages:preview`. Cette variante est en `noindex` et n’émet pas de `CNAME`; elle ne doit pas remplacer la branche de production.
+`vercel.json` impose les URL avec slash final et redirige les chemins `index.html` vers leurs URL canoniques. Après une publication, `npm run check:public` contrôle HTTPS, les routes canoniques, les redirections permanentes, `www` et les destinations de portfolio marquées comme publiques. Ce contrôle réseau reste séparé de `npm run check` afin que la validation locale demeure déterministe.
 
-Après une publication, `npm run check:public` contrôle HTTPS, les routes canoniques, la redirection `www` et les destinations de portfolio marquées comme publiques. Ce contrôle réseau reste séparé de `npm run check` afin que la validation locale demeure déterministe.
+Les commandes `build:pages`, `check:pages` et leurs variantes `preview` restent disponibles pour valider les anciens profils de build GitHub Pages. Elles ne constituent pas une voie de production tant que la politique de confidentialité nomme Vercel comme hébergeur. La variante `ales27pm.github.io/27pm/` reste en `noindex` et n’émet pas de `CNAME`.
 
 ## Structure
 
@@ -43,7 +43,7 @@ Le laboratoire compose localement une piste de solution à partir de trois choix
 
 ## Avant la mise en ligne
 
-- Dans les réglages Pages, confirmer la branche `gh-pages`, le domaine `27pm.org`, le certificat puis activer **Enforce HTTPS**. Les enregistrements DNS doivent suivre la [configuration officielle de GitHub Pages](https://docs.github.com/fr/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
-- Configurer l’hébergeur pour servir `404.html` avec un véritable statut HTTP `404`.
+- Dans Vercel, confirmer la branche de production `main`, le domaine `27pm.org`, la redirection `www` et le certificat TLS.
+- Confirmer que Vercel sert `404.html` avec un véritable statut HTTP `404` et applique les redirections de `vercel.json`.
 - Rediriger `www.27pm.org` vers `https://27pm.org/` de façon permanente, puis exécuter `npm run check:public`.
 - Faire confirmer par la direction les territoires de traitement, les durées de conservation, le fournisseur de courriel, l’identité légale de l’entreprise et la personne responsable avant de présenter la politique comme une attestation juridique complète.

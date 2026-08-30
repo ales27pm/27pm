@@ -29,7 +29,8 @@ for (const [name, html] of [['home', home], ['privacy', privacy]]) {
 }
 
 assert.doesNotMatch(privacy, /Selon le service d’hébergement retenu/i, 'privacy copy must identify the public host');
-assert.match(privacy, /GitHub Pages/, 'privacy copy must name the public host');
+assert.match(privacy, /Vercel/, 'privacy copy must name the public host');
+assert.doesNotMatch(privacy, /GitHub Pages/, 'privacy copy must not name the former public host');
 assert.match(home, /<title>27PM \| Sites web, applications et IA sur mesure<\/title>/, 'home must publish the v5 title');
 assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
 assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
