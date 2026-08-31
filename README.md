@@ -43,13 +43,13 @@ Le laboratoire compose localement une piste de solution à partir de trois choix
 
 ### Configuration du formulaire CRM
 
-La seule variable cliente requise est une clé **publique** de site Turnstile. L’ancien build `github-pages` la charge de façon déterministe depuis `.env.github-pages`; son build preview la neutralise explicitement afin de conserver le fallback hors de `27pm.org`.
+La seule variable cliente requise est une clé **publique** de site Turnstile. Le build de production Vercel la charge de façon déterministe depuis `.env.production`. L’ancien build `github-pages` utilise `.env.github-pages`; son build preview neutralise explicitement la clé afin de conserver le fallback hors de `27pm.org`.
 
 ```bash
 VITE_TURNSTILE_SITE_KEY="<site-key-publique-pour-27pm.org>" npm run build
 ```
 
-En production, `VITE_TURNSTILE_SITE_KEY` doit être configurée dans Vercel. Ne jamais placer la clé secrète Turnstile dans Vite, le dépôt ou le navigateur. Le widget doit autoriser l’hôte `27pm.org` et le backend doit valider l’action `crm_intake`. Une réponse HTTP `202` indique seulement la mise en file d’examen. Si la variable manque, si Turnstile ne charge pas ou si le CRM refuse la demande, le site conserve le fallback `mailto:`.
+La sitekey est publique et se retrouve nécessairement dans le code client. Ne jamais placer la clé secrète Turnstile dans Vite, le dépôt ou le navigateur. Le widget doit autoriser l’hôte `27pm.org` et le backend doit valider l’action `crm_intake`. Une réponse HTTP `202` indique seulement la mise en file d’examen. Si la variable manque, si Turnstile ne charge pas ou si le CRM refuse la demande, le site conserve le fallback `mailto:`.
 
 L’intégration locale de Google Analytics 4 (`G-S0SKT2CTV0`) utilise un mode de consentement basique : aucune balise Google n’est chargée avant une acceptation explicite, et le chargement est limité à l’origine canonique `https://27pm.org`. L’activation de production est fermée par défaut; elle exige explicitement `VITE_ANALYTICS_APPROVED=true` après signature de l’EFVP. Les refus et acceptations sont conservés localement; le bouton « Préférences de mesure » permet de retirer son accord sur chaque page publique lorsque cette activation est autorisée.
 

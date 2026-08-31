@@ -760,7 +760,7 @@ test('publishes a complete privacy SEO contract', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Retour au site' })).toHaveAttribute('href', '/');
 
   const description =
-    'Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement.';
+    'Découvrez comment 27PM protège les renseignements transmis par formulaire ou courriel et utilise Google Analytics uniquement avec votre consentement.';
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
   expect(description.length).toBeGreaterThanOrEqual(120);
   expect(description.length).toBeLessThanOrEqual(170);

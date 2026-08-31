@@ -6,7 +6,7 @@ const root = process.cwd();
 const readDist = (path) => readFile(resolve(root, 'dist', path), 'utf8');
 const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
 const description =
-  'Découvrez comment 27PM protège les renseignements transmis par courriel et utilise Google Analytics uniquement avec votre consentement.';
+  'Découvrez comment 27PM protège les renseignements transmis par formulaire ou courriel et utilise Google Analytics uniquement avec votre consentement.';
 const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 
 const [home, privacy, notFound, robots, sitemap, vercelConfigText] = await Promise.all([
@@ -17,6 +17,11 @@ const [home, privacy, notFound, robots, sitemap, vercelConfigText] = await Promi
   readDist('sitemap.xml'),
   readFile(resolve(root, 'vercel.json'), 'utf8'),
 ]);
+const productionEnv = await readFile(resolve(root, '.env.production'), 'utf8');
+const publicTurnstileSiteKey = productionEnv.match(
+  /^VITE_TURNSTILE_SITE_KEY=(\S+)$/mu,
+)?.[1];
+assert.ok(publicTurnstileSiteKey, 'production must configure the public Turnstile sitekey');
 
 const metaContent = (html, attribute, value) => {
   const tag = html.match(new RegExp(`<meta\\s+[^>]*${attribute}="${value}"[^>]*>`, 'i'))?.[0];
@@ -41,6 +46,20 @@ const compiledJavascript = (
       .map((file) => readDist(`assets/${file}`)),
   )
 ).join('\n');
+assert.ok(
+  compiledJavascript.includes(publicTurnstileSiteKey),
+  'production assets must contain the configured public Turnstile sitekey',
+);
+assert.match(
+  compiledJavascript,
+  /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/,
+  'production assets must load Turnstile explicitly',
+);
+assert.match(
+  compiledJavascript,
+  /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+  'production assets must target the CRM intake endpoint',
+);
 if (analyticsApproved) {
   assert.match(compiledJavascript, /G-S0SKT2CTV0/, 'approved assets must contain the GA4 measurement ID');
   assert.match(
@@ -105,6 +124,8 @@ assert.deepEqual(
   'privacy JSON-LD must describe the visible page',
 );
 assert.match(privacy, /href="https:\/\/vercel\.com\/legal\/privacy-notice">Vercel<\/a>/, 'privacy copy must name Vercel');
+assert.match(privacy, /Cloudflare Turnstile/, 'privacy copy must identify the anti-bot provider');
+assert.match(privacy, /file d’examen/, 'privacy copy must disclose CRM review queueing');
 assert.match(privacy, /Google Analytics 4/, 'privacy copy must identify the audience measurement provider');
 assert.match(privacy, /aucun script Google Analytics n’est chargé/i, 'privacy copy must disclose pre-consent blocking');
 assert.doesNotMatch(privacy, /GitHub Pages/i, 'privacy copy must not name the former host');

@@ -12,3 +12,4 @@ tmp/
 .env.*
 !.env.example
 !.env.github-pages
+!.env.production
