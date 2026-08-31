@@ -104,6 +104,9 @@ const { body: home, response: homeResponse } = await requireOk('/', [
   'Les choix saisis servent uniquement au résultat affiché',
   'data-analytics-consent',
   'data-analytics-preferences',
+  'data-crm-intake',
+  'Envoyer pour examen',
+  'data-crm-unavailable',
   'Concept indépendant 27PM',
   'Non officiel et non déployé',
   'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/',
@@ -116,10 +119,12 @@ assert.doesNotMatch(home, directGoogleResource, 'deployed home must not embed a 
 const { body: privacy, response: privacyResponse } = await requireOk('/confidentialite/', [
   'Politique de confidentialité',
   '<link rel="canonical" href="https://27pm.org/confidentialite/"',
-  'Découvrez comment 27PM protège les renseignements transmis par courriel',
+  'Découvrez comment 27PM protège les renseignements transmis par formulaire ou courriel',
   '<meta property="og:url" content="https://27pm.org/confidentialite/"',
   '"@type": "WebPage"',
   'Google Analytics 4',
+  'Cloudflare Turnstile',
+  'file d’examen',
   'data-analytics-consent',
   'data-analytics-preferences',
   'https://vercel.com/legal/privacy-notice',
@@ -153,6 +158,21 @@ for (const href of javascriptAssetUrls) {
   }
 }
 const deployedJavascript = deployedJavascriptParts.join('\n');
+assert.match(
+  deployedJavascript,
+  /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/,
+  'deployed assets must contain the Turnstile loader',
+);
+assert.match(
+  deployedJavascript,
+  /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+  'deployed assets must target the CRM intake endpoint',
+);
+assert.match(
+  deployedJavascript,
+  /crm_intake/,
+  'deployed assets must contain the expected Turnstile action',
+);
 if (analyticsApproved) {
   assert.match(deployedJavascript, /G-S0SKT2CTV0/, 'approved deployed assets must contain the GA4 measurement ID');
   assert.match(
