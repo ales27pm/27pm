@@ -285,6 +285,12 @@ test('submits the exact queued CRM contract once with Turnstile enabled', async 
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect(page.locator('[data-project-status]')).toHaveText('Envoi sécurisé en cours…');
+  await expect(page.getByLabel('Votre projet')).toBeDisabled();
+  await expect(page.getByLabel('Votre organisation')).toBeDisabled();
+  await expect(page.getByLabel('Votre nom')).toBeDisabled();
+  await expect(page.getByLabel('Votre courriel')).toBeDisabled();
+  await expect(page.getByLabel('Une application', { exact: true })).toBeDisabled();
+  await expect(page.getByLabel(/J’ai pris connaissance/)).toBeDisabled();
   await page.locator('[data-contact-form]').evaluate((form) => {
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   });
@@ -295,6 +301,7 @@ test('submits the exact queued CRM contract once with Turnstile enabled', async 
     'Demande reçue et placée dans la file d’examen. Aucun message ni suivi n’est envoyé automatiquement.',
   );
   await expect(submit).toBeDisabled();
+  await expect(page.getByLabel('Votre organisation')).toBeEnabled();
   expect(capturedHeaders['content-type']).toBe('application/json');
   expect(capturedHeaders['idempotency-key']).toMatch(
     /^form-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,

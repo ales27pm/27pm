@@ -426,6 +426,22 @@ function updateCrmSubmitAvailability(): void {
   crmSubmit.disabled = !turnstileToken || submissionInFlight || submissionAccepted;
 }
 
+function setIntakeControlsDisabled(disabled: boolean): void {
+  projectOptions.forEach((option) => {
+    option.disabled = disabled;
+  });
+  [
+    contactContext,
+    contactOrganization,
+    contactName,
+    contactReply,
+    contactWebsite,
+    contactPrivacy,
+  ].forEach((control) => {
+    if (control) control.disabled = disabled;
+  });
+}
+
 function clearIntakeInvalidState(): void {
   [contactOrganization, contactName, contactReply, contactContext, contactPrivacy].forEach((input) => {
     input?.removeAttribute('aria-invalid');
@@ -568,6 +584,7 @@ contactForm?.addEventListener('submit', async (event) => {
 
   submissionKey ??= createIdempotencyKey();
   submissionInFlight = true;
+  setIntakeControlsDisabled(true);
   if (contactForm) contactForm.setAttribute('aria-busy', 'true');
   if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoi en cours…';
   setContactStatus('Envoi sécurisé en cours…', 'loading');
@@ -575,6 +592,7 @@ contactForm?.addEventListener('submit', async (event) => {
 
   const result = await submitPublicIntake(createPublicIntakePayload(draft), submissionKey);
   submissionInFlight = false;
+  setIntakeControlsDisabled(false);
   contactForm?.removeAttribute('aria-busy');
   if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoyer pour examen';
 
