@@ -51,6 +51,19 @@ describe('analytics consent contract', () => {
     expect(sanitizeAnalyticsReferrer('not a url')).toBe('');
   });
 
+  it('recognizes published service and study pages without retaining visitor input', () => {
+    for (const path of [
+      '/services/sites-catalogues-fabricants/',
+      '/services/applications-web-sur-mesure/',
+      '/services/automatisation-ia/',
+      '/etudes/boulet/',
+      '/etudes/maisons-turner/',
+    ]) {
+      expect(sanitizeAnalyticsPageLocation(`https://27pm.org${path}?email=private@example.test#brief`)).toBe(`https://27pm.org${path}`);
+    }
+    expect(sanitizeAnalyticsPageLocation('https://27pm.org/etudes/private-client/')).toBe('https://27pm.org/404.html');
+  });
+
   it('fails closed when a browser cannot replace or remove an old grant', () => {
     let value: string | null = 'granted';
     const removableStorage = {

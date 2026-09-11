@@ -1,3 +1,36 @@
+.service-paths {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.service-paths a {
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--line);
+  color: var(--blue-deep);
+  font-size: 1.1rem;
+  font-weight: 620;
+  line-height: 1.5;
+  text-underline-offset: 0.25em;
+}
+
+.case-study-link {
+  display: block;
+  width: fit-content;
+  margin-top: 1.25rem;
+  color: var(--blue-deep);
+  font-weight: 620;
+  text-underline-offset: 0.25em;
+}
+
+@media (max-width: 650px) {
+  .service-paths {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
 .site-header {
   position: relative;
   z-index: 20;
@@ -1053,7 +1086,17 @@
   outline-offset: 2px;
 }
 
+.privacy-acknowledgement__copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.privacy-acknowledgement__copy label {
+  cursor: pointer;
+}
+
 .privacy-acknowledgement a {
+  width: fit-content;
   font-weight: 650;
   text-underline-offset: 0.18em;
 }

@@ -1,3 +1,5 @@
+import contentRoutes from './content-routes.json';
+
 export const ANALYTICS_MEASUREMENT_ID = 'G-S0SKT2CTV0';
 export const ANALYTICS_CONSENT_STORAGE_KEY = '27pm.analytics-consent.v1';
 export const ANALYTICS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 60;
@@ -82,7 +84,7 @@ export function isAnalyticsCookieName(name: string): boolean {
   return /^_ga(?:_|$)/.test(name);
 }
 
-const canonicalAnalyticsPaths = new Set(['/', '/confidentialite/', '/404.html']);
+const canonicalAnalyticsPaths = new Set(['/', '/confidentialite/', '/404.html', ...contentRoutes]);
 
 function parseAnalyticsUrl(value: string): URL | null {
   try {

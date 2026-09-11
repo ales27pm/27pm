@@ -15,6 +15,7 @@ const isAnalyticsRequest = (url: string) => {
     || hostname === 'www.google.com';
 };
 const expectedTurnstileSiteKey = process.env.EXPECTED_TURNSTILE_SITE_KEY;
+const crmTestProfile = process.env.CRM_TEST_PROFILE;
 
 test.beforeEach(async ({ page }) => {
   await page.route(
@@ -148,13 +149,18 @@ test('presents both independent projects as clearly labelled full demos', async 
   ];
 
   for (const demo of demos) {
+    const status = page.locator(`#${demo.project}-demo-status`);
     const links = page.locator(`a[data-demo-project="${demo.project}"][href="${demo.href}"]`);
+    await expect(status).not.toHaveAttribute('aria-label');
     await expect(links).toHaveCount(2);
     for (const link of await links.all()) {
       await expect(link).toHaveAttribute('target', '_blank');
       await expect(link).toHaveAttribute('rel', /nofollow/);
       await expect(link).toHaveAttribute('rel', /noopener/);
       await expect(link).toHaveAttribute('rel', /noreferrer/);
+      await expect(link).toHaveAccessibleDescription(
+        /Concept indépendant 27PM\s+Démo complète\s+Non officiel et non déployé/,
+      );
     }
   }
 
@@ -245,7 +251,91 @@ test('explains the email handoff and copies the visible fallback address', async
   await expect(page.locator('[data-copy-email-status]')).toHaveText('Adresse copiée.');
 });
 
-test('submits the exact queued CRM contract once with Turnstile enabled', async ({ page }) => {
+test('keeps privacy-policy navigation separate from explicit consent', async ({ page }) => {
+  let crmRequestCount = 0;
+  await page.route('https://crm.27pm.org/api/public/intake', async (route) => {
+    crmRequestCount += 1;
+    await route.fulfill({ status: 202 });
+  });
+
+  await page.goto('/#contact');
+  await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'enabled');
+
+  const context = page.getByLabel('Votre projet');
+  const organization = page.getByLabel('Votre organisation');
+  const name = page.getByLabel('Votre nom');
+  const email = page.getByLabel('Votre courriel');
+  const project = page.getByLabel('Une application', { exact: true });
+  const privacy = page.getByLabel(/J’ai pris connaissance/);
+  const consentLabel = page.locator('label[for="contact-privacy-acknowledgement"]');
+  const policyLink = page.getByRole('link', {
+    name: 'Consulter la politique de confidentialité (nouvel onglet)',
+  });
+
+  const expectDraftUnchanged = async () => {
+    await expect(context).toHaveValue('Préserver ce brouillon pendant la lecture de la politique.');
+    await expect(organization).toHaveValue('Atelier Exemple');
+    await expect(name).toHaveValue('Alex Tremblay');
+    await expect(email).toHaveValue('alex@example.test');
+    await expect(project).toBeChecked();
+  };
+
+  await context.fill('Préserver ce brouillon pendant la lecture de la politique.');
+  await organization.fill('Atelier Exemple');
+  await name.fill('Alex Tremblay');
+  await email.fill('alex@example.test');
+  await project.check();
+
+  await expect(privacy).not.toBeChecked();
+  await expect(privacy).toHaveAttribute('id', 'contact-privacy-acknowledgement');
+  await expect(consentLabel).toHaveAttribute('for', 'contact-privacy-acknowledgement');
+  await expect(privacy).toHaveAccessibleName(
+    'J’ai pris connaissance de la politique de confidentialité et je consens à transmettre ces renseignements pour l’examen de ma demande.',
+  );
+  await expect(policyLink.locator('xpath=ancestor::label')).toHaveCount(0);
+  await expect(policyLink).toHaveAttribute('target', '_blank');
+  await expect(policyLink).toHaveAttribute('rel', /noopener/);
+
+  const pointerPopupPromise = page.waitForEvent('popup');
+  await policyLink.click();
+  const pointerPopup = await pointerPopupPromise;
+  await expect(pointerPopup).toHaveURL(/\/confidentialite\/$/);
+  expect(await pointerPopup.evaluate(() => window.opener)).toBeNull();
+  expect(page.context().pages()).toHaveLength(2);
+  await pointerPopup.close();
+
+  await expect(page).toHaveURL(/\/#contact$/);
+  await expectDraftUnchanged();
+  await expect(privacy).not.toBeChecked();
+  expect(page.context().pages()).toHaveLength(1);
+  expect(crmRequestCount).toBe(0);
+
+  await consentLabel.click();
+  await expect(privacy).toBeChecked();
+  expect(page.context().pages()).toHaveLength(1);
+
+  await policyLink.focus();
+  await expect(policyLink).toBeFocused();
+  const keyboardPopupPromise = page.waitForEvent('popup');
+  await page.keyboard.press('Enter');
+  const keyboardPopup = await keyboardPopupPromise;
+  await expect(keyboardPopup).toHaveURL(/\/confidentialite\/$/);
+  expect(await keyboardPopup.evaluate(() => window.opener)).toBeNull();
+  expect(page.context().pages()).toHaveLength(2);
+  await keyboardPopup.close();
+
+  await expect(page).toHaveURL(/\/#contact$/);
+  await expectDraftUnchanged();
+  await expect(privacy).toBeChecked();
+  expect(page.context().pages()).toHaveLength(1);
+  expect(crmRequestCount).toBe(0);
+
+  await privacy.press('Space');
+  await expect(privacy).not.toBeChecked();
+  expect(crmRequestCount).toBe(0);
+});
+
+test('handles the exact mocked queued CRM response once with Turnstile enabled', async ({ page }) => {
   let requestCount = 0;
   let releaseRequest: (() => void) | undefined;
   const requestReleased = new Promise<void>((resolve) => {
@@ -281,7 +371,7 @@ test('submits the exact queued CRM contract once with Turnstile enabled', async 
   await page.getByLabel('Une application', { exact: true }).check();
   await page.getByLabel(/J’ai pris connaissance/).check();
 
-  const submit = page.getByRole('button', { name: 'Envoyer pour examen' });
+  const submit = page.locator('[data-crm-submit]');
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect(page.locator('[data-project-status]')).toHaveText('Envoi sécurisé en cours…');
@@ -381,10 +471,103 @@ test('reuses idempotency on CRM retry and keeps the mail fallback visible', asyn
   expect(idempotencyKeys[1]).toBe(idempotencyKeys[0]);
 });
 
-test('keeps the mail fallback when CRM configuration is absent', async ({ page }) => {
+test('recovers the CRM form after a stalled request and retries idempotently', async ({ page }) => {
+  await page.clock.install();
+  await page.addInitScript(() => {
+    const originalFetch = window.fetch.bind(window);
+    const state = { attempts: 0, idempotencyKeys: [] as string[] };
+    (
+      window as typeof window & { __crmTimeoutTestState?: typeof state }
+    ).__crmTimeoutTestState = state;
+
+    window.fetch = (input, init) => {
+      const url = typeof input === 'string'
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+      if (url !== 'https://crm.27pm.org/api/public/intake') {
+        return originalFetch(input, init);
+      }
+
+      state.attempts += 1;
+      state.idempotencyKeys.push(new Headers(init?.headers).get('Idempotency-Key') ?? '');
+      if (state.attempts > 1) return Promise.resolve(new Response(null, { status: 202 }));
+
+      return new Promise<Response>((_resolve, reject) => {
+        const signal = init?.signal;
+        signal?.addEventListener('abort', () => {
+          reject(new DOMException('Request aborted', 'AbortError'));
+        }, { once: true });
+      });
+    };
+  });
   await page.goto('/#contact');
-  const mode = await page.locator('html').getAttribute('data-crm-intake');
-  test.skip(mode === 'enabled', 'This assertion runs against the explicit no-key build lane.');
+
+  const form = page.locator('[data-contact-form]');
+  const context = page.getByLabel('Votre projet');
+  const organization = page.getByLabel('Votre organisation');
+  const name = page.getByLabel('Votre nom');
+  const email = page.getByLabel('Votre courriel');
+  const project = page.getByLabel('Une application', { exact: true });
+  const privacy = page.getByLabel(/J’ai pris connaissance/);
+  const submit = page.locator('[data-crm-submit]');
+  const status = page.locator('[data-project-status]');
+
+  await context.fill('Préserver le brouillon après un délai réseau.');
+  await organization.fill('Atelier Exemple');
+  await name.fill('Alex Tremblay');
+  await email.fill('alex@example.test');
+  await project.check();
+  await privacy.check();
+  await submit.click();
+
+  await expect(form).toHaveAttribute('aria-busy', 'true');
+  await expect(submit).toHaveText('Envoi en cours…');
+  await page.clock.fastForward(12_000);
+  await expect(form).not.toHaveAttribute('aria-busy', 'true');
+  await expect(status).toHaveText(
+    'L’envoi direct n’a pas abouti. Réessayez ou utilisez le courriel préparé.',
+  );
+  await expect(submit).toHaveText('Envoyer pour examen');
+  await expect(submit).toBeEnabled();
+  await expect(context).toBeEnabled();
+  await expect(context).toHaveValue('Préserver le brouillon après un délai réseau.');
+  await expect(organization).toHaveValue('Atelier Exemple');
+  await expect(name).toHaveValue('Alex Tremblay');
+  await expect(email).toHaveValue('alex@example.test');
+  await expect(project).toBeChecked();
+  await expect(privacy).toBeChecked();
+  await expect(page.getByRole('link', { name: 'Préparer un courriel' })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (
+    window as typeof window & { __turnstileResetCount?: number }
+  ).__turnstileResetCount ?? 0)).toBe(1);
+
+  await submit.click();
+  await expect(status).toHaveAttribute('data-state', 'success');
+  const timeoutState = await page.evaluate(() => (
+    window as typeof window & {
+      __crmTimeoutTestState?: { attempts: number; idempotencyKeys: string[] };
+    }
+  ).__crmTimeoutTestState);
+  expect(timeoutState?.attempts).toBe(2);
+  expect(timeoutState?.idempotencyKeys).toHaveLength(2);
+  expect(timeoutState?.idempotencyKeys[1]).toBe(timeoutState?.idempotencyKeys[0]);
+});
+
+test('keeps the mail fallback when CRM configuration is absent', async ({ page }) => {
+  test.skip(crmTestProfile !== 'fallback', 'Explicit no-key CRM build assertion');
+  await page.goto('/#contact');
+
+  await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'disabled');
+  await expect(page.locator('.crm-intake')).toBeHidden();
+  await expect(page.getByText(/L’envoi direct est indisponible/)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Préparer un courriel' })).toBeVisible();
+});
+
+test('keeps CRM intake dormant without explicit approval', async ({ page }) => {
+  test.skip(crmTestProfile !== 'inactive', 'Explicit unapproved CRM build assertion');
+  await page.goto('/#contact');
 
   await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'disabled');
   await expect(page.locator('.crm-intake')).toBeHidden();
@@ -500,10 +683,14 @@ test('loads and revokes the Google tag on the simulated canonical production ori
     const publicUrl = new URL(route.request().url());
     const localUrl = new URL(`${publicUrl.pathname}${publicUrl.search}`, 'http://127.0.0.1:4174');
     const response = await apiRequest.get(localUrl.href);
+    // Match Vercel's branded error body while retaining the unknown URL and 404 status.
+    const documentResponse = response.status() === 404
+      ? await apiRequest.get(new URL('/404.html', localUrl).href)
+      : response;
     await route.fulfill({
       status: response.status(),
-      headers: response.headers(),
-      body: await response.body(),
+      headers: documentResponse.headers(),
+      body: await documentResponse.body(),
     });
   });
 

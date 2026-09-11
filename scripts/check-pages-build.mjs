@@ -4,19 +4,19 @@ import { resolve } from 'node:path';
 
 const dist = resolve(process.cwd(), 'dist');
 const read = (path) => readFile(resolve(dist, path), 'utf8');
-const pagesHost = process.env.PAGES_HOST ?? '27pm.org';
-const isPreview = pagesHost !== '27pm.org';
 const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
-const normalizedPath = (process.env.PAGES_BASE_PATH ?? (isPreview ? '/27pm' : '/')).replace(/^\/+|\/+$/g, '');
+const normalizedPath = (process.env.PAGES_BASE_PATH ?? '/27pm').replace(/^\/+|\/+$/g, '');
 const base = normalizedPath ? `/${normalizedPath}/` : '/';
 const publicTurnstileSiteKey = '0x4AAAAAAEhozc0Mxhb3yUyb';
+const generatedAssetsPath = 'assets/generated';
 const verifiedDemoProjects = new Map([
   ['boulet', 'https://fenetres-boulet-redesign.ales27pm.chatgpt.site/'],
   ['turner', 'https://ales27pm.github.io/s-turner/'],
 ]);
 const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 
-assert.ok(isPreview || base === '/', '27pm.org production builds must use the root base path');
+assert.notEqual(base, '/', 'the retired Pages profile must remain a non-root preview');
+assert.equal(analyticsApproved, false, 'the Pages preview must keep analytics unapproved');
 
 const [home, privacy, notFound, manifestText, nestedManifestText] = await Promise.all([
   read('index.html'),
@@ -30,17 +30,28 @@ const [crmSource, clientSource] = await Promise.all([
   readFile(resolve(process.cwd(), 'src/main.ts'), 'utf8'),
 ]);
 const crmClientSource = `${crmSource}\n${clientSource}`;
+const generatedAssetFiles = await readdir(resolve(dist, generatedAssetsPath));
+assert.ok(generatedAssetFiles.length > 0, 'the Pages preview must emit generated assets');
+for (const file of generatedAssetFiles) {
+  assert.match(
+    file,
+    /-[A-Za-z0-9_-]{8,}\.[A-Za-z0-9]+$/,
+    `generated asset must use a content-hashed name: ${file}`,
+  );
+}
 const clientCode = (
   await Promise.all(
-    (await readdir(resolve(dist, 'assets')))
+    generatedAssetFiles
       .filter((name) => name.endsWith('.js'))
-      .map((name) => read(`assets/${name}`)),
+      .map((name) => read(`${generatedAssetsPath}/${name}`)),
   )
 ).join('\n');
 
 for (const [name, html] of [['home', home], ['privacy', privacy]]) {
-  const robots = isPreview ? 'noindex, nofollow' : 'index, follow';
-  assert.ok(html.includes(`content="${robots}"`), `${name} must use ${robots} on ${pagesHost}`);
+  assert.ok(
+    html.includes('content="noindex, nofollow"'),
+    `${name} must remain noindex in the retired Pages preview`,
+  );
 }
 
 assert.doesNotMatch(privacy, /Selon le service d’hébergement retenu/i, 'privacy copy must identify the public host');
@@ -60,6 +71,11 @@ assert.match(home, /data-crm-submit[^>]*>/, 'home must publish the guarded CRM s
 assert.match(crmClientSource, /https:\/\/crm\.27pm\.org\/api\/public\/intake/, 'client must target the public CRM intake endpoint');
 assert.match(crmClientSource, /crm_intake/, 'client must request the expected Turnstile action');
 assert.match(crmClientSource, /Idempotency-Key/, 'client must send an idempotency key');
+assert.match(
+  crmClientSource,
+  /import\.meta\.env\.VITE_CRM_INTAKE_APPROVED === 'true'/,
+  'client must require explicit CRM approval',
+);
 
 for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
   assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
@@ -67,14 +83,28 @@ for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFou
   assert.doesNotMatch(html, directGoogleResource, `${name} must not embed a pre-consent Google resource`);
 }
 
-const assetFiles = await readdir(resolve(dist, 'assets'));
 const compiledJavascript = (
   await Promise.all(
-    assetFiles
+    generatedAssetFiles
       .filter((file) => file.endsWith('.js'))
-      .map((file) => read(`assets/${file}`)),
+      .map((file) => read(`${generatedAssetsPath}/${file}`)),
   )
 ).join('\n');
+assert.doesNotMatch(
+  compiledJavascript,
+  /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+  'the retired Pages preview must exclude the CRM intake endpoint',
+);
+assert.doesNotMatch(
+  compiledJavascript,
+  /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/,
+  'the retired Pages preview must exclude the Turnstile loader',
+);
+assert.doesNotMatch(
+  compiledJavascript,
+  /crm_intake/,
+  'the retired Pages preview must exclude the Turnstile action',
+);
 if (analyticsApproved) {
   assert.match(compiledJavascript, /G-S0SKT2CTV0/, 'approved assets must contain the GA4 measurement ID');
   assert.match(
@@ -127,22 +157,19 @@ for (const marker of ['data-scenario-form', 'data-contact-form']) {
   assert.doesNotMatch(formTag, /\baction\s*=/i, `${marker} must not submit visitor data to a remote endpoint`);
 }
 
-if (isPreview) {
-  assert.doesNotMatch(
-    clientCode,
-    new RegExp(publicTurnstileSiteKey),
-    'preview builds must keep the production Turnstile sitekey disabled',
-  );
-  await assert.rejects(access(resolve(dist, 'CNAME')), 'preview builds must not claim the production domain');
-} else {
-  assert.match(
-    clientCode,
-    new RegExp(publicTurnstileSiteKey),
-    'production builds must include the configured public Turnstile sitekey',
-  );
-  assert.equal(await read('CNAME'), '27pm.org\n', 'production Pages builds must preserve the custom domain');
-  assert.equal(await read('.nojekyll'), '', 'production Pages builds must disable Jekyll processing');
-}
+assert.doesNotMatch(
+  clientCode,
+  new RegExp(publicTurnstileSiteKey),
+  'the Pages preview must keep the production Turnstile sitekey disabled',
+);
+await assert.rejects(
+  access(resolve(dist, 'CNAME')),
+  'the retired Pages preview must not claim the production domain',
+);
+await assert.rejects(
+  access(resolve(dist, '.nojekyll')),
+  'the retired Pages preview must not retain a legacy Jekyll marker',
+);
 
 assert.match(notFound, /content="noindex, nofollow"/, '404 must always remain non-indexable');
 
@@ -174,4 +201,6 @@ for (const icon of nestedManifest.icons) {
   await access(resolve(dist, 'assets/brand-v4', icon.src));
 }
 
-console.log(`GitHub Pages build contract passed for ${base} on ${pagesHost}.`);
+console.log(`Retired GitHub Pages preview contract passed for ${base}.`);
+process.env.CONTENT_PREVIEW_BASE = base;
+await import('./check-content-build.mjs');

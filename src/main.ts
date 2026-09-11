@@ -406,6 +406,7 @@ declare global {
   }
 }
 
+const crmIntakeApproved = import.meta.env.VITE_CRM_INTAKE_APPROVED === 'true';
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? '';
 let turnstileApi: TurnstileApi | undefined;
 let turnstileWidgetId: string | undefined;
@@ -492,7 +493,14 @@ function loadTurnstile(): Promise<TurnstileApi> {
 }
 
 async function enableCrmIntake(): Promise<void> {
-  if (!turnstileSiteKey || !crmIntake || !crmUnavailable || !crmSubmit || !turnstileContainer) {
+  if (
+    !crmIntakeApproved
+    || !turnstileSiteKey
+    || !crmIntake
+    || !crmUnavailable
+    || !crmSubmit
+    || !turnstileContainer
+  ) {
     document.documentElement.dataset.crmIntake = 'disabled';
     return;
   }
@@ -555,7 +563,11 @@ contactForm?.addEventListener('input', (event) => {
 contactForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  if (!turnstileSiteKey || document.documentElement.dataset.crmIntake !== 'enabled') {
+  if (
+    !crmIntakeApproved
+    || !turnstileSiteKey
+    || document.documentElement.dataset.crmIntake !== 'enabled'
+  ) {
     mailLink?.click();
     return;
   }
@@ -590,11 +602,16 @@ contactForm?.addEventListener('submit', async (event) => {
   setContactStatus('Envoi sécurisé en cours…', 'loading');
   updateCrmSubmitAvailability();
 
-  const result = await submitPublicIntake(createPublicIntakePayload(draft), submissionKey);
-  submissionInFlight = false;
-  setIntakeControlsDisabled(false);
-  contactForm?.removeAttribute('aria-busy');
-  if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoyer pour examen';
+  let result: Awaited<ReturnType<typeof submitPublicIntake>>;
+  try {
+    result = await submitPublicIntake(createPublicIntakePayload(draft), submissionKey);
+  } finally {
+    submissionInFlight = false;
+    setIntakeControlsDisabled(false);
+    contactForm?.removeAttribute('aria-busy');
+    if (crmSubmitLabel) crmSubmitLabel.textContent = 'Envoyer pour examen';
+    updateCrmSubmitAvailability();
+  }
 
   if (result.accepted) {
     submissionAccepted = true;
@@ -614,7 +631,42 @@ contactForm?.addEventListener('submit', async (event) => {
   );
 });
 
-void enableCrmIntake();
+function scheduleCrmIntake(): void {
+  if (
+    !crmIntakeApproved
+    || !turnstileSiteKey
+    || !contactForm
+    || !('IntersectionObserver' in window)
+  ) {
+    void enableCrmIntake();
+    return;
+  }
+
+  let started = false;
+  const start = (): void => {
+    if (started) return;
+    started = true;
+    observer.disconnect();
+    contactForm.removeEventListener('focusin', start);
+    window.removeEventListener('hashchange', startForContactHash);
+    void enableCrmIntake();
+  };
+  const startForContactHash = (): void => {
+    if (window.location.hash === '#contact') start();
+  };
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) start();
+    },
+    { rootMargin: '600px 0px' },
+  );
+  observer.observe(contactForm);
+  contactForm.addEventListener('focusin', start);
+  window.addEventListener('hashchange', startForContactHash);
+  startForContactHash();
+}
+
+scheduleCrmIntake();
 
 const contactEmail = document.querySelector<HTMLAnchorElement>('[data-contact-email]');
 const copyEmailButton = document.querySelector<HTMLButtonElement>('[data-copy-email]');

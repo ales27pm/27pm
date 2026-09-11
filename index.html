@@ -104,7 +104,7 @@
             <span>Solide pour vous.</span>
           </h1>
           <p>
-            Sites web, applications sur mesure et systèmes propulsés par l’IA
+            Studio québécois de sites web, d’applications sur mesure et de systèmes propulsés par l’IA
             pour rendre une offre complexe claire, utile et facile à faire évoluer.
           </p>
           <a class="button" href="#capacites">
@@ -226,6 +226,12 @@
         </div>
       </section>
 
+      <nav class="section-shell service-paths" aria-label="Services en détail">
+        <a href="%BASE_URL%services/sites-catalogues-fabricants/">Sites web et catalogues pour fabricants</a>
+        <a href="%BASE_URL%services/applications-web-sur-mesure/">Applications web sur mesure</a>
+        <a href="%BASE_URL%services/automatisation-ia/">Automatisation et IA pour PME</a>
+      </nav>
+
       <section class="work" id="realisations" aria-labelledby="work-title">
         <div class="section-shell">
           <div class="work-heading" data-reveal>
@@ -263,6 +269,7 @@
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10" /></svg>
                   <span class="sr-only"> (nouvel onglet)</span>
                 </a>
+                <a class="case-study-link" href="%BASE_URL%etudes/boulet/">Lire l’étude du concept Boulet</a>
               </div>
               <a
                 class="case-visual"
@@ -284,7 +291,7 @@
                   />
                 </span>
               </a>
-              <p class="case-status" id="boulet-demo-status" aria-label="Statut du concept Boulet">
+              <p class="case-status" id="boulet-demo-status">
                 <span>Concept indépendant 27PM</span>
                 <span>Démo complète</span>
                 <span>Non officiel et non déployé</span>
@@ -317,6 +324,7 @@
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10" /></svg>
                   <span class="sr-only"> (nouvel onglet)</span>
                 </a>
+                <a class="case-study-link" href="%BASE_URL%etudes/maisons-turner/">Lire l’étude du concept Maisons S. Turner</a>
               </div>
               <a
                 class="case-visual"
@@ -338,7 +346,7 @@
                   />
                 </span>
               </a>
-              <p class="case-status" id="turner-demo-status" aria-label="Statut du concept Turner">
+              <p class="case-status" id="turner-demo-status">
                 <span>Concept indépendant 27PM</span>
                 <span>Démo complète</span>
                 <span>Non officiel et non déployé</span>
@@ -507,10 +515,13 @@
             </div>
 
             <div class="crm-intake" hidden data-crm-intake>
-              <label class="privacy-acknowledgement">
-                <input type="checkbox" name="privacyAcknowledged" required data-contact-privacy />
-                <span>J’ai pris connaissance de la <a href="%BASE_URL%confidentialite/">politique de confidentialité</a> et je consens à transmettre ces renseignements pour l’examen de ma demande.</span>
-              </label>
+              <div class="privacy-acknowledgement">
+                <input id="contact-privacy-acknowledgement" type="checkbox" name="privacyAcknowledged" required data-contact-privacy />
+                <div class="privacy-acknowledgement__copy">
+                  <label for="contact-privacy-acknowledgement">J’ai pris connaissance de la politique de confidentialité et je consens à transmettre ces renseignements pour l’examen de ma demande.</label>
+                  <a href="%BASE_URL%confidentialite/" target="_blank" rel="noopener">Consulter la politique de confidentialité (nouvel onglet)</a>
+                </div>
+              </div>
               <div class="turnstile-widget" data-turnstile-widget role="group" aria-label="Vérification antirobot"></div>
               <p class="crm-intake-note">
                 Un statut « reçu » signifie uniquement que la demande est placée dans une file d’examen; aucun message ni suivi n’est envoyé automatiquement.
@@ -558,14 +569,14 @@
       </div>
       <nav class="footer-column" aria-label="Capacités">
         <strong>Capacités</strong>
-        <a href="#capacites">Convaincre</a>
-        <a href="#capacites">Simplifier</a>
-        <a href="#capacites">Inventer</a>
+        <a href="%BASE_URL%services/sites-catalogues-fabricants/">Sites et catalogues</a>
+        <a href="%BASE_URL%services/applications-web-sur-mesure/">Applications sur mesure</a>
+        <a href="%BASE_URL%services/automatisation-ia/">Automatisation et IA</a>
       </nav>
       <nav class="footer-column" aria-label="Réalisations">
         <strong>Réalisations</strong>
-        <a href="#realisations">Boulet</a>
-        <a href="#realisations">Maisons S. Turner</a>
+        <a href="%BASE_URL%etudes/boulet/">Concept Boulet</a>
+        <a href="%BASE_URL%etudes/maisons-turner/">Concept Maisons S. Turner</a>
       </nav>
       <nav class="footer-column" aria-label="Méthode">
         <strong>Méthode</strong>
