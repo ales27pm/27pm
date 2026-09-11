@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const pages = [
+  ['/services/creation-sites-web/', 'Création de sites web pour PME à Sorel-Tracy'],
   ['/services/sites-catalogues-fabricants/', 'Sites web et catalogues pour fabricants québécois'],
   ['/services/applications-web-sur-mesure/', 'Applications web sur mesure pour PME'],
   ['/services/automatisation-ia/', 'Automatisation et IA pour PME'],

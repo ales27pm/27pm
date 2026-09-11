@@ -2,7 +2,7 @@
 
 Site vitrine de 27PM, studio québécois de sites web, d’applications sur mesure et de systèmes propulsés par l’IA.
 
-[Visiter 27PM](https://27pm.org/) · [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/) · [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/) · [Automatisation et IA](https://27pm.org/services/automatisation-ia/)
+[Visiter 27PM](https://27pm.org/) · [Création de sites web à Sorel-Tracy](https://27pm.org/services/creation-sites-web/) · [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/) · [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/) · [Automatisation et IA](https://27pm.org/services/automatisation-ia/)
 
 Deux études présentent des concepts indépendants, sans mandat ni approbation des entreprises concernées : [Boulet](https://27pm.org/etudes/boulet/) et [Maisons S. Turner](https://27pm.org/etudes/maisons-turner/).
 
@@ -47,7 +47,7 @@ Les commandes `build:pages`, `check:pages` et leurs alias `preview` ne produisen
 
 ### Pages de services et études
 
-Les trois offres disposent de pages HTML autonomes sous `/services/sites-catalogues-fabricants/`, `/services/applications-web-sur-mesure/` et `/services/automatisation-ia/`. Les études `/etudes/boulet/` et `/etudes/maisons-turner/` présentent les décisions de conception et les limites des démonstrations, sans les qualifier de mandats clients.
+Les quatre offres disposent de pages HTML autonomes sous `/services/creation-sites-web/`, `/services/sites-catalogues-fabricants/`, `/services/applications-web-sur-mesure/` et `/services/automatisation-ia/`. Les études `/etudes/boulet/` et `/etudes/maisons-turner/` présentent les décisions de conception et les limites des démonstrations, sans les qualifier de mandats clients.
 
 `src/content-routes.json` déclare ces routes pour le build Vite, la génération du sitemap et la liste des chemins autorisés dans la mesure d’audience. `scripts/check-content-build.mjs` vérifie le contenu initial, les métadonnées, les données structurées, les destinations locales et les liens entrants de chaque nouvelle page. Les tests de navigateur couvrent leur lecture, l’accessibilité, le retour au contact et le parcours sans JavaScript.
 

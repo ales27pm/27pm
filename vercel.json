@@ -15,6 +15,11 @@
       "permanent": true
     },
     {
+      "source": "/services/creation-sites-web/index.html",
+      "destination": "/services/creation-sites-web/",
+      "permanent": true
+    },
+    {
       "source": "/services/sites-catalogues-fabricants/index.html",
       "destination": "/services/sites-catalogues-fabricants/",
       "permanent": true
