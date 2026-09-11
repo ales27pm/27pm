@@ -90,6 +90,28 @@ const requireProductionHeaders = (path, response) => {
   );
 };
 
+const requireIndexablePage = (path, html) => {
+  const attribute = (tag, name) => {
+    const match = tag.match(new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
+    return (match?.[1] ?? match?.[2] ?? match?.[3] ?? '').toLowerCase();
+  };
+  const metaTags = html.replace(/<!--[\s\S]*?-->/g, '').match(/<meta\b[^>]*>/gi) ?? [];
+  let explicitIndexFollow = false;
+  for (const tag of metaTags) {
+    const crawler = attribute(tag, 'name');
+    if (!['robots', 'googlebot', 'googlebot-news', 'bingbot'].includes(crawler)) continue;
+    const directives = attribute(tag, 'content').split(/[\s,]+/);
+    assert.ok(
+      !directives.some((directive) => ['noindex', 'nofollow', 'none'].includes(directive)),
+      `${path}: ${crawler} meta tag must not block indexing or link discovery`,
+    );
+    if (crawler === 'robots' && directives.includes('index') && directives.includes('follow')) {
+      explicitIndexFollow = true;
+    }
+  }
+  assert.ok(explicitIndexFollow, `${path}: must retain the explicit index, follow robots policy`);
+};
+
 const requireImmutableGeneratedAsset = (url, response) => {
   assert.match(
     url.pathname,
@@ -156,19 +178,21 @@ const { body: privacy, response: privacyResponse } = await requireOk('/confident
   'https://vercel.com/legal/privacy-notice',
 ]);
 requireProductionHeaders('/confidentialite/', privacyResponse);
+const publicDocuments = new Map([['/', home], ['/confidentialite/', privacy]]);
 for (const route of contentRoutes) {
   const { body, response } = await requireOk(route, [
     `href="https://27pm.org${route}"`,
-    'content="index, follow"',
     '"WebPage"',
     '"BreadcrumbList"',
     'data-analytics-preferences',
   ]);
+  publicDocuments.set(route, body);
   requireProductionHeaders(route, response);
   assert.equal((body.match(/<h1\b/g) ?? []).length, 1, `${route}: must expose one H1`);
   await requirePermanentRedirect(route.slice(0, -1), route);
   await requirePermanentRedirect(`${route}index.html`, route);
 }
+for (const [path, html] of publicDocuments) requireIndexablePage(path, html);
 assert.doesNotMatch(privacy, /GitHub Pages/i, 'deployed privacy copy must not name the former host');
 assert.doesNotMatch(privacy, directGoogleResource, 'deployed privacy page must not embed a pre-consent Google resource');
 
@@ -191,7 +215,7 @@ function javascriptImports(source) {
 }
 
 const javascriptAssetUrls = new Set(
-  [home, privacy].flatMap((html) =>
+  [...publicDocuments.values()].flatMap((html) =>
     [...html.matchAll(/(?:src|href)="([^"]+\.js)"/gi)].map(
       (match) => new URL(match[1], origin).href,
     ),
@@ -241,7 +265,7 @@ for (const [pattern, marker] of [
 }
 
 const stylesheetAssetUrls = new Set(
-  [home, privacy].flatMap((html) =>
+  [...publicDocuments.values()].flatMap((html) =>
     [...html.matchAll(/(?:src|href)="([^"]+\.css)"/gi)].map(
       (match) => new URL(match[1], origin).href,
     ),
@@ -334,7 +358,21 @@ assert.equal(
 await requirePermanentRedirect('/confidentialite', '/confidentialite/');
 await requirePermanentRedirect('/index.html', '/');
 await requirePermanentRedirect('/confidentialite/index.html', '/confidentialite/');
-await requireOk('/robots.txt', ['Sitemap: https://27pm.org/sitemap.xml']);
+const { body: robots } = await requireOk('/robots.txt');
+// This site intentionally allows all crawlers. Any policy change must be reviewed,
+// rather than passing merely because a Sitemap directive is still present.
+const robotsPolicy = robots.split(/\r?\n/)
+  .map((line) => line.replace(/#.*$/, '').trim())
+  .filter(Boolean)
+  .map((line) => {
+    const colon = line.indexOf(':');
+    return [line.slice(0, colon).trim().toLowerCase(), line.slice(colon + 1).trim()];
+  });
+assert.deepEqual(robotsPolicy, [
+  ['user-agent', '*'],
+  ['allow', '/'],
+  ['sitemap', 'https://27pm.org/sitemap.xml'],
+], 'robots.txt: must retain the approved allow-all crawler policy and canonical sitemap');
 await requireOk('/sitemap.xml', ['https://27pm.org/confidentialite/', ...contentRoutes.map((route) => `https://27pm.org${route}`)]);
 
 const missingUrl = new URL('/__27pm-public-check-missing__', origin);
@@ -376,4 +414,4 @@ for (const [project, verifiedProject] of verifiedDemoProjects) {
   assert.ok((await response.text()).includes(verifiedProject.marker), `${href}: final page does not identify the verified project`);
 }
 
-console.log(`Public site contract passed for ${origin.href}`);
+console.log(`Public site contract passed for ${origin.href} (${publicDocuments.size} indexable pages, ${javascriptAssetUrls.size} JavaScript assets, ${stylesheetAssetUrls.size} stylesheets, ${fontAssetUrls.size} fonts).`);
