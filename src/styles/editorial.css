@@ -146,6 +146,14 @@
   padding-top: 3rem;
 }
 
+.editorial-contact {
+  max-width: 48rem;
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
 .editorial-related ul {
   display: grid;
   gap: 1rem;

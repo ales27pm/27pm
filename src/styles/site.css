@@ -913,6 +913,21 @@
   margin-top: 2rem;
 }
 
+.studio-address {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+  font-style: normal;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.studio-address a,
+.closing-studio p a {
+  color: var(--blue-deep);
+  text-underline-offset: 0.25em;
+}
+
 .closing-contact {
   border-left: 1px solid var(--line-strong);
 }
