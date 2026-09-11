@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import ts from 'typescript';
 
 const contentRoutes = JSON.parse(await readFile(new URL('../src/content-routes.json', import.meta.url), 'utf8'));
 
@@ -171,6 +172,24 @@ for (const route of contentRoutes) {
 assert.doesNotMatch(privacy, /GitHub Pages/i, 'deployed privacy copy must not name the former host');
 assert.doesNotMatch(privacy, directGoogleResource, 'deployed privacy page must not embed a pre-consent Google resource');
 
+function javascriptImports(source) {
+  const imports = new Set();
+  const tree = ts.createSourceFile('deployed.js', source, ts.ScriptTarget.Latest, false, ts.ScriptKind.JS);
+  const visit = (node) => {
+    let specifier;
+    if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
+      specifier = node.moduleSpecifier;
+    } else if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      specifier = node.arguments[0];
+    }
+    // StringLiteralLike includes static backtick imports, but excludes interpolation.
+    if (specifier && ts.isStringLiteralLike(specifier)) imports.add(specifier.text);
+    ts.forEachChild(node, visit);
+  };
+  visit(tree);
+  return imports;
+}
+
 const javascriptAssetUrls = new Set(
   [home, privacy].flatMap((html) =>
     [...html.matchAll(/(?:src|href)="([^"]+\.js)"/gi)].map(
@@ -190,59 +209,34 @@ for (const href of javascriptAssetUrls) {
   const source = await response.text();
   deployedJavascriptParts.push(source);
 
-  for (const match of source.matchAll(/(?:from\s*|import\s*\(\s*)["']([^"']+\.js(?:\?[^"']*)?)["']/g)) {
-    const dependency = new URL(match[1], url);
+  for (const specifier of javascriptImports(source)) {
+    const dependency = new URL(specifier, url);
+    if (!dependency.pathname.endsWith('.js')) continue;
     assert.equal(dependency.origin, origin.origin, `${dependency}: JavaScript dependency must stay on the canonical origin`);
+    dependency.hash = '';
     javascriptAssetUrls.add(dependency.href);
   }
 }
 const deployedJavascript = deployedJavascriptParts.join('\n');
-if (crmApproved) {
-  assert.match(
-    deployedJavascript,
-    /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/,
-    'approved deployed CRM assets must contain the Turnstile loader',
-  );
-  assert.match(
-    deployedJavascript,
-    /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
-    'approved deployed CRM assets must target the intake endpoint',
-  );
-  assert.match(
-    deployedJavascript,
-    /crm_intake/,
-    'approved deployed CRM assets must contain the expected Turnstile action',
-  );
-} else {
-  assert.doesNotMatch(
-    deployedJavascript,
-    /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/,
-    'unapproved deployed CRM assets must exclude the Turnstile loader',
-  );
-  assert.doesNotMatch(
-    deployedJavascript,
-    /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
-    'unapproved deployed CRM assets must exclude the intake endpoint',
-  );
-  assert.doesNotMatch(
-    deployedJavascript,
-    /crm_intake/,
-    'unapproved deployed CRM assets must exclude the Turnstile action',
+for (const [pattern, marker] of [
+  [/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/, 'Turnstile loader'],
+  [/https:\/\/crm\.27pm\.org\/api\/public\/intake/, 'CRM intake endpoint'],
+  [/crm_intake/, 'Turnstile action'],
+]) {
+  assert.equal(
+    pattern.test(deployedJavascript),
+    crmApproved,
+    `deployed JavaScript must ${crmApproved ? 'include' : 'exclude'} the ${marker}`,
   );
 }
-if (analyticsApproved) {
-  assert.match(deployedJavascript, /G-S0SKT2CTV0/, 'approved deployed assets must contain the GA4 measurement ID');
-  assert.match(
-    deployedJavascript,
-    /www\.googletagmanager\.com\/gtag\/js/,
-    'approved deployed assets must contain the consent-gated Google tag loader',
-  );
-} else {
-  assert.doesNotMatch(deployedJavascript, /G-S0SKT2CTV0/, 'unapproved deployed assets must exclude the GA4 measurement ID');
-  assert.doesNotMatch(
-    deployedJavascript,
-    /www\.googletagmanager\.com\/gtag\/js/,
-    'unapproved deployed assets must exclude the Google tag loader',
+for (const [pattern, marker] of [
+  [/G-S0SKT2CTV0/, 'GA4 measurement ID'],
+  [/www\.googletagmanager\.com\/gtag\/js/, 'consent-gated Google tag loader'],
+]) {
+  assert.equal(
+    pattern.test(deployedJavascript),
+    analyticsApproved,
+    `deployed JavaScript must ${analyticsApproved ? 'include' : 'exclude'} the ${marker}`,
   );
 }
 
