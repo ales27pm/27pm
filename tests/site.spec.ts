@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }) => {
 test('renders the complete French v5 landing page', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
-  await expect(page).toHaveTitle('27PM | Sites web, applications et IA sur mesure');
+  await expect(page).toHaveTitle('27PM | Sites web, applications et IA pour PME au Québec');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     /Clair pour\s+vos clients\.\s+Solide pour vous\./,
   );

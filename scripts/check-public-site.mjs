@@ -145,7 +145,7 @@ const requirePermanentRedirect = async (path, destination) => {
 };
 
 const { body: home, response: homeResponse } = await requireOk('/', [
-  '<title>27PM | Sites web, applications et IA sur mesure</title>',
+  '<title>27PM | Sites web, applications et IA pour PME au Québec</title>',
   '<link rel="canonical" href="https://27pm.org/"',
   'Une idée. Plusieurs métiers.',
   'data-scenario-form',

@@ -59,7 +59,7 @@ assert.match(privacy, /Vercel/, 'privacy copy must name the public host');
 assert.doesNotMatch(privacy, /GitHub Pages/, 'privacy copy must not name the former public host');
 assert.match(privacy, /Cloudflare Turnstile/, 'privacy copy must disclose the anti-bot provider');
 assert.match(privacy, /file d’examen/, 'privacy copy must describe CRM review queueing');
-assert.match(home, /<title>27PM \| Sites web, applications et IA sur mesure<\/title>/, 'home must publish the v5 title');
+assert.match(home, /<title>27PM \| Sites web, applications et IA pour PME au Québec<\/title>/, 'home must publish the v5 title');
 assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
 assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
 assert.match(home, /data-contact-form/, 'home must publish the contextual contact brief');

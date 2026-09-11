@@ -2,7 +2,7 @@
 
 Site vitrine de 27PM, studio québécois de sites web, d’applications sur mesure et de systèmes propulsés par l’IA.
 
-[Visiter 27PM](https://27pm.org/) · [Création de sites web à Sorel-Tracy](https://27pm.org/services/creation-sites-web/) · [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/) · [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/) · [Automatisation et IA](https://27pm.org/services/automatisation-ia/)
+[Visiter 27PM](https://27pm.org/) · [Création de sites web pour PME au Québec](https://27pm.org/services/creation-sites-web/) · [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/) · [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/) · [Automatisation et IA](https://27pm.org/services/automatisation-ia/)
 
 Deux études présentent des concepts indépendants, sans mandat ni approbation des entreprises concernées : [Boulet](https://27pm.org/etudes/boulet/) et [Maisons S. Turner](https://27pm.org/etudes/maisons-turner/).
 
