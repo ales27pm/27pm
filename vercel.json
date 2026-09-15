@@ -20,6 +20,11 @@
       "permanent": true
     },
     {
+      "source": "/services/agence-web/index.html",
+      "destination": "/services/agence-web/",
+      "permanent": true
+    },
+    {
       "source": "/services/sites-catalogues-fabricants/index.html",
       "destination": "/services/sites-catalogues-fabricants/",
       "permanent": true

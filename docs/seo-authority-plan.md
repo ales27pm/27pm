@@ -6,6 +6,42 @@ Ce plan prépare sept occasions pertinentes pour un studio québécois de sites 
 
 Ce document prépare les contenus et suit les démarches autorisées. Aucun profil tiers ni aucune adhésion ne sont déduits de la simple préparation d’un texte.
 
+## Mise à jour du 14 septembre 2026 — campagne liée aux pages « création » et « agence »
+
+SiteGuru signale toujours l’autorité comme le principal manque de 27pm.org : rang de domaine **0 / 100**. Son analyse d’intersection du 14 septembre compare `lawebshop.ca`, `altitudestrategies.ca` et `webici.ca`, et retourne 14 domaines qui lient au moins deux de ces concurrents. Cette liste est un point de départ, pas une autorisation de publier ni une preuve de qualité.
+
+Une seule occasion ressort nettement par son rang : **[grenier.qc.ca](https://www.grenier.qc.ca/)**, rang 51, devant `intently.co` (13) et `reviewsonmywebsite.com` (5); les 11 autres domaines ont un rang nul dans cette analyse. Le score antipourriel de Grenier est 27, ce qui impose quand même une revue éditoriale et contextuelle. Les répertoires SEO génériques ou domaines sans lien clair avec les entreprises québécoises ne sont pas retenus pour une soumission en volume.
+
+### Ordre d’approche préparé
+
+1. **Publier et vérifier les pages de destination.** Utiliser ensuite l’URL canonique `/services/creation-sites-web/` pour un contenu pédagogique et `/services/agence-web/` pour une fiche de fournisseur. Tant que la page agence ne répond pas publiquement en `200`, aucun profil ni article ne doit pointer vers elle.
+2. **Décider d’une adhésion locale à la CCIST.** La [Chambre de commerce et d’industrie de Sorel-Tracy](https://ccist.ca/membres/devenir-membre/) propose un répertoire public de membres avec champ de site web. Les prix affichés lors de la vérification sont de 125 $ CA par 12 mois pour un travailleur autonome et de 200 $ CA pour une entreprise de 2 à 10 employés; le statut applicable, l’admissibilité et la dépense doivent être confirmés avant toute adhésion. La fiche doit utiliser le nom 27PM, une description factuelle et l’URL propre de la page agence, sans bourrage de mots-clés. [Consulter le répertoire](https://ccist.ca/membres/repertoire-des-membres/).
+3. **Créer un actif éditorial qui mérite d’être cité.** Avant de solliciter un média, produire un petit rapport original avec méthode, échantillon, date, limites et données réutilisables — par exemple un baromètre de la performance, de l’accessibilité et des pratiques de confidentialité sur un échantillon défini de sites de PME québécoises. Le rapport devient la destination principale du lien; son contenu relie ensuite naturellement les pages « création » et « agence ».
+4. **Proposer le sujet à Grenier.** Le [formulaire officiel de contact](https://www.grenier.qc.ca/contactez-nous) accepte une « nouvelle à soumettre ». Une contribution externe non commanditée a été observée, mais elle ne garantit ni acceptation ni lien sortant. Demander si une citation contextuelle vers le rapport source est permise et accepter la décision éditoriale. La [formule de contenu partenaire](https://www.grenier.qc.ca/annoncez-avec-le-grenier-aux-nouvelles) relève d’une décision publicitaire séparée; aucun achat ne doit être présenté comme un backlink éditorial.
+5. **Réserver les médias locaux à une vraie nouvelle.** [SorelTracy Magazine](https://www.soreltracy.com/communiques/) et [Sorel-Tracy Info](https://soreltracy.info/communiques/) publient leurs consignes de soumission de nouvelles ou communiqués. Un baromètre local publié, une clinique numérique réellement organisée ou une ressource utile aux entreprises de Pierre-De Saurel peut constituer un sujet; l’ouverture de 27PM ou une page commerciale seule n’en est pas un. SorelTracy Magazine a déjà publié des articles avec lien sortant direct. Un article échantillonné de Sorel-Tracy Info utilisait `nofollow`, donc sa valeur est d’abord locale et éditoriale. [CJSO](https://www.cjso.ca/contact/) accepte aussi les nouvelles, mais les sites cités y apparaissent parfois sans lien.
+6. **Conserver les citations déjà vérifiées.** Sortlist, GitHub et Behance peuvent relier l’identité publique de 27PM à son site, mais leurs liens ou profils ne constituent ni des avis clients ni une preuve de résultat. Pages Jaunes et Bing Places offrent aussi des fiches de base; créer ou revendiquer une seule fiche exacte plutôt que multiplier les annuaires. Mettre leur description à jour seulement après vérification de la nouvelle page publique.
+7. **Écarter les soumissions de masse.** `seodirectorypro.com`, `ahrefs-links.com`, `yelpdirectory.com` et les domaines similaires de l’intersection ne correspondent pas au ciblage francophone canadien demandé. Clutch Basic ne fournit pas de lien de répertoire selon sa page d’inscription; son offre Verified est payante. Aucun achat ni contact n’est préparé uniquement pour obtenir un lien.
+
+### Deux contenus d’approche, sans envoi
+
+**Description CCIST (moins de 500 caractères)**
+
+> 27PM est un studio web indépendant établi à Sorel-Tracy. Il accompagne les PME du Québec dans la conception et la refonte de sites web, les applications sur mesure et l’automatisation. Son approche relie stratégie, contenu, design et développement. Les projets peuvent être suivis à distance; les rencontres au studio se font sur rendez-vous.
+
+**Angle éditorial pour Grenier ou un média local**
+
+> Performance, accessibilité et protection des renseignements personnels : que montre un échantillon défini de sites de PME québécoises en 2026? L’article publierait la méthode, les constats agrégés, les limites et une liste de contrôles concrets. Le rapport source resterait consultable sur 27pm.org. Les exemples Boulet et Maisons S. Turner, s’ils sont utiles, seraient présentés comme concepts indépendants 27PM, jamais comme mandats, approbations ou résultats clients.
+
+### Preuve attendue pour chaque démarche
+
+- Conserver l’URL publique, la date, le texte publié et la destination exacte du lien.
+- Vérifier la page sans connexion et relever l’attribut du lien lorsqu’il est observable.
+- Distinguer une demande soumise, une fiche publiée, un lien accessible et un domaine référent reconnu : ce sont quatre états différents.
+- Suivre les impressions et clics des deux pages dans Search Console, puis les visites référentes dans Analytics uniquement avec la mesure déjà autorisée.
+- Ne promettre ni classement, ni délai d’indexation, ni hausse d’autorité à partir d’une publication.
+
+Aucune adhésion, soumission éditoriale, prise de contact ou dépense n’a été effectuée dans cette mise à jour.
+
 ## Suivi du 11 septembre 2026
 
 - Le dépôt public [ales27pm/27pm](https://github.com/ales27pm/27pm) possède déjà un lien vers le site dans sa présentation, avec l’attribut `nofollow`. Le README de cette publication ajoute des liens lisibles vers l’accueil, les quatre services et les deux études indépendantes. Ce sont des liens depuis un dépôt existant, pas de nouveaux domaines référents.

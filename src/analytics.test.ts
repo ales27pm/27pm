@@ -53,6 +53,8 @@ describe('analytics consent contract', () => {
 
   it('recognizes published service and study pages without retaining visitor input', () => {
     for (const path of [
+      '/services/creation-sites-web/',
+      '/services/agence-web/',
       '/services/sites-catalogues-fabricants/',
       '/services/applications-web-sur-mesure/',
       '/services/automatisation-ia/',

@@ -2,7 +2,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const pages = [
-  ['/services/creation-sites-web/', 'Création de sites web pour PME au Québec'],
+  ['/services/creation-sites-web/', 'Création de site web pour les PME du Québec'],
+  ['/services/agence-web/', 'Agence web au Québec : conception, refonte et développement'],
   ['/services/sites-catalogues-fabricants/', 'Sites web et catalogues pour fabricants québécois'],
   ['/services/applications-web-sur-mesure/', 'Applications web sur mesure pour PME au Québec'],
   ['/services/automatisation-ia/', 'Automatisation et IA pour PME au Québec'],
@@ -49,5 +50,17 @@ test('exposes every service and study from the homepage without JavaScript', asy
     }
   } finally {
     await context.close();
+  }
+});
+
+test('keeps every detail page inside a 320px viewport', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only assertion');
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const [path] of pages) {
+    await page.goto(path);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow, `Horizontal overflow on ${path}`).toBeLessThanOrEqual(1);
   }
 });
