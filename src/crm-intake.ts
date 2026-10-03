@@ -1,6 +1,7 @@
 import type { ProjectKind } from './contact';
 
-export const CRM_INTAKE_ENDPOINT = 'https://crm.27pm.org/api/public/intake';
+// Public intake must reach the Worker directly to preserve the visitor IP used by Turnstile and rate limits.
+export const CRM_INTAKE_ENDPOINT = 'https://api.crm.27pm.org/api/public/intake';
 export const TURNSTILE_ACTION = 'crm_intake';
 export const CRM_INTAKE_TIMEOUT_MS = 12_000;
 

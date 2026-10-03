@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  CRM_INTAKE_ENDPOINT,
   CRM_INTAKE_TIMEOUT_MS,
   createIdempotencyKey,
   createPublicIntakePayload,
@@ -77,7 +76,7 @@ describe('public CRM intake contract', () => {
       status: 202,
     });
     expect(fetcher).toHaveBeenCalledOnce();
-    expect(fetcher).toHaveBeenCalledWith(CRM_INTAKE_ENDPOINT, {
+    expect(fetcher).toHaveBeenCalledWith('https://api.crm.27pm.org/api/public/intake', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

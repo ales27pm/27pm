@@ -8,8 +8,8 @@ const origin = new URL(process.env.PUBLIC_SITE_ORIGIN ?? 'https://27pm.org');
 const timeoutMs = Number(process.env.PUBLIC_SITE_TIMEOUT_MS ?? 12_000);
 const analyticsApproved = process.env.PUBLIC_SITE_ANALYTICS_APPROVED === 'true';
 const crmApproved = process.env.PUBLIC_SITE_CRM_APPROVED === 'true';
-const contentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; script-src-attr 'none'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self'; connect-src 'self' https://crm.27pm.org https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com; frame-src https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'none'; media-src 'none'; upgrade-insecure-requests";
-const crmIntakeEndpoint = new URL('https://crm.27pm.org/api/public/intake');
+const contentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; script-src-attr 'none'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self'; connect-src 'self' https://api.crm.27pm.org https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com; frame-src https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'none'; media-src 'none'; upgrade-insecure-requests";
+const crmIntakeEndpoint = new URL('https://api.crm.27pm.org/api/public/intake');
 const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 const verifiedDemoProjects = new Map([
   ['boulet', {
@@ -242,9 +242,14 @@ for (const href of javascriptAssetUrls) {
   }
 }
 const deployedJavascript = deployedJavascriptParts.join('\n');
+assert.doesNotMatch(
+  deployedJavascript,
+  /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+  'deployed JavaScript must not target the Vercel proxy that blocks public intake',
+);
 for (const [pattern, marker] of [
   [/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/, 'Turnstile loader'],
-  [/https:\/\/crm\.27pm\.org\/api\/public\/intake/, 'CRM intake endpoint'],
+  [/https:\/\/api\.crm\.27pm\.org\/api\/public\/intake/, 'CRM intake endpoint'],
   [/crm_intake/, 'Turnstile action'],
 ]) {
   assert.equal(

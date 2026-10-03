@@ -8,7 +8,7 @@ const readDist = (path) => readFile(resolve(root, 'dist', path), 'utf8');
 const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
 const crmApproved = process.env.VITE_CRM_INTAKE_APPROVED === 'true';
 const generatedAssetsPath = 'assets/generated';
-const contentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; script-src-attr 'none'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self'; connect-src 'self' https://crm.27pm.org https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com; frame-src https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'none'; media-src 'none'; upgrade-insecure-requests";
+const contentSecurityPolicy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; script-src-attr 'none'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self'; connect-src 'self' https://api.crm.27pm.org https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com; frame-src https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'none'; media-src 'none'; upgrade-insecure-requests";
 const description =
   'Découvrez comment 27PM protège les renseignements transmis par formulaire ou courriel et utilise Google Analytics uniquement avec votre consentement.';
 const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
@@ -83,7 +83,7 @@ if (crmApproved) {
   );
   assert.match(
     compiledJavascript,
-    /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+    /https:\/\/api\.crm\.27pm\.org\/api\/public\/intake/,
     'approved CRM assets must target the intake endpoint',
   );
 } else {
@@ -98,7 +98,7 @@ if (crmApproved) {
   );
   assert.doesNotMatch(
     compiledJavascript,
-    /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+    /https:\/\/(?:api\.)?crm\.27pm\.org\/api\/public\/intake/,
     'unapproved CRM assets must exclude the intake endpoint',
   );
 }

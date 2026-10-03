@@ -253,7 +253,7 @@ test('explains the email handoff and copies the visible fallback address', async
 
 test('keeps privacy-policy navigation separate from explicit consent', async ({ page }) => {
   let crmRequestCount = 0;
-  await page.route('https://crm.27pm.org/api/public/intake', async (route) => {
+  await page.route('https://api.crm.27pm.org/api/public/intake', async (route) => {
     crmRequestCount += 1;
     await route.fulfill({ status: 202 });
   });
@@ -344,7 +344,7 @@ test('handles the exact mocked queued CRM response once with Turnstile enabled',
   let capturedHeaders: Record<string, string> = {};
   let capturedPayload: unknown;
 
-  await page.route('https://crm.27pm.org/api/public/intake', async (route) => {
+  await page.route('https://api.crm.27pm.org/api/public/intake', async (route) => {
     requestCount += 1;
     capturedHeaders = await route.request().allHeaders();
     capturedPayload = route.request().postDataJSON();
@@ -445,7 +445,7 @@ test('reuses idempotency on CRM retry and keeps the mail fallback visible', asyn
   const idempotencyKeys: string[] = [];
   let attempt = 0;
 
-  await page.route('https://crm.27pm.org/api/public/intake', async (route) => {
+  await page.route('https://api.crm.27pm.org/api/public/intake', async (route) => {
     attempt += 1;
     idempotencyKeys.push((await route.request().allHeaders())['idempotency-key'] ?? '');
     await route.fulfill({ status: attempt === 1 ? 503 : 202 });
@@ -486,7 +486,7 @@ test('recovers the CRM form after a stalled request and retries idempotently', a
         : input instanceof URL
           ? input.href
           : input.url;
-      if (url !== 'https://crm.27pm.org/api/public/intake') {
+      if (url !== 'https://api.crm.27pm.org/api/public/intake') {
         return originalFetch(input, init);
       }
 

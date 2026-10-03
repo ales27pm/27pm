@@ -29,7 +29,7 @@ async function mockTurnstile(page: Page, verifyImmediately = false): Promise<() 
 test('defers the anti-bot script until the contact form approaches the viewport', async ({ page }) => {
   const requests = await mockTurnstile(page);
   let intakeRequests = 0;
-  await page.route('https://crm.27pm.org/api/public/intake', async (route) => {
+  await page.route('https://api.crm.27pm.org/api/public/intake', async (route) => {
     intakeRequests += 1;
     await route.abort();
   });

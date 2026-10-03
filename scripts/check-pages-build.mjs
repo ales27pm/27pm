@@ -68,7 +68,7 @@ assert.match(home, /data-crm-intake/, 'home must publish the progressively enhan
 assert.match(home, /data-crm-unavailable/, 'home must preserve the no-configuration fallback');
 assert.match(home, /name="website"/, 'home must publish the empty honeypot field');
 assert.match(home, /data-crm-submit[^>]*>/, 'home must publish the guarded CRM submit control');
-assert.match(crmClientSource, /https:\/\/crm\.27pm\.org\/api\/public\/intake/, 'client must target the public CRM intake endpoint');
+assert.match(crmClientSource, /https:\/\/api\.crm\.27pm\.org\/api\/public\/intake/, 'client must target the public CRM intake endpoint');
 assert.match(crmClientSource, /crm_intake/, 'client must request the expected Turnstile action');
 assert.match(crmClientSource, /Idempotency-Key/, 'client must send an idempotency key');
 assert.match(
@@ -92,7 +92,7 @@ const compiledJavascript = (
 ).join('\n');
 assert.doesNotMatch(
   compiledJavascript,
-  /https:\/\/crm\.27pm\.org\/api\/public\/intake/,
+  /https:\/\/(?:api\.)?crm\.27pm\.org\/api\/public\/intake/,
   'the retired Pages preview must exclude the CRM intake endpoint',
 );
 assert.doesNotMatch(
