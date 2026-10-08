@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test';
 const pages = [
   ['/services/creation-sites-web/', 'Création de site web pour les PME du Québec'],
   ['/services/agence-web/', 'Agence web au Québec : conception, refonte et développement'],
+  ['/services/refonte-site-web/', 'Refonte de site web au Québec : préserver vos acquis'],
   ['/services/sites-catalogues-fabricants/', 'Sites web et catalogues pour fabricants québécois'],
   ['/services/applications-web-sur-mesure/', 'Applications web sur mesure pour PME au Québec'],
   ['/services/automatisation-ia/', 'Automatisation et IA pour PME au Québec'],

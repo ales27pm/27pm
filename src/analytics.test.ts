@@ -55,6 +55,7 @@ describe('analytics consent contract', () => {
     for (const path of [
       '/services/creation-sites-web/',
       '/services/agence-web/',
+      '/services/refonte-site-web/',
       '/services/sites-catalogues-fabricants/',
       '/services/applications-web-sur-mesure/',
       '/services/automatisation-ia/',

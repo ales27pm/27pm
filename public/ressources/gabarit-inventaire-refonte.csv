@@ -1,0 +1,4 @@
+url_actuelle,destination_prevue,decision,priorite,trafic_organique_a_relever,liens_entrants_a_relever,statut_http,redirection_verifiee,responsable,notes
+https://example.com/fr/ancienne-page/,https://example.com/fr/nouvelle-page/,rediriger,haute,a_relever,a_relever,200,non,Nom a confirmer,Exemple a remplacer
+https://example.com/fr/page-a-conserver/,https://example.com/fr/page-a-conserver/,conserver,moyenne,a_relever,a_relever,200,sans_objet,Nom a confirmer,Verifier le contenu et les metadonnees
+https://example.com/fr/page-a-fusionner/,https://example.com/fr/page-principale/,fusionner,moyenne,a_relever,a_relever,200,non,Nom a confirmer,Reporter le contenu utile avant la redirection

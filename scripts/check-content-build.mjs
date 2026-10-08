@@ -7,8 +7,10 @@ const read = (path) => readFile(resolve(root, path), 'utf8');
 const routes = JSON.parse(await read('src/content-routes.json'));
 const creationSiteRoute = '/services/creation-sites-web/';
 const agencyRoute = '/services/agence-web/';
+const redesignRoute = '/services/refonte-site-web/';
 assert.ok(routes.includes(creationSiteRoute), 'the creation-site pillar route must stay published');
 assert.ok(routes.includes(agencyRoute), 'the agency service route must be published');
+assert.ok(routes.includes(redesignRoute), 'the website-redesign service route must be published');
 const base = process.env.CONTENT_PREVIEW_BASE ?? '/';
 const preview = process.env.CONTENT_PREVIEW_BASE !== undefined;
 const origin = 'https://27pm.org';
@@ -61,13 +63,16 @@ for (const [route, html] of documents) {
 
 const creationSite = documents.get(creationSiteRoute);
 const agency = documents.get(agencyRoute);
+const redesign = documents.get(redesignRoute);
 assert.ok(creationSite, 'the creation-site pillar must be present in the build');
 assert.ok(agency, 'the agency service page must be present in the build');
+assert.ok(redesign, 'the website-redesign service page must be present in the build');
 
 const metaDescription = (html) => html.match(/<meta\s+name="description"\s+content="([^"]+)"/s)?.[1] ?? '';
 const primaryHeading = (html) => html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 const creationText = text(creationSite);
 const agencyText = text(agency);
+const redesignText = text(redesign);
 
 assert.match(primaryHeading(creationSite), /création de site web/i, 'pillar H1 must clearly name the service');
 assert.match(metaDescription(creationSite), /création site web/i, 'pillar description must contain the exact primary query');
@@ -102,6 +107,38 @@ assert.match(creationSite, new RegExp(`href="${base}${agencyRoute.slice(1)}`), '
 assert.match(agency, new RegExp(`href="${base}${creationSiteRoute.slice(1)}`), 'agency page must link to pillar');
 assert.match(agencyText, /concepts? indépendants?/i, 'agency proof section must label independent concepts');
 assert.match(agencyText, /ne (?:sont|constituent) (?:pas|ni).*clients?/i, 'agency proof section must not imply client work');
+
+assert.match(primaryHeading(redesign), /refonte de site web/i, 'redesign H1 must contain the primary query');
+assert.match(metaDescription(redesign), /refonte de site web/i, 'redesign description must contain the primary query');
+assert.match(metaDescription(redesign), /québec/i, 'redesign description must identify the served market');
+assert.ok(metaDescription(redesign).length >= 120 && metaDescription(redesign).length <= 170, 'redesign description must stay within 120–170 characters');
+for (const topic of [
+  /inventaire des URL/i,
+  /plan de redirections/i,
+  /search console/i,
+  /accessibilité/i,
+  /performance/i,
+  /contrôle après la mise en ligne/i,
+]) {
+  assert.match(redesignText, topic, `redesign page must cover ${topic}`);
+}
+assert.match(redesign, new RegExp(`href="${base}${agencyRoute.slice(1)}`), 'redesign page must link to agency page');
+assert.match(redesign, new RegExp(`href="${base}${creationSiteRoute.slice(1)}`), 'redesign page must link to creation pillar');
+assert.match(agency, new RegExp(`href="${base}${redesignRoute.slice(1)}`), 'agency page must link to redesign service');
+assert.match(creationSite, new RegExp(`href="${base}${redesignRoute.slice(1)}`), 'creation pillar must link to redesign service');
+
+const redesignGraph = JSON.parse(
+  redesign.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
+)['@graph'];
+const redesignFaqPage = redesignGraph?.find((node) => node['@type'] === 'FAQPage');
+assert.equal(redesignFaqPage?.mainEntity?.length, 5, 'redesign schema must describe every visible FAQ entry');
+const visibleRedesignFaq = [...redesign.matchAll(/<details>\s*<summary>([\s\S]*?)<\/summary>\s*<p>([\s\S]*?)<\/p>\s*<\/details>/gi)]
+  .map((match) => ({ name: text(match[1]), answer: text(match[2]) }));
+assert.deepEqual(
+  redesignFaqPage.mainEntity.map((item) => ({ name: item.name, answer: item.acceptedAnswer?.text })),
+  visibleRedesignFaq,
+  'redesign FAQ schema must match the visible questions and answers',
+);
 
 const creationGraph = JSON.parse(
   creationSite.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
