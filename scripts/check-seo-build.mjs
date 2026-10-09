@@ -237,6 +237,18 @@ assert.deepEqual(
   vercelConfig.headers,
   [
     {
+      source: '/ressources/checklist-fin-projet-web.csv',
+      headers: [
+        { key: 'Link', value: '<https://27pm.org/ressources/checklist-fin-projet-web/>; rel="canonical"' },
+      ],
+    },
+    {
+      source: '/ressources/checklist-fin-projet-web.json',
+      headers: [
+        { key: 'Link', value: '<https://27pm.org/ressources/checklist-fin-projet-web/>; rel="canonical"' },
+      ],
+    },
+    {
       source: '/assets/generated/(.*)',
       headers: [
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },

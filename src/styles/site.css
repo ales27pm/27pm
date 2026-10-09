@@ -881,6 +881,22 @@
   line-height: 1.55;
 }
 
+.method-resource {
+  max-width: 48rem;
+  margin-top: clamp(2.5rem, 4vw, 4rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.method-resource a {
+  color: var(--blue-deep);
+  font-weight: 650;
+  text-underline-offset: 0.25em;
+}
+
 .closing {
   display: grid;
   width: min(100%, var(--shell));

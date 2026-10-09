@@ -66,7 +66,63 @@ test('offers the editable end-of-project checklist CSV', async ({ page, request 
   );
   const response = await request.get('/ressources/checklist-fin-projet-web.csv');
   expect(response.status()).toBe(200);
-  expect(await response.text()).toContain('zone_de_controle,quoi_verifier,preuves_a_conserver');
+  const csv = await response.text();
+  expect(csv).toContain('zone_de_controle,quoi_verifier,preuves_a_conserver');
+  expect(csv.split('\n')[0]).toContain('statut,niveau_preuve,notes');
+  expect(csv.match(/,"À vérifier","non_documente",/g)).toHaveLength(8);
+
+  await expect(page.getByRole('link', { name: 'Télécharger le référentiel en JSON' }).first()).toHaveAttribute(
+    'href',
+    '/ressources/checklist-fin-projet-web.json',
+  );
+  const jsonResponse = await request.get('/ressources/checklist-fin-projet-web.json');
+  expect(jsonResponse.status()).toBe(200);
+  expect(jsonResponse.headers()['content-type']).toContain('application/json');
+  const framework = await jsonResponse.json();
+  expect(framework).toEqual(expect.objectContaining({
+    schema_version: '1.0',
+    resource_version: '1.0.0',
+    id: 'https://27pm.org/ressources/checklist-fin-projet-web/#referentiel',
+    canonical_url: 'https://27pm.org/ressources/checklist-fin-projet-web/',
+  }));
+  expect(framework.controls).toHaveLength(8);
+  expect(framework.states.map((state: { id: string }) => state.id)).toEqual([
+    'a_verifier',
+    'verifie',
+    'a_corriger',
+    'non_applicable',
+  ]);
+  expect(framework.evidence_levels.map((level: { id: string }) => level.id)).toEqual([
+    'non_documente',
+    'documente',
+    'verifie',
+    'teste',
+  ]);
+  expect(framework.method.evidence_level_rule).toContain('niveau le plus faible');
+  expect(framework).not.toHaveProperty('overall_states');
+
+  const schema = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  )['@graph'];
+  const article = schema.find((node: { '@type': string | string[] }) => (
+    Array.isArray(node['@type']) && node['@type'].includes('TechArticle')
+  ));
+  expect(article.hasPart['@id']).toBe(framework.id);
+
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://27pm.org/assets/checklist-fin-projet-web-1200x630.png',
+  );
+  const imageResponse = await request.get('/assets/checklist-fin-projet-web-1200x630.png');
+  expect(imageResponse.status()).toBe(200);
+  expect(imageResponse.headers()['content-type']).toContain('image/png');
+
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'checklist de fin de projet web', exact: true }).first()).toHaveAttribute(
+    'href',
+    '/ressources/checklist-fin-projet-web/',
+  );
 });
 
 test('publishes a canonical author profile and linked visible bylines', async ({ page }) => {

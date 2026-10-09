@@ -13,6 +13,8 @@ const redesignRoute = '/services/refonte-site-web/';
 const applicationsRoute = '/services/applications-web-sur-mesure/';
 const automationRoute = '/services/automatisation-ia/';
 const checklistRoute = '/ressources/checklist-fin-projet-web/';
+const checklistJsonDownload = 'ressources/checklist-fin-projet-web.json';
+const checklistImage = 'assets/checklist-fin-projet-web-1200x630.png';
 const authorRoute = '/auteurs/alexis-boulet/';
 const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
 const authorId = `${siteMetadata.origin}${authorRoute}#person`;
@@ -292,11 +294,19 @@ for (const [area, topic] of controlAreas) {
 const recoveryCheck = checklist.match(/<ol\s+data-recovery-check>([\s\S]*?)<\/ol>/i)?.[1] ?? '';
 assert.equal((recoveryCheck.match(/<li\b/g) ?? []).length, 6, 'the recovery check must contain six actions');
 assert.match(checklistText, /Révision\s*:\s*9 octobre 2026/i, 'checklist must publish its dated revision');
+assert.match(checklistText, /Version\s*:\s*1\.0\.0/i, 'checklist must publish its resource version');
 assert.match(checklistText, /Auteur\s*:\s*Alexis Boulet/i, 'checklist must identify its author');
 assert.match(checklistText, /Éditeur\s*:\s*27PM/i, 'checklist must identify its publisher');
-assert.match(checklistText, /Méthode\s*:/i, 'checklist must explain its method');
-assert.match(checklistText, /ne remplace pas.*avis juridique.*sécurité/i, 'checklist must state its legal and security limitations');
-assert.match(checklistText, /adapter.*contexte/i, 'checklist must tell readers to adapt it to their context');
+for (const id of ['reponse-courte', 'methode', 'citer-cette-ressource', 'limites', 'historique-versions']) {
+  assert.match(checklist, new RegExp(`<section\\s+id="${id}"`), `checklist must publish #${id}`);
+}
+assert.match(checklistText, /aucune certification juridique.*sécurité.*confidentialité.*accessibilité.*conformité/i, 'checklist must state its certification limits');
+assert.match(checklistText, /adaptés? au périmètre réel/i, 'checklist must tell readers to adapt it to their scope');
+assert.match(
+  checklistText,
+  /Boulet, Alexis.*Checklist de fin de projet web : garder le contrôle.*Version 1\.0\.0.*27PM.*9 octobre 2026/i,
+  'checklist must publish a stable suggested citation',
+);
 
 const checklistDownload = 'ressources/checklist-fin-projet-web.csv';
 assert.match(
@@ -307,24 +317,108 @@ assert.match(
 const checklistCsvBuffer = await readFile(resolve(root, 'dist', checklistDownload));
 const checklistCsv = checklistCsvBuffer.toString('utf8');
 const checklistRows = checklistCsv.trim().split(/\r?\n/);
-assert.equal(checklistRows.length, 9, 'checklist CSV must contain one header and eight control areas');
-for (const [index, row] of checklistRows.entries()) {
+const parseCsvRow = (row) => {
+  const fields = [];
+  let field = '';
   let quoted = false;
-  let columns = 1;
   for (let cursor = 0; cursor < row.length; cursor += 1) {
-    if (row[cursor] === '"') {
-      if (quoted && row[cursor + 1] === '"') cursor += 1;
-      else quoted = !quoted;
-    } else if (row[cursor] === ',' && !quoted) {
-      columns += 1;
+    const character = row[cursor];
+    if (character === '"') {
+      if (quoted && row[cursor + 1] === '"') {
+        field += '"';
+        cursor += 1;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === ',' && !quoted) {
+      fields.push(field);
+      field = '';
+    } else {
+      field += character;
     }
   }
-  assert.equal(quoted, false, `checklist CSV row ${index + 1} must have balanced quotes`);
-  assert.equal(columns, 8, `checklist CSV row ${index + 1} must contain eight columns`);
+  assert.equal(quoted, false, 'checklist CSV row must have balanced quotes');
+  fields.push(field);
+  return fields;
+};
+const checklistTable = checklistRows.map(parseCsvRow);
+assert.equal(checklistRows.length, 9, 'checklist CSV must contain one header and eight control areas');
+assert.deepEqual(checklistTable[0], [
+  'zone_de_controle',
+  'quoi_verifier',
+  'preuves_a_conserver',
+  'responsable',
+  'emplacement_preuve',
+  'date_derniere_verification',
+  'statut',
+  'niveau_preuve',
+  'notes',
+], 'checklist CSV must publish the versioned nine-column contract');
+for (const [index, row] of checklistTable.entries()) {
+  assert.equal(row.length, 9, `checklist CSV row ${index + 1} must contain nine columns`);
 }
 for (const [, topic] of controlAreas) assert.match(checklistCsv, topic, `checklist CSV must cover ${topic}`);
 const checklistCsvBytes = checklistCsvBuffer.byteLength;
 const checklistCsvSha256 = createHash('sha256').update(checklistCsvBuffer).digest('hex');
+const checklistJsonBuffer = await readFile(resolve(root, 'dist', checklistJsonDownload));
+const checklistJsonSha256 = createHash('sha256').update(checklistJsonBuffer).digest('hex');
+const checklistJsonBytes = checklistJsonBuffer.byteLength;
+const checklistJson = JSON.parse(checklistJsonBuffer.toString('utf8'));
+assert.equal(checklistJson.schema_version, '1.0', 'checklist JSON must publish its schema version');
+assert.equal(checklistJson.resource_version, '1.0.0', 'checklist JSON must publish its resource version');
+assert.equal(checklistJson.id, `${origin}${checklistRoute}#referentiel`, 'checklist JSON must use the stable dataset identifier');
+assert.equal(checklistJson.canonical_url, `${origin}${checklistRoute}`, 'checklist JSON must identify the canonical HTML page');
+assert.equal(checklistJson.date_published, '2026-10-08', 'checklist JSON must publish the visible release date');
+assert.equal(checklistJson.date_modified, siteMetadata.lastModified[checklistRoute], 'checklist JSON date must match the sitemap date');
+assert.equal(checklistJson.author?.name, 'Alexis Boulet', 'checklist JSON must identify its author');
+assert.equal(checklistJson.publisher?.name, '27PM', 'checklist JSON must identify its publisher');
+assert.equal(checklistJson.method?.default_state, 'a_verifier', 'checklist JSON must define the initial state');
+assert.equal(checklistJson.method?.default_evidence_level, 'non_documente', 'checklist JSON must define the initial evidence level');
+assert.match(checklistJson.method?.evidence_level_rule ?? '', /niveau le plus faible.*points applicables/i, 'checklist JSON must use the conservative evidence rule');
+assert.equal(Object.hasOwn(checklistJson, 'overall_states'), false, 'checklist JSON must not publish an undefined aggregate state vocabulary');
+assert.deepEqual(
+  checklistJson.states.map((state) => state.id),
+  ['a_verifier', 'verifie', 'a_corriger', 'non_applicable'],
+  'checklist JSON must publish the four review states in order',
+);
+assert.equal(checklistJson.evidence_levels.length, 4, 'checklist JSON must publish four evidence levels');
+assert.deepEqual(
+  checklistJson.evidence_levels.map((level) => level.id),
+  ['non_documente', 'documente', 'verifie', 'teste'],
+  'checklist JSON must publish the four evidence identifiers in order',
+);
+assert.deepEqual(
+  [...checklist.matchAll(/data-review-state-id="([^"]+)"/g)].map((match) => match[1]),
+  checklistJson.states.map((state) => state.id),
+  'visible review states and JSON review states must match',
+);
+assert.deepEqual(
+  [...checklist.matchAll(/data-evidence-level-id="([^"]+)"/g)].map((match) => match[1]),
+  checklistJson.evidence_levels.map((level) => level.id),
+  'visible evidence levels and JSON evidence levels must match',
+);
+assert.deepEqual(
+  checklistJson.controls.map((control) => control.id),
+  controlAreas.map(([area]) => area),
+  'checklist JSON and HTML must publish the same eight control identifiers',
+);
+assert.deepEqual(
+  checklistTable.slice(1).map((row) => row[0]),
+  checklistJson.controls.map((control) => control.name),
+  'checklist CSV and JSON must publish the same eight control names in order',
+);
+for (const [index, row] of checklistTable.slice(1).entries()) {
+  assert.equal(row[6], 'À vérifier', `checklist CSV control ${index + 1} must start in the review state`);
+  assert.equal(row[7], 'non_documente', `checklist CSV control ${index + 1} must start at the conservative evidence level`);
+  assert.ok(checklistJson.controls[index].minimum_evidence.length > 0, `checklist JSON control ${index + 1} must define evidence`);
+}
+assert.equal(checklistJson.csv_integrity.bytes, checklistCsvBytes, 'checklist JSON must publish the current CSV byte size');
+assert.equal(checklistJson.csv_integrity.sha256, checklistCsvSha256, 'checklist JSON must publish the current CSV SHA-256');
+assert.equal(
+  checklistJson.citation?.recommended_text,
+  'Boulet, Alexis. « Checklist de fin de projet web : garder le contrôle ». Version 1.0.0. 27PM, mise à jour le 9 octobre 2026. https://27pm.org/ressources/checklist-fin-projet-web/',
+  'checklist JSON must publish the visible suggested citation',
+);
 
 const checklistGraph = JSON.parse(
   checklist.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
@@ -332,21 +426,49 @@ const checklistGraph = JSON.parse(
 assert.ok(Array.isArray(checklistGraph), 'checklist schema must publish a graph');
 assert.ok(!checklistGraph.some((node) => node['@type'] === 'Service'), 'resource route must not use Service schema');
 const checklistWebPage = checklistGraph.find((node) => node['@type'] === 'WebPage');
-const checklistArticle = checklistGraph.find((node) => node['@type'] === 'TechArticle');
+const checklistArticle = checklistGraph.find((node) => {
+  const types = Array.isArray(node['@type']) ? node['@type'] : [node['@type']];
+  return types.includes('TechArticle');
+});
 assert.equal(checklistWebPage?.author?.['@id'], authorId, 'checklist WebPage must identify its canonical author entity');
 assert.equal(checklistWebPage?.mainEntity?.['@id'], `${origin}${checklistRoute}#article`, 'checklist WebPage must identify its article');
 assert.equal(checklistArticle?.author?.['@id'], authorId, 'checklist article must identify its canonical author entity');
 assert.equal(checklistArticle?.datePublished, '2026-10-08', 'checklist article must publish its release date');
 assert.equal(checklistArticle?.dateModified, '2026-10-09', 'checklist article must publish its revision date');
+assert.equal(checklistArticle?.version, '1.0.0', 'checklist article must publish the visible resource version');
+assert.equal(checklistArticle?.image?.contentUrl, `${origin}/assets/checklist-fin-projet-web-1200x630.png`, 'checklist article must publish its dedicated image');
+assert.equal(checklistArticle?.image?.width, 1200, 'checklist article image width');
+assert.equal(checklistArticle?.image?.height, 630, 'checklist article image height');
+const checklistDataset = checklistArticle?.hasPart;
+assert.equal(checklistDataset?.['@type'], 'Dataset', 'checklist article must identify the accompanying dataset');
+assert.equal(checklistDataset?.['@id'], checklistJson.id, 'checklist JSON and JSON-LD must use the same dataset identifier');
+assert.equal(checklistDataset?.version, '1.0.0', 'checklist dataset must publish the visible resource version');
+const checklistDistributions = checklistDataset?.distribution ?? [];
+const checklistCsvDistribution = checklistDistributions.find((item) => item.encodingFormat === 'text/csv');
+const checklistJsonDistribution = checklistDistributions.find((item) => item.encodingFormat === 'application/json');
 assert.equal(
-  checklistArticle?.encoding?.contentUrl,
+  checklistCsvDistribution?.contentUrl,
   `${origin}/ressources/checklist-fin-projet-web.csv`,
   'checklist article must identify its downloadable CSV',
 );
-assert.equal(checklistArticle?.encoding?.contentSize, `${checklistCsvBytes} bytes`, 'checklist schema must publish the current CSV byte size');
-assert.equal(checklistArticle?.encoding?.sha256, checklistCsvSha256, 'checklist schema must publish the current CSV SHA-256');
+assert.equal(checklistCsvDistribution?.contentSize, `${checklistCsvBytes} bytes`, 'checklist schema must publish the current CSV byte size');
+assert.equal(checklistCsvDistribution?.sha256, checklistCsvSha256, 'checklist schema must publish the current CSV SHA-256');
+assert.equal(checklistJsonDistribution?.contentUrl, `${origin}/ressources/checklist-fin-projet-web.json`, 'checklist article must identify its JSON representation');
+assert.equal(checklistJsonDistribution?.contentSize, `${checklistJsonBytes} bytes`, 'checklist schema must publish the current JSON byte size');
+assert.equal(checklistJsonDistribution?.sha256, checklistJsonSha256, 'checklist schema must publish the current JSON SHA-256');
 assert.match(checklistText, new RegExp(`${checklistCsvBytes} octets`, 'i'), 'checklist must visibly publish the CSV byte size');
 assert.match(checklistText, new RegExp(`SHA-256\\s*:\\s*${checklistCsvSha256}`, 'i'), 'checklist must visibly publish the CSV SHA-256');
+assert.match(checklistText, new RegExp(`${checklistJsonBytes} octets`, 'i'), 'checklist must visibly publish the JSON byte size');
+assert.match(checklistText, new RegExp(`SHA-256\\s*:\\s*${checklistJsonSha256}`, 'i'), 'checklist must visibly publish the JSON SHA-256');
+assert.match(checklist, new RegExp(`href="${base}${checklistJsonDownload}"[^>]*\\bdownload\\b`), 'checklist page must link to the JSON download');
+assert.match(checklist, /rel="alternate"\s+type="application\/json"\s+href="https:\/\/27pm\.org\/ressources\/checklist-fin-projet-web\.json"/, 'checklist page must advertise the JSON representation');
+assert.match(checklist, /property="og:type"\s+content="article"/, 'checklist must use the article social type');
+assert.match(checklist, new RegExp(`property="og:image"\\s+content="${origin}/${checklistImage}"`), 'checklist must publish its dedicated social image');
+const checklistImageBuffer = await readFile(resolve(root, 'dist', checklistImage));
+assert.equal(checklistImageBuffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', 'checklist social image must be a PNG');
+assert.equal(checklistImageBuffer.readUInt32BE(16), 1200, 'checklist social image width');
+assert.equal(checklistImageBuffer.readUInt32BE(20), 630, 'checklist social image height');
+assert.match(documents.get('/'), new RegExp(`href="${base}${checklistRoute.slice(1)}"`), 'homepage must link directly to the checklist');
 
 const creationGraph = JSON.parse(
   creationSite.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',

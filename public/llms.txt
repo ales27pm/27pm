@@ -21,7 +21,7 @@ Auteur des contenus: Alexis Boulet. Éditeur: 27PM.
 
 ## Ressource originale
 
-- [Checklist de fin de projet web](https://27pm.org/ressources/checklist-fin-projet-web/): huit zones de contrôle, méthode, limites et fichier CSV téléchargeable pour vérifier une remise de projet web.
+- [Checklist de fin de projet web](https://27pm.org/ressources/checklist-fin-projet-web/): référentiel 27PM version 1.0.0 avec huit zones de contrôle, quatre états, quatre niveaux de preuve et représentations CSV et JSON pour documenter une remise de projet web.
 
 ## Concepts indépendants
 

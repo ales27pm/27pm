@@ -8,19 +8,23 @@
     <meta name="description" content="Checklist de fin de projet web pour PME québécoises : vérifiez domaines, accès, données, sauvegardes et preuves à conserver avant la remise finale." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://27pm.org/ressources/checklist-fin-projet-web/" />
+    <link rel="alternate" type="application/json" href="https://27pm.org/ressources/checklist-fin-projet-web.json" />
     <link rel="icon" type="image/png" sizes="64x64" href="%BASE_URL%favicon-64.png" />
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="article" />
     <meta property="og:locale" content="fr_CA" />
     <meta property="og:site_name" content="27PM" />
     <meta property="og:url" content="https://27pm.org/ressources/checklist-fin-projet-web/" />
     <meta property="og:title" content="Checklist de fin de projet web | 27PM" />
     <meta property="og:description" content="Checklist de fin de projet web pour PME québécoises : vérifiez domaines, accès, données, sauvegardes et preuves à conserver avant la remise finale." />
-    <meta property="og:image" content="https://27pm.org/assets/og-27pm-1200x630.png" />
+    <meta property="og:image" content="https://27pm.org/assets/checklist-fin-projet-web-1200x630.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="27PM — Checklist de fin de projet web" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Checklist de fin de projet web | 27PM" />
+    <meta name="twitter:description" content="Huit zones de contrôle et quatre niveaux de preuve pour documenter la remise d’un projet web." />
+    <meta name="twitter:image" content="https://27pm.org/assets/checklist-fin-projet-web-1200x630.png" />
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -61,7 +65,7 @@
       }
     },
     {
-      "@type": "TechArticle",
+      "@type": ["Article", "TechArticle"],
       "@id": "https://27pm.org/ressources/checklist-fin-projet-web/#article",
       "headline": "Checklist de fin de projet web : garder le contrôle",
       "description": "Huit zones de contrôle et les preuves à conserver pour vérifier la remise d’un projet web à une PME québécoise.",
@@ -69,6 +73,9 @@
       "inLanguage": "fr-CA",
       "datePublished": "2026-10-08",
       "dateModified": "2026-10-09",
+      "version": "1.0.0",
+      "isAccessibleForFree": true,
+      "usageInfo": "https://27pm.org/ressources/checklist-fin-projet-web/#citer-cette-ressource",
       "author": {
         "@type": "Person",
         "@id": "https://27pm.org/auteurs/alexis-boulet/#person",
@@ -86,13 +93,41 @@
         "Continuité opérationnelle",
         "Gouvernance numérique"
       ],
-      "encoding": {
-        "@type": "MediaObject",
-        "name": "Checklist de fin de projet web — fichier CSV",
-        "contentUrl": "https://27pm.org/ressources/checklist-fin-projet-web.csv",
-        "encodingFormat": "text/csv",
-        "contentSize": "2700 bytes",
-        "sha256": "c6728c446cd840f499546b375e360af7626c52c45c5c2ff4e68e337852c033f3"
+      "image": {
+        "@type": "ImageObject",
+        "contentUrl": "https://27pm.org/assets/checklist-fin-projet-web-1200x630.png",
+        "width": 1200,
+        "height": 630,
+        "caption": "Checklist de fin de projet web — Référentiel 27PM 1.0.0"
+      },
+      "hasPart": {
+        "@type": "Dataset",
+        "@id": "https://27pm.org/ressources/checklist-fin-projet-web/#referentiel",
+        "name": "Référentiel 27PM de remise d’un projet web",
+        "description": "Huit zones de contrôle, quatre états de suivi et quatre niveaux de preuve pour documenter une remise de projet web.",
+        "version": "1.0.0",
+        "inLanguage": "fr-CA",
+        "creator": {
+          "@id": "https://27pm.org/auteurs/alexis-boulet/#person"
+        },
+        "distribution": [
+          {
+            "@type": "DataDownload",
+            "name": "Checklist de fin de projet web — fichier CSV",
+            "contentUrl": "https://27pm.org/ressources/checklist-fin-projet-web.csv",
+            "encodingFormat": "text/csv",
+            "contentSize": "2842 bytes",
+            "sha256": "3348b2f5848e6efe355b2f660949cdebe0ec49a9434ba8256a16d0e334f5c5ed"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "Référentiel 27PM — représentation JSON",
+            "contentUrl": "https://27pm.org/ressources/checklist-fin-projet-web.json",
+            "encodingFormat": "application/json",
+            "contentSize": "7528 bytes",
+            "sha256": "ddef53f045cc3ede47860c74733a3cf225a32cf0c2921b041ff3123718346f1f"
+          }
+        ]
       }
     },
     {
@@ -140,13 +175,18 @@
         <div class="editorial-actions">
           <a class="button" href="%BASE_URL%#contact">Planifier une remise avec 27PM</a>
           <a class="text-link" href="%BASE_URL%ressources/checklist-fin-projet-web.csv" download>Télécharger la checklist en CSV</a>
+          <a class="text-link" href="%BASE_URL%ressources/checklist-fin-projet-web.json" download>Télécharger le référentiel en JSON</a>
         </div>
       </header>
       <article class="editorial-body" aria-label="Checklist de fin de projet web pour PME">
+<section id="reponse-courte">
+  <h2>Réponse courte</h2>
+  <p>Une fin de projet est documentée lorsque l’équipe peut retrouver les comptes, les sources, les données, les échéances et les procédures de reprise, puis associer chaque point à une preuve datée. Le référentiel 27PM répartit cette revue en huit zones et décrit quatre niveaux de preuve. Ces niveaux présentent l’état observé; ils ne certifient pas le site.</p>
+</section>
 <section>
   <h2>Une vérification de contrôle, pas seulement une liste de fichiers</h2>
   <p>Recevoir un site fonctionnel ne confirme pas que l’entreprise peut le faire évoluer, renouveler ses services ou réagir à un incident. La question utile est opérationnelle : si la personne qui a réalisé le projet est indisponible, l’équipe peut-elle identifier les fournisseurs, ouvrir les comptes, retrouver les sources et comprendre les prochaines échéances?</p>
-  <p><strong>Auteur : Alexis Boulet.</strong> <strong>Éditeur : 27PM.</strong> <strong>Révision : 9 octobre 2026.</strong> <strong>Méthode :</strong> cette ressource regroupe huit zones de contrôle observables à la fin d’une création ou d’une refonte. Pour chacune, elle distingue ce qu’il faut vérifier de la preuve à conserver. Une capture d’écran seule ne remplace pas un accès testé, un export lisible ou une responsabilité confirmée.</p>
+  <p><strong>Auteur : Alexis Boulet.</strong> <strong>Éditeur : 27PM.</strong> <strong>Version : 1.0.0.</strong> <strong>Révision : 9 octobre 2026.</strong> Cette ressource regroupe huit zones de contrôle observables à la fin d’une création ou d’une refonte. Pour chacune, elle distingue ce qu’il faut vérifier de la preuve à conserver. Une capture d’écran seule ne remplace pas un accès testé, un export lisible ou une responsabilité confirmée.</p>
   <p>Faites la vérification avec une personne responsable côté entreprise. Inscrivez les écarts, le nom de la personne qui doit les corriger et une date de suivi dans le <a href="%BASE_URL%ressources/checklist-fin-projet-web.csv" download>fichier CSV modifiable</a>.</p>
   <nav aria-label="Les huit zones de contrôle">
     <h3>En bref : les huit contrôles à effectuer</h3>
@@ -161,6 +201,25 @@
       <li><a href="#sauvegardes-continuite">Tester les sauvegardes, la continuité et le soutien.</a></li>
     </ol>
   </nav>
+</section>
+<section id="methode">
+  <h2>Méthode du référentiel 27PM</h2>
+  <p>Pour chacune des huit zones, une personne côté entreprise examine les points de revue, réalise l’action lorsqu’elle peut le faire sans risque, puis consigne une référence de preuve, la date, la personne responsable, l’état et le niveau de preuve. Un point non applicable exige une raison. Un point à corriger exige une personne responsable et une date de suivi. La revue est complète lorsqu’aucun point ne reste à vérifier; « complète » ne signifie pas conforme, sécurisée ou sans risque.</p>
+  <h3>Quatre états de suivi</h3>
+  <ul>
+    <li data-review-state-id="a_verifier"><strong>À vérifier :</strong> aucun examen actuel ou aucune preuve suffisante n’a encore été consigné.</li>
+    <li data-review-state-id="verifie"><strong>Vérifié :</strong> les points applicables ont été examinés; une preuve, une date et une personne responsable sont consignées.</li>
+    <li data-review-state-id="a_corriger"><strong>À corriger :</strong> au moins un point applicable manque, échoue ou demeure incertain; une personne responsable et une date de suivi sont consignées.</li>
+    <li data-review-state-id="non_applicable"><strong>Non applicable :</strong> une justification propre au périmètre est consignée.</li>
+  </ul>
+  <h3>Quatre niveaux de preuve</h3>
+  <ol>
+    <li data-evidence-level-id="non_documente"><strong>Non documenté :</strong> le propriétaire, l’accès ou la preuve n’est pas identifié.</li>
+    <li data-evidence-level-id="documente"><strong>Documenté :</strong> l’information et la responsabilité sont consignées, sans test récent.</li>
+    <li data-evidence-level-id="verifie"><strong>Vérifié :</strong> une personne autorisée a confirmé l’accès ou la preuve à une date donnée.</li>
+    <li data-evidence-level-id="teste"><strong>Testé :</strong> l’action critique a été exécutée de façon contrôlée et son résultat a été conservé.</li>
+  </ol>
+  <p>Chaque zone est évaluée séparément; le référentiel ne produit ni note globale ni pourcentage. Son niveau correspond au niveau le plus faible atteint par l’ensemble de ses points applicables. Un seul test réussi ne peut donc pas masquer un autre point non documenté.</p>
 </section>
 <section id="domaine-dns" data-control-area="domaine-dns">
   <h2>1. Domaine et DNS</h2>
@@ -218,12 +277,36 @@
 <section>
   <h2>Utiliser la version CSV dans votre projet</h2>
   <p>Le <a href="%BASE_URL%ressources/checklist-fin-projet-web.csv" download>CSV de la checklist de fin de projet web</a> contient une ligne par zone de contrôle et des colonnes pour le responsable, l’emplacement de la preuve, la date, le statut et les notes. Importez-le dans votre tableur, remplacez les indications génériques par les systèmes réels et ajoutez des lignes si votre contexte comporte plusieurs domaines, établissements ou plateformes.</p>
-  <p class="resource-integrity"><strong>Intégrité du fichier publié :</strong> 2700 octets · SHA-256 : <code>c6728c446cd840f499546b375e360af7626c52c45c5c2ff4e68e337852c033f3</code>. Ces valeurs permettent de vérifier que le fichier téléchargé correspond à la version décrite sur cette page.</p>
+  <p class="resource-integrity"><strong>Intégrité du fichier publié :</strong> 2842 octets · SHA-256 : <code>3348b2f5848e6efe355b2f660949cdebe0ec49a9434ba8256a16d0e334f5c5ed</code>. Ces valeurs permettent de vérifier que le fichier téléchargé correspond à la version décrite sur cette page.</p>
   <p>Évitez d’y copier des secrets. Inscrivez plutôt le nom du coffre ou du système autorisé où ils se trouvent. Une fois la remise acceptée, rangez la checklist avec le contrat, les factures, les instructions et les décisions de projet afin qu’elle reste accessible à l’entreprise.</p>
 </section>
-<section>
+<section id="representation-json">
+  <h2>Réutiliser le référentiel en JSON</h2>
+  <p>La <a href="%BASE_URL%ressources/checklist-fin-projet-web.json" download>représentation JSON du référentiel 27PM</a> publie la version, la méthode, les quatre états, les niveaux de preuve et les huit zones avec des identifiants stables. Elle peut servir à préparer un formulaire interne ou une grille de suivi sans extraire le contenu de la page.</p>
+  <p class="resource-integrity"><strong>Intégrité du fichier publié :</strong> 7528 octets · SHA-256 : <code>ddef53f045cc3ede47860c74733a3cf225a32cf0c2921b041ff3123718346f1f</code>.</p>
+</section>
+<section id="citer-cette-ressource">
+  <h2>Citer cette ressource</h2>
+  <p>Forme suggérée : <cite>Boulet, Alexis. « Checklist de fin de projet web : garder le contrôle ». Version 1.0.0. 27PM, mise à jour le 9 octobre 2026. https://27pm.org/ressources/checklist-fin-projet-web/</cite></p>
+  <p>Cette forme facilite l’attribution de la version consultée; elle ne constitue pas une permission générale de reproduction.</p>
+</section>
+<section id="historique-versions">
+  <h2>Historique des versions</h2>
+  <ul>
+    <li><strong>1.0.0 — 9 octobre 2026 :</strong> première version du référentiel, avec huit zones, quatre états de suivi, quatre niveaux de preuve et représentations CSV et JSON.</li>
+  </ul>
+  <p>Une version majeure modifiera les zones, la signification des états ou la méthode. Une version mineure pourra ajouter des points de revue ou des exemples de preuve. Une correction précisera le texte sans changer le contrôle attendu.</p>
+</section>
+<section id="limites">
   <h2>Limites et prochaine étape</h2>
-  <p>Cette checklist fournit un cadre opérationnel général. Elle ne remplace pas un avis juridique ni une évaluation de sécurité, de confidentialité ou de conformité. Il faut adapter cette liste à votre contexte, à la sensibilité des données, aux contrats applicables, aux obligations de votre secteur et aux politiques internes de votre organisation.</p>
+  <ul>
+    <li>Ce cadre opérationnel général n’est pas exhaustif.</li>
+    <li>Il décrit un état observé à une date donnée et ne constitue aucune certification juridique, contractuelle, de sécurité, de confidentialité, d’accessibilité ou de conformité.</li>
+    <li>Les critères doivent être adaptés au périmètre réel, au secteur, aux contrats, aux systèmes et à la sensibilité des données.</li>
+    <li>Une capture ou un export ne prouve pas à lui seul qu’un accès fonctionne.</li>
+    <li>Aucun secret ne doit être inscrit dans le CSV ou le JSON.</li>
+    <li>Toute action susceptible d’affecter la production doit être réalisée dans un contexte contrôlé.</li>
+  </ul>
   <p>27PM peut intégrer ces contrôles au périmètre d’une <a href="%BASE_URL%services/creation-sites-web/">création de site web</a> ou d’une <a href="%BASE_URL%services/refonte-site-web/">refonte</a>, puis définir avec votre équipe les preuves et responsabilités attendues avant la réception.</p>
   <p><a href="%BASE_URL%#contact">Parler à 27PM de votre projet et de sa remise</a></p>
 </section>
@@ -236,6 +319,7 @@
             <li><a href="%BASE_URL%services/refonte-site-web/">Refonte de site web : préserver les acquis</a></li>
             <li><a href="%BASE_URL%services/agence-web/">Agence web : conception, refonte et développement</a></li>
             <li><a href="%BASE_URL%ressources/checklist-fin-projet-web.csv" download>Télécharger la checklist en CSV</a></li>
+            <li><a href="%BASE_URL%ressources/checklist-fin-projet-web.json" download>Télécharger le référentiel en JSON</a></li>
             <li><a href="%BASE_URL%">Découvrir 27PM</a></li>
           </ul>
         </nav>

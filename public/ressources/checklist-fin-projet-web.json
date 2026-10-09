@@ -1,0 +1,155 @@
+{
+  "schema_version": "1.0",
+  "resource_version": "1.0.0",
+  "id": "https://27pm.org/ressources/checklist-fin-projet-web/#referentiel",
+  "title": "Référentiel 27PM de remise d’un projet web",
+  "canonical_url": "https://27pm.org/ressources/checklist-fin-projet-web/",
+  "language": "fr-CA",
+  "date_published": "2026-10-08",
+  "date_modified": "2026-10-09",
+  "author": {
+    "name": "Alexis Boulet",
+    "url": "https://27pm.org/auteurs/alexis-boulet/"
+  },
+  "publisher": {
+    "name": "27PM",
+    "url": "https://27pm.org/"
+  },
+  "summary": "Une fin de projet est documentée lorsque l’équipe peut retrouver les comptes, les sources, les données, les échéances et les procédures de reprise, puis associer chaque point à une preuve datée. Le référentiel 27PM répartit cette revue en huit zones et décrit quatre niveaux de preuve. Ces niveaux présentent l’état observé; ils ne certifient pas le site.",
+  "scope": "Cadre opérationnel général pour vérifier la remise d’un site ou d’une application web à une PME.",
+  "method": {
+    "unit_of_assessment": "Chaque zone de contrôle est évaluée séparément.",
+    "aggregate_score": false,
+    "default_state": "a_verifier",
+    "default_evidence_level": "non_documente",
+    "evidence_level_rule": "Le niveau d’une zone correspond au niveau le plus faible atteint par l’ensemble de ses points applicables. Un seul test réussi ne peut donc pas masquer un autre point non documenté.",
+    "not_applicable_rule": "Un contrôle non applicable doit être accompagné d’une justification écrite et d’une personne responsable de cette décision."
+  },
+  "states": [
+    {
+      "id": "a_verifier",
+      "label": "À vérifier",
+      "criterion": "Aucun examen actuel ou aucune preuve suffisante n’a encore été consigné."
+    },
+    {
+      "id": "verifie",
+      "label": "Vérifié",
+      "criterion": "Les points applicables ont été examinés; une preuve, une date et une personne responsable sont consignées."
+    },
+    {
+      "id": "a_corriger",
+      "label": "À corriger",
+      "criterion": "Au moins un point applicable manque, échoue ou demeure incertain; une personne responsable et une date de suivi sont consignées."
+    },
+    {
+      "id": "non_applicable",
+      "label": "Non applicable",
+      "criterion": "Une justification propre au périmètre est consignée."
+    }
+  ],
+  "evidence_levels": [
+    {
+      "id": "non_documente",
+      "level": 0,
+      "name": "Non documenté",
+      "definition": "Le propriétaire, l’accès ou la preuve n’est pas identifié."
+    },
+    {
+      "id": "documente",
+      "level": 1,
+      "name": "Documenté",
+      "definition": "L’information et la responsabilité sont consignées, mais l’accès ou l’action n’a pas été vérifié."
+    },
+    {
+      "id": "verifie",
+      "level": 2,
+      "name": "Vérifié",
+      "definition": "Une personne autorisée a confirmé l’accès ou la preuve à une date donnée."
+    },
+    {
+      "id": "teste",
+      "level": 3,
+      "name": "Testé",
+      "definition": "L’action critique a été exécutée de façon contrôlée et son résultat a été conservé."
+    }
+  ],
+  "controls": [
+    {
+      "order": 1,
+      "id": "domaine-dns",
+      "name": "Domaine et DNS",
+      "objective": "Confirmer que l’entreprise contrôle le domaine, son renouvellement et la zone DNS.",
+      "minimum_evidence": ["Compte du registraire accessible", "Titulaire et contacts confirmés", "Date de renouvellement", "Relevé daté de la zone DNS"]
+    },
+    {
+      "order": 2,
+      "id": "hebergement-facturation",
+      "name": "Hébergement et facturation",
+      "objective": "Identifier le service en production, son propriétaire, son coût et les avis opérationnels.",
+      "minimum_evidence": ["Projet de production identifié", "Propriétaire du compte", "Facture ou abonnement récent", "Canal de soutien"]
+    },
+    {
+      "order": 3,
+      "id": "code-deploiement",
+      "name": "Code source et déploiement",
+      "objective": "Retrouver la source livrée et comprendre comment une version atteint la production.",
+      "minimum_evidence": ["Dépôt source accessible", "Version livrée identifiée", "Instructions de construction", "Procédure de déploiement"]
+    },
+    {
+      "order": 4,
+      "id": "contenus-licences",
+      "name": "Contenus, médias et licences",
+      "objective": "Établir la provenance, les droits et les échéances applicables aux contenus livrés.",
+      "minimum_evidence": ["Sources des contenus", "Fichiers convenus", "Licences ou autorisations", "Attributions et renouvellements"]
+    },
+    {
+      "order": 5,
+      "id": "comptes-acces",
+      "name": "Comptes, accès et 2FA",
+      "objective": "Maintenir des administrateurs internes et une récupération qui ne dépend pas d’une seule personne.",
+      "minimum_evidence": ["Inventaire des comptes", "Rôles et propriétaires", "Méthodes 2FA", "Procédure de récupération"]
+    },
+    {
+      "order": 6,
+      "id": "formulaires-donnees",
+      "name": "Formulaires, données et confidentialité",
+      "objective": "Vérifier la collecte, la destination, la conservation et la suppression des renseignements.",
+      "minimum_evidence": ["Champs et avis visibles", "Destinations documentées", "Règles de conservation", "Résultat d’un envoi de test"]
+    },
+    {
+      "order": 7,
+      "id": "analytique-integrations",
+      "name": "Analytique, Search Console et intégrations",
+      "objective": "Confirmer la propriété des outils de mesure et documenter les échanges entre systèmes.",
+      "minimum_evidence": ["Propriétaires des outils", "Configuration de consentement", "Événements retenus", "Inventaire des intégrations"]
+    },
+    {
+      "order": 8,
+      "id": "sauvegardes-continuite",
+      "name": "Sauvegardes, continuité et support",
+      "objective": "Démontrer qu’une reprise et un transfert de soutien peuvent être organisés.",
+      "minimum_evidence": ["Portée et fréquence des sauvegardes", "Responsable de la reprise", "Dernier test de restauration", "Conditions de soutien"]
+    }
+  ],
+  "limitations": [
+    "Ce cadre opérationnel général n’est pas exhaustif.",
+    "Il décrit un état observé à une date donnée et ne constitue aucune certification juridique, contractuelle, de sécurité, de confidentialité, d’accessibilité ou de conformité.",
+    "Les critères doivent être adaptés au périmètre réel, au secteur, aux contrats, aux systèmes et à la sensibilité des données.",
+    "Une capture ou un export ne prouve pas à lui seul qu’un accès fonctionne.",
+    "Aucun secret ne doit être inscrit dans le CSV ou le JSON.",
+    "Toute action susceptible d’affecter la production doit être réalisée dans un contexte contrôlé."
+  ],
+  "representations": {
+    "html": "https://27pm.org/ressources/checklist-fin-projet-web/",
+    "csv": "https://27pm.org/ressources/checklist-fin-projet-web.csv",
+    "json": "https://27pm.org/ressources/checklist-fin-projet-web.json"
+  },
+  "csv_integrity": {
+    "bytes": 2842,
+    "sha256": "3348b2f5848e6efe355b2f660949cdebe0ec49a9434ba8256a16d0e334f5c5ed"
+  },
+  "citation": {
+    "recommended_text": "Boulet, Alexis. « Checklist de fin de projet web : garder le contrôle ». Version 1.0.0. 27PM, mise à jour le 9 octobre 2026. https://27pm.org/ressources/checklist-fin-projet-web/",
+    "url": "https://27pm.org/ressources/checklist-fin-projet-web/"
+  }
+}
