@@ -8,10 +8,14 @@ const routes = JSON.parse(await read('src/content-routes.json'));
 const creationSiteRoute = '/services/creation-sites-web/';
 const agencyRoute = '/services/agence-web/';
 const redesignRoute = '/services/refonte-site-web/';
+const applicationsRoute = '/services/applications-web-sur-mesure/';
+const automationRoute = '/services/automatisation-ia/';
 const checklistRoute = '/ressources/checklist-fin-projet-web/';
 assert.ok(routes.includes(creationSiteRoute), 'the creation-site pillar route must stay published');
 assert.ok(routes.includes(agencyRoute), 'the agency service route must be published');
 assert.ok(routes.includes(redesignRoute), 'the website-redesign service route must be published');
+assert.ok(routes.includes(applicationsRoute), 'the custom-application service route must be published');
+assert.ok(routes.includes(automationRoute), 'the automation service route must be published');
 assert.ok(routes.includes(checklistRoute), 'the end-of-project checklist resource route must be published');
 const base = process.env.CONTENT_PREVIEW_BASE ?? '/';
 const preview = process.env.CONTENT_PREVIEW_BASE !== undefined;
@@ -66,10 +70,14 @@ for (const [route, html] of documents) {
 const creationSite = documents.get(creationSiteRoute);
 const agency = documents.get(agencyRoute);
 const redesign = documents.get(redesignRoute);
+const applications = documents.get(applicationsRoute);
+const automation = documents.get(automationRoute);
 const checklist = documents.get(checklistRoute);
 assert.ok(creationSite, 'the creation-site pillar must be present in the build');
 assert.ok(agency, 'the agency service page must be present in the build');
 assert.ok(redesign, 'the website-redesign service page must be present in the build');
+assert.ok(applications, 'the custom-application service page must be present in the build');
+assert.ok(automation, 'the automation service page must be present in the build');
 assert.ok(checklist, 'the end-of-project checklist resource must be present in the build');
 
 const metaDescription = (html) => html.match(/<meta\s+name="description"\s+content="([^"]+)"/s)?.[1] ?? '';
@@ -153,6 +161,12 @@ assert.equal(
 assert.match(metaDescription(checklist), /checklist/i, 'checklist description must identify the resource format');
 assert.match(metaDescription(checklist), /PME/i, 'checklist description must identify the intended audience');
 assert.ok(metaDescription(checklist).length >= 120 && metaDescription(checklist).length <= 170, 'checklist description must stay within 120–170 characters');
+assert.match(agency, new RegExp(`href="${base}${checklistRoute.slice(1)}`), 'agency page must link to the checklist');
+assert.match(automation, new RegExp(`href="${base}${checklistRoute.slice(1)}`), 'automation page must link to the checklist');
+assert.match(applications, new RegExp(`href="${base}${checklistRoute.slice(1)}`), 'custom-application page must link to the checklist');
+assert.match(checklist, new RegExp(`href="${base}${automationRoute.slice(1)}`), 'checklist must link to the automation service');
+assert.match(agency, new RegExp(`href="${base}${automationRoute.slice(1)}`), 'agency page must link to the automation service');
+assert.match(creationSite, new RegExp(`href="${base}${automationRoute.slice(1)}`), 'creation pillar must link to the automation service');
 
 const controlAreas = [
   ['domaine-dns', /domaine.*DNS|DNS.*domaine/i],
