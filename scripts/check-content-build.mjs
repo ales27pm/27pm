@@ -32,8 +32,10 @@ const documents = new Map(await Promise.all(['/', '/confidentialite/', ...routes
 const sitemap = await read('dist/sitemap.xml');
 const sitemapEntries = [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod><\/url>/g)]
   .map((match) => ({ url: match[1], path: new URL(match[1]).pathname, lastModified: match[2] }));
-const sitemapPaths = sitemapEntries.map(({ path }) => path);
+const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
+  .map(([, url]) => new URL(url).pathname);
 assert.deepEqual(sitemapPaths.sort(), [...documents.keys()].sort(), 'sitemap must enumerate exactly the published routes');
+assert.equal(sitemapEntries.length, sitemapPaths.length, 'every sitemap URL must provide a lastmod date');
 assert.deepEqual(
   Object.keys(siteMetadata.lastModified).sort(),
   [...documents.keys()].sort(),
@@ -285,8 +287,8 @@ assert.match(
   new RegExp(`href="${base}${checklistDownload}"[^>]*\\bdownload\\b`),
   'checklist page must link to the editable CSV download',
 );
-const checklistCsv = await read(`public/${checklistDownload}`);
-await access(resolve(root, 'dist', checklistDownload));
+const checklistCsvBuffer = await readFile(resolve(root, 'dist', checklistDownload));
+const checklistCsv = checklistCsvBuffer.toString('utf8');
 const checklistRows = checklistCsv.trim().split(/\r?\n/);
 assert.equal(checklistRows.length, 9, 'checklist CSV must contain one header and eight control areas');
 for (const [index, row] of checklistRows.entries()) {
@@ -304,8 +306,8 @@ for (const [index, row] of checklistRows.entries()) {
   assert.equal(columns, 8, `checklist CSV row ${index + 1} must contain eight columns`);
 }
 for (const [, topic] of controlAreas) assert.match(checklistCsv, topic, `checklist CSV must cover ${topic}`);
-const checklistCsvBytes = Buffer.byteLength(checklistCsv);
-const checklistCsvSha256 = createHash('sha256').update(checklistCsv).digest('hex');
+const checklistCsvBytes = checklistCsvBuffer.byteLength;
+const checklistCsvSha256 = createHash('sha256').update(checklistCsvBuffer).digest('hex');
 
 const checklistGraph = JSON.parse(
   checklist.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
