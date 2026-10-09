@@ -48,6 +48,9 @@ const metaContent = (html, attribute, value) => {
   assert.ok(tag, `missing meta ${attribute}=${value}`);
   return tag.match(/\bcontent="([^"]*)"/i)?.[1];
 };
+const tagAttribute = (tag, attribute) => (
+  tag.match(new RegExp(`\\b${attribute}="([^"]*)"`, 'i'))?.[1]
+);
 
 assert.match(home, /<meta\s+name="robots"\s+content="index, follow"/i, 'home must remain indexable');
 const homeHead = home.match(/<head\b[^>]*>([\s\S]*?)<\/head>/i)?.[1];
@@ -62,6 +65,14 @@ assert.equal(
   '7A5477F0660FC14521A95AB93B5ED998',
   'home head must retain Bing Webmaster Tools ownership verification',
 );
+const homeBrandMarks = (home.match(/<img\b[^>]*>/gi) ?? []).filter(
+  (tag) => tagAttribute(tag, 'src') === '/assets/brand-v4/27pm-mark-1024.webp',
+);
+assert.equal(homeBrandMarks.length, 3, 'home must publish the three expected 27PM brand marks');
+for (const tag of homeBrandMarks) {
+  assert.equal(tagAttribute(tag, 'alt'), '27PM', 'homepage brand marks must identify 27PM to image crawlers');
+  assert.equal(tagAttribute(tag, 'aria-hidden'), 'true', 'labelled links and hero copy must own the accessible name');
+}
 assert.match(home, /<link\s+rel="canonical"\s+href="https:\/\/27pm\.org\/"/i, 'home canonical must remain stable');
 const homeStructuredDataText = home.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
 assert.ok(homeStructuredDataText, 'home must publish JSON-LD');
