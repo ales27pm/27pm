@@ -69,6 +69,12 @@ for (const [route, html] of documents) {
     /(?:créé|produit|généré)\s+(?:avec|par)\s+(?:l[’']?)?(?:IA|intelligence artificielle)|assistance générative/i,
     `${route}: no unrequired AI-production disclosure in published copy`,
   );
+  assert.doesNotMatch(html, /10340\s+Marie-Victorin|J3R\s*0K2|"streetAddress"/i, `${route}: private service-area address must not be published`);
+  assert.doesNotMatch(
+    text(html),
+    /rencontres?\s+(?:en personne\s+)?(?:au studio|sur rendez-vous)|rencontres?\s+au studio/i,
+    `${route}: site must not imply that clients are received at a physical location`,
+  );
   const graphs = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
     .flatMap((match) => { const data = JSON.parse(match[1]); return data['@graph'] ?? [data]; });
   const webPage = graphs.find((node) => {
