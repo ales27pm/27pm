@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#F4F0E7" />
+    <meta name="author" content="Alexis Boulet" />
     <meta
       name="description"
       content="Sites web, applications sur mesure et systèmes propulsés par l’IA pour les PME du Québec. 27PM, studio à Sorel-Tracy, collaboration à distance."
@@ -32,35 +33,83 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "@id": "https://27pm.org/#organization",
-        "name": "27PM",
-        "url": "https://27pm.org/",
-        "logo": "https://27pm.org/assets/brand-v4/27pm-mark-1024.webp",
-        "email": "bonjour@27pm.org",
-        "telephone": "+15144479286",
-        "description": "Studio de sites web, d’applications sur mesure et de systèmes propulsés par l’IA pour les PME de tout le Québec. Établi à Sorel-Tracy, collaboration à distance et rencontres au studio sur rendez-vous.",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "10340 Marie-Victorin",
-          "addressLocality": "Sorel-Tracy",
-          "addressRegion": "QC",
-          "postalCode": "J3R 0K2",
-          "addressCountry": "CA"
-        },
-        "sameAs": ["https://www.sortlist.com/agency/27pm"],
-        "areaServed": {
-          "@type": "AdministrativeArea",
-          "name": "Québec, Canada"
-        },
-        "knowsAbout": [
-          "Stratégie numérique",
-          "Design d’expérience",
-          "Sites web",
-          "Applications sur mesure",
-          "Intelligence artificielle appliquée",
-          "Automatisation",
-          "Accessibilité web"
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://27pm.org/#organization",
+            "name": "27PM",
+            "url": "https://27pm.org/",
+            "logo": "https://27pm.org/assets/brand-v4/27pm-mark-1024.webp",
+            "email": "bonjour@27pm.org",
+            "telephone": "+15144479286",
+            "description": "Studio de sites web, d’applications sur mesure et de systèmes propulsés par l’IA pour les PME de tout le Québec. Établi à Sorel-Tracy, collaboration à distance et rencontres au studio sur rendez-vous.",
+            "founder": {
+              "@id": "https://27pm.org/#alexis-boulet"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "10340 Marie-Victorin",
+              "addressLocality": "Sorel-Tracy",
+              "addressRegion": "QC",
+              "postalCode": "J3R 0K2",
+              "addressCountry": "CA"
+            },
+            "sameAs": ["https://www.sortlist.com/agency/27pm"],
+            "areaServed": {
+              "@type": "AdministrativeArea",
+              "name": "Québec, Canada"
+            },
+            "knowsAbout": [
+              "Stratégie numérique",
+              "Design d’expérience",
+              "Sites web",
+              "Applications sur mesure",
+              "Intelligence artificielle appliquée",
+              "Automatisation",
+              "Accessibilité web"
+            ]
+          },
+          {
+            "@type": "Person",
+            "@id": "https://27pm.org/#alexis-boulet",
+            "name": "Alexis Boulet",
+            "jobTitle": "Fondateur de 27PM",
+            "sameAs": ["https://github.com/ales27pm"],
+            "affiliation": {
+              "@id": "https://27pm.org/#organization"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://27pm.org/#website",
+            "url": "https://27pm.org/",
+            "name": "27PM",
+            "alternateName": "27PM.org",
+            "inLanguage": "fr-CA",
+            "creator": {
+              "@id": "https://27pm.org/#alexis-boulet"
+            },
+            "publisher": {
+              "@id": "https://27pm.org/#organization"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://27pm.org/#webpage",
+            "url": "https://27pm.org/",
+            "name": "27PM | Sites web, applications et IA pour PME au Québec",
+            "description": "Sites web, applications sur mesure et systèmes propulsés par l’IA pour les PME du Québec. 27PM, studio à Sorel-Tracy, collaboration à distance.",
+            "inLanguage": "fr-CA",
+            "author": {
+              "@id": "https://27pm.org/#alexis-boulet"
+            },
+            "isPartOf": {
+              "@id": "https://27pm.org/#website"
+            },
+            "about": {
+              "@id": "https://27pm.org/#organization"
+            }
+          }
         ]
       }
     </script>

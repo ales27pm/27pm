@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 
 const root = process.cwd();
 const contentRoutes = JSON.parse(await readFile(resolve(root, 'src/content-routes.json'), 'utf8'));
+const siteMetadata = JSON.parse(await readFile(resolve(root, 'src/site-metadata.json'), 'utf8'));
 const readDist = (path) => readFile(resolve(root, 'dist', path), 'utf8');
 const analyticsApproved = process.env.VITE_ANALYTICS_APPROVED === 'true';
 const crmApproved = process.env.VITE_CRM_INTAKE_APPROVED === 'true';
@@ -13,12 +14,14 @@ const description =
   'Découvrez comment 27PM protège les renseignements transmis par formulaire ou courriel et utilise Google Analytics uniquement avec votre consentement.';
 const directGoogleResource = /<(?:script|img|iframe|link)\b[^>]*(?:src|href)\s*=\s*["']https:\/\/(?:[^/"']+\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|google\.com)(?:[/:"'])/i;
 
-const [home, privacy, notFound, robots, sitemap, vercelConfigText] = await Promise.all([
+const [home, privacy, notFound, robots, sitemap, llms, indexNowKey, vercelConfigText] = await Promise.all([
   readDist('index.html'),
   readDist('confidentialite/index.html'),
   readDist('404.html'),
   readDist('robots.txt'),
   readDist('sitemap.xml'),
+  readDist('llms.txt'),
+  readDist(`${siteMetadata.indexNowKey}.txt`),
   readFile(resolve(root, 'vercel.json'), 'utf8'),
 ]);
 const productionEnv = await readFile(resolve(root, '.env.production'), 'utf8');
@@ -48,6 +51,17 @@ const metaContent = (html, attribute, value) => {
 
 assert.match(home, /<meta\s+name="robots"\s+content="index, follow"/i, 'home must remain indexable');
 assert.match(home, /<link\s+rel="canonical"\s+href="https:\/\/27pm\.org\/"/i, 'home canonical must remain stable');
+const homeStructuredDataText = home.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
+assert.ok(homeStructuredDataText, 'home must publish JSON-LD');
+const homeGraph = JSON.parse(homeStructuredDataText)['@graph'];
+assert.ok(Array.isArray(homeGraph), 'home JSON-LD must publish a connected graph');
+assert.ok(homeGraph.some((node) => node['@type'] === 'Organization' && node['@id'] === 'https://27pm.org/#organization'), 'home graph must identify 27PM');
+assert.ok(homeGraph.some((node) => node['@type'] === 'Person' && node['@id'] === 'https://27pm.org/#alexis-boulet' && node.name === 'Alexis Boulet'), 'home graph must identify the author');
+assert.ok(homeGraph.find((node) => node['@id'] === 'https://27pm.org/#alexis-boulet')?.sameAs?.includes('https://github.com/ales27pm'), 'author graph must link to the verified public profile');
+assert.ok(homeGraph.some((node) => node['@type'] === 'WebSite' && node['@id'] === 'https://27pm.org/#website'), 'home graph must define the website referenced by detail pages');
+assert.ok(homeGraph.some((node) => node['@type'] === 'WebPage' && node['@id'] === 'https://27pm.org/#webpage'), 'home graph must define the homepage');
+assert.equal(homeGraph.find((node) => node['@type'] === 'WebSite')?.creator?.['@id'], 'https://27pm.org/#alexis-boulet', 'website creator must be Alexis Boulet');
+assert.equal(homeGraph.find((node) => node['@type'] === 'WebPage')?.author?.['@id'], 'https://27pm.org/#alexis-boulet', 'homepage author must be Alexis Boulet');
 
 for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
   assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
@@ -154,6 +168,7 @@ assert.deepEqual(
     url: structuredData.url,
     description: structuredData.description,
     inLanguage: structuredData.inLanguage,
+    author: structuredData.author,
     dateModified: structuredData.dateModified,
   },
   {
@@ -163,7 +178,8 @@ assert.deepEqual(
     url: 'https://27pm.org/confidentialite/',
     description,
     inLanguage: 'fr-CA',
-    dateModified: '2026-08-31',
+    author: { '@type': 'Person', '@id': 'https://27pm.org/#alexis-boulet', name: 'Alexis Boulet' },
+    dateModified: '2026-10-09',
   },
   'privacy JSON-LD must describe the visible page',
 );
@@ -181,6 +197,17 @@ assert.match(
   /<loc>https:\/\/27pm\.org\/confidentialite\/<\/loc>/,
   'sitemap must include the canonical privacy URL',
 );
+for (const [path, lastModified] of Object.entries(siteMetadata.lastModified)) {
+  assert.ok(
+    sitemap.includes(`<url><loc>${siteMetadata.origin}${path}</loc><lastmod>${lastModified}</lastmod></url>`),
+    `${path}: sitemap must publish its reviewed lastmod`,
+  );
+  assert.ok(llms.includes(`${siteMetadata.origin}${path}`), `${path}: llms.txt must reference the canonical source`);
+}
+assert.equal(indexNowKey.trim(), siteMetadata.indexNowKey, 'build must publish the IndexNow ownership key');
+assert.match(llms, /concepts indépendants, non officiels, non approuvés et non déployés/i, 'llms.txt must preserve the concept disclaimer');
+assert.match(llms, /Auteur des contenus:\s*Alexis Boulet/i, 'llms.txt must identify Alexis Boulet as author');
+assert.match(llms, /bonjour@27pm\.org/, 'llms.txt must provide the canonical contact');
 
 const vercelConfig = JSON.parse(vercelConfigText);
 assert.equal(vercelConfig.trailingSlash, true, 'Vercel must redirect extensionless paths to trailing slashes');

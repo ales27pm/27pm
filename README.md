@@ -34,6 +34,8 @@ Vercel publie `https://27pm.org/` à partir de la branche `main`. La commande `n
 
 `vercel.json` impose les URL avec slash final et redirige les chemins `index.html` vers leurs URL canoniques. Après une publication, `npm run check:public` contrôle HTTPS, les routes canoniques, les en-têtes de sécurité et de cache, les redirections permanentes, `www`, les destinations de portfolio et le preflight CORS du CRM pour l’origine approuvée et une origine refusée. Ce contrôle envoie uniquement des requêtes `OPTIONS` sans données de formulaire : aucun `POST` ni soumission d’intake. Il ne prouve donc ni Turnstile côté serveur, ni persistance, ni dédoublonnage, ni restauration. Il reste séparé de `npm run check` afin que la validation locale demeure déterministe.
 
+`src/site-metadata.json` est la source révisée des dates `lastmod` du sitemap et de la clé publique IndexNow. `public/llms.txt` offre une carte éditoriale expérimentale vers les sources canoniques; sa présence ne constitue pas une garantie de classement ni de citation. Après un déploiement vérifié, `npm run submit:indexnow` contrôle d’abord que la clé est publique, puis soumet les URL canoniques à l’endpoint IndexNow. Un statut `200` ou `202` confirme seulement la réception de la notification, pas l’indexation.
+
 Les commandes `build:pages`, `check:pages` et leurs alias `preview` ne produisent plus qu’un aperçu historique sous `/27pm/`, toujours en `noindex`, sans analytique, sans CRM direct et sans `CNAME`. Elles ne constituent pas une voie de production. Le site Pages encore configuré dans GitHub doit être désactivé séparément dans le compte afin de libérer définitivement son ancienne revendication de `27pm.org`.
 
 ## Structure

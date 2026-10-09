@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 const root = process.cwd();
 const read = (path) => readFile(resolve(root, path), 'utf8');
 const routes = JSON.parse(await read('src/content-routes.json'));
+const siteMetadata = JSON.parse(await read('src/site-metadata.json'));
 const creationSiteRoute = '/services/creation-sites-web/';
 const agencyRoute = '/services/agence-web/';
 const redesignRoute = '/services/refonte-site-web/';
@@ -24,8 +25,21 @@ const documents = new Map(await Promise.all(['/', '/confidentialite/', ...routes
   route, await read(`dist${route}index.html`),
 ])));
 const sitemap = await read('dist/sitemap.xml');
-const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname);
+const sitemapEntries = [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod><\/url>/g)]
+  .map((match) => ({ url: match[1], path: new URL(match[1]).pathname, lastModified: match[2] }));
+const sitemapPaths = sitemapEntries.map(({ path }) => path);
 assert.deepEqual(sitemapPaths.sort(), [...documents.keys()].sort(), 'sitemap must enumerate exactly the published routes');
+assert.deepEqual(
+  Object.keys(siteMetadata.lastModified).sort(),
+  [...documents.keys()].sort(),
+  'site metadata must date every published route exactly once',
+);
+for (const { url, path, lastModified } of sitemapEntries) {
+  assert.equal(url, `${siteMetadata.origin}${path}`, `${path}: sitemap URL must use the canonical origin`);
+  assert.match(lastModified, /^\d{4}-\d{2}-\d{2}$/, `${path}: sitemap lastmod must use an ISO date`);
+  assert.equal(lastModified, siteMetadata.lastModified[path], `${path}: sitemap lastmod must match reviewed metadata`);
+  assert.ok(new Date(`${lastModified}T00:00:00Z`) <= new Date(), `${path}: sitemap lastmod cannot be in the future`);
+}
 const text = (html) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const titles = new Set();
 const descriptions = new Set();
@@ -40,13 +54,24 @@ for (const [route, html] of documents) {
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${route}: one primary heading required`);
   assert.ok(html.includes(`href="${origin}${route}"`), `${route}: canonical must stay on production origin`);
   assert.match(html, preview ? /content="noindex, nofollow"/ : /content="index, follow"/, `${route}: indexation mode`);
+  assert.match(html, /<meta\s+name="author"\s+content="Alexis Boulet"/i, `${route}: Alexis Boulet author metadata`);
+  assert.doesNotMatch(
+    text(html),
+    /(?:créé|produit|généré)\s+(?:avec|par)\s+(?:l[’']?)?(?:IA|intelligence artificielle)|assistance générative/i,
+    `${route}: no unrequired AI-production disclosure in published copy`,
+  );
+  const graphs = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .flatMap((match) => { const data = JSON.parse(match[1]); return data['@graph'] ?? [data]; });
+  const webPage = graphs.find((node) => node['@type'] === 'WebPage' && node.url === `${origin}${route}`);
+  assert.ok(webPage, `${route}: WebPage schema`);
+  assert.equal(webPage.author?.['@id'], `${origin}/#alexis-boulet`, `${route}: WebPage author must be Alexis Boulet`);
+  const authorName = webPage.author?.name
+    ?? graphs.find((node) => node['@type'] === 'Person' && node['@id'] === `${origin}/#alexis-boulet`)?.name;
+  assert.equal(authorName, 'Alexis Boulet', `${route}: author name must stay explicit or resolve in the local graph`);
   if (!routes.includes(route)) continue;
   assert.match(html, /<html lang="fr-CA"/, `${route}: French Canadian document language`);
   assert.ok(html.includes(`property="og:url" content="${origin}${route}"`), `${route}: social URL must match canonical`);
   assert.ok(text(html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '').length > 1500, `${route}: useful initial HTML required`);
-  const graphs = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
-    .flatMap((match) => { const data = JSON.parse(match[1]); return data['@graph'] ?? [data]; });
-  assert.ok(graphs.some((node) => node['@type'] === 'WebPage' && node.url === `${origin}${route}`), `${route}: WebPage schema`);
   assert.ok(graphs.some((node) => node['@type'] === 'BreadcrumbList'), `${route}: breadcrumb schema`);
   if (route.startsWith('/services/')) assert.ok(graphs.some((node) => node['@type'] === 'Service'), `${route}: service schema`);
   if (route.startsWith('/etudes/')) {
@@ -187,7 +212,9 @@ for (const [area, topic] of controlAreas) {
 
 const recoveryCheck = checklist.match(/<ol\s+data-recovery-check>([\s\S]*?)<\/ol>/i)?.[1] ?? '';
 assert.equal((recoveryCheck.match(/<li\b/g) ?? []).length, 6, 'the recovery check must contain six actions');
-assert.match(checklistText, /Révision\s*:\s*8 octobre 2026/i, 'checklist must publish its dated revision');
+assert.match(checklistText, /Révision\s*:\s*9 octobre 2026/i, 'checklist must publish its dated revision');
+assert.match(checklistText, /Auteur\s*:\s*Alexis Boulet/i, 'checklist must identify its author');
+assert.match(checklistText, /Éditeur\s*:\s*27PM/i, 'checklist must identify its publisher');
 assert.match(checklistText, /Méthode\s*:/i, 'checklist must explain its method');
 assert.match(checklistText, /ne remplace pas.*avis juridique.*sécurité/i, 'checklist must state its legal and security limitations');
 assert.match(checklistText, /adapter.*contexte/i, 'checklist must tell readers to adapt it to their context');
@@ -223,6 +250,18 @@ const checklistGraph = JSON.parse(
 )['@graph'];
 assert.ok(Array.isArray(checklistGraph), 'checklist schema must publish a graph');
 assert.ok(!checklistGraph.some((node) => node['@type'] === 'Service'), 'resource route must not use Service schema');
+const checklistWebPage = checklistGraph.find((node) => node['@type'] === 'WebPage');
+const checklistArticle = checklistGraph.find((node) => node['@type'] === 'TechArticle');
+assert.equal(checklistWebPage?.author?.['@id'], `${origin}/#alexis-boulet`, 'checklist WebPage must identify its author');
+assert.equal(checklistWebPage?.mainEntity?.['@id'], `${origin}${checklistRoute}#article`, 'checklist WebPage must identify its article');
+assert.equal(checklistArticle?.author?.['@id'], `${origin}/#alexis-boulet`, 'checklist article must identify its author');
+assert.equal(checklistArticle?.datePublished, '2026-10-08', 'checklist article must publish its release date');
+assert.equal(checklistArticle?.dateModified, '2026-10-09', 'checklist article must publish its revision date');
+assert.equal(
+  checklistArticle?.encoding?.contentUrl,
+  `${origin}/ressources/checklist-fin-projet-web.csv`,
+  'checklist article must identify its downloadable CSV',
+);
 
 const creationGraph = JSON.parse(
   creationSite.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',

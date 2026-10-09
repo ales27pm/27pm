@@ -2,9 +2,15 @@ import { rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import contentRoutes from './src/content-routes.json' with { type: 'json' };
+import siteMetadata from './src/site-metadata.json' with { type: 'json' };
 
 const publicPaths = ['/', '/confidentialite/', ...contentRoutes];
-const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${publicPaths.map((path) => `  <url><loc>https://27pm.org${path}</loc></url>`).join('\n')}\n</urlset>\n`;
+const lastModified: Record<string, string> = siteMetadata.lastModified;
+const metadataPaths = Object.keys(lastModified);
+if (metadataPaths.length !== publicPaths.length || publicPaths.some((path) => !metadataPaths.includes(path))) {
+  throw new Error('site metadata must define lastModified for every public path');
+}
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${publicPaths.map((path) => `  <url><loc>${siteMetadata.origin}${path}</loc><lastmod>${lastModified[path]}</lastmod></url>`).join('\n')}\n</urlset>\n`;
 
 const sitemapPlugin = (): Plugin => ({
   name: '27pm-sitemap',

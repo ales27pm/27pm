@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 
 const contentRoutes = JSON.parse(await readFile(new URL('../src/content-routes.json', import.meta.url), 'utf8'));
+const siteMetadata = JSON.parse(await readFile(new URL('../src/site-metadata.json', import.meta.url), 'utf8'));
 
 const origin = new URL(process.env.PUBLIC_SITE_ORIGIN ?? 'https://27pm.org');
 const timeoutMs = Number(process.env.PUBLIC_SITE_TIMEOUT_MS ?? 12_000);
@@ -378,7 +379,25 @@ assert.deepEqual(robotsPolicy, [
   ['allow', '/'],
   ['sitemap', 'https://27pm.org/sitemap.xml'],
 ], 'robots.txt: must retain the approved allow-all crawler policy and canonical sitemap');
-await requireOk('/sitemap.xml', ['https://27pm.org/confidentialite/', ...contentRoutes.map((route) => `https://27pm.org${route}`)]);
+const { body: sitemap } = await requireOk('/sitemap.xml', ['https://27pm.org/confidentialite/', ...contentRoutes.map((route) => `https://27pm.org${route}`)]);
+for (const [path, lastModified] of Object.entries(siteMetadata.lastModified)) {
+  assert.ok(
+    sitemap.includes(`<url><loc>${siteMetadata.origin}${path}</loc><lastmod>${lastModified}</lastmod></url>`),
+    `${path}: public sitemap must publish its reviewed lastmod`,
+  );
+}
+const { body: llms } = await requireOk('/llms.txt', [
+  '# 27PM',
+  'Auteur des contenus: Alexis Boulet',
+  'https://27pm.org/services/creation-sites-web/',
+  'https://27pm.org/ressources/checklist-fin-projet-web/',
+  'concepts indépendants, non officiels, non approuvés et non déployés',
+]);
+for (const path of Object.keys(siteMetadata.lastModified)) {
+  assert.ok(llms.includes(`${siteMetadata.origin}${path}`), `${path}: public llms.txt must reference the canonical source`);
+}
+const { body: indexNowKey } = await requireOk(`/${siteMetadata.indexNowKey}.txt`);
+assert.equal(indexNowKey.trim(), siteMetadata.indexNowKey, 'public IndexNow key must match reviewed metadata');
 
 const missingUrl = new URL('/__27pm-public-check-missing__', origin);
 const missingResponse = await get(missingUrl);

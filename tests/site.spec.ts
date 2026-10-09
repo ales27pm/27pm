@@ -1028,19 +1028,40 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
     '/conditions-utilisation/',
   );
 
-  const organization = await page.locator('script[type="application/ld+json"]').textContent();
-  expect(organization).not.toBeNull();
-  expect(JSON.parse(organization ?? '{}')).toMatchObject({
-    '@type': 'Organization',
-    url: 'https://27pm.org/',
-    email: 'bonjour@27pm.org',
-    knowsAbout: expect.arrayContaining([
-      'Sites web',
-      'Applications sur mesure',
-      'Intelligence artificielle appliquée',
-      'Accessibilité web',
-    ]),
-  });
+  const structuredData = await page.locator('script[type="application/ld+json"]').textContent();
+  expect(structuredData).not.toBeNull();
+  const graph = JSON.parse(structuredData ?? '{}')['@graph'];
+  expect(graph).toEqual(expect.arrayContaining([
+    expect.objectContaining({
+      '@type': 'Organization',
+      '@id': 'https://27pm.org/#organization',
+      url: 'https://27pm.org/',
+      email: 'bonjour@27pm.org',
+      knowsAbout: expect.arrayContaining([
+        'Sites web',
+        'Applications sur mesure',
+        'Intelligence artificielle appliquée',
+        'Accessibilité web',
+      ]),
+    }),
+    expect.objectContaining({
+      '@type': 'Person',
+      '@id': 'https://27pm.org/#alexis-boulet',
+      name: 'Alexis Boulet',
+      affiliation: { '@id': 'https://27pm.org/#organization' },
+    }),
+    expect.objectContaining({
+      '@type': 'WebSite',
+      '@id': 'https://27pm.org/#website',
+      url: 'https://27pm.org/',
+      name: '27PM',
+    }),
+    expect.objectContaining({
+      '@type': 'WebPage',
+      '@id': 'https://27pm.org/#webpage',
+      isPartOf: { '@id': 'https://27pm.org/#website' },
+    }),
+  ]));
 
   const robots = await request.get('/robots.txt');
   expect(robots.ok()).toBe(true);
@@ -1051,6 +1072,14 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
   const sitemapText = await sitemap.text();
   expect(sitemapText).toContain('<loc>https://27pm.org/confidentialite/</loc>');
   expect(sitemapText).toContain('<loc>https://27pm.org/conditions-utilisation/</loc>');
+  expect(sitemapText).toContain('<lastmod>2026-10-09</lastmod>');
+
+  const llms = await request.get('/llms.txt');
+  expect(llms.ok()).toBe(true);
+  const llmsText = await llms.text();
+  expect(llmsText).toContain('# 27PM');
+  expect(llmsText).toContain('https://27pm.org/ressources/checklist-fin-projet-web/');
+  expect(llmsText).toContain('concepts indépendants, non officiels, non approuvés et non déployés');
 
   await page.getByRole('link', { name: 'Conditions d’utilisation', exact: true }).click();
   await expect(page).toHaveURL(/\/conditions-utilisation\/$/);

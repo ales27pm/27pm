@@ -25,6 +25,7 @@
     "build:preview": "tsc --noEmit && vite build --mode preview",
     "check:preview": "node scripts/check-preview-build.mjs",
     "check:public": "node scripts/check-public-site.mjs",
+    "submit:indexnow": "node scripts/submit-indexnow.mjs",
     "check": "npm run lint && npm run test && npm run build && npm run check:seo"
   },
   "dependencies": {

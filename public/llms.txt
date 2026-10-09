@@ -1,0 +1,39 @@
+# 27PM
+
+> 27PM est un studio indépendant établi à Sorel-Tracy qui conçoit des sites web, des applications sur mesure et des systèmes propulsés par l'intelligence artificielle pour les PME du Québec.
+
+Les pages ci-dessous sont les sources canoniques de 27PM. Le contenu est en français canadien. Les études Boulet et Maisons Turner sont des concepts indépendants, non officiels, non approuvés et non déployés; elles ne représentent pas des mandats clients.
+
+Auteur des contenus: Alexis Boulet. Éditeur: 27PM.
+
+## Services
+
+- [Création de site web](https://27pm.org/services/creation-sites-web/): étapes, coûts, délais, plateformes, hébergement et responsabilités pour une PME québécoise.
+- [Agence web](https://27pm.org/services/agence-web/): conception, refonte et développement sur mesure par 27PM.
+- [Refonte de site web](https://27pm.org/services/refonte-site-web/): inventaire des URL, redirections, accessibilité, performance et contrôles de mise en ligne.
+- [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/): catalogues, configurateurs et parcours techniques.
+- [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/): portails, intégrations et outils métier.
+- [Automatisation et IA](https://27pm.org/services/automatisation-ia/): automatisations avec validation humaine et reprise manuelle.
+
+## Ressource originale
+
+- [Checklist de fin de projet web](https://27pm.org/ressources/checklist-fin-projet-web/): huit zones de contrôle, méthode, limites et fichier CSV téléchargeable pour vérifier une remise de projet web.
+
+## Concepts indépendants
+
+- [Concept Boulet](https://27pm.org/etudes/boulet/): exploration indépendante, non officielle et non déployée.
+- [Concept Maisons Turner](https://27pm.org/etudes/maisons-turner/): exploration indépendante, non officielle et non déployée.
+
+## Informations et contact
+
+- [Accueil](https://27pm.org/): identité, capacités, méthode et coordonnées de 27PM.
+- [Politique de confidentialité](https://27pm.org/confidentialite/)
+- [Conditions d'utilisation](https://27pm.org/conditions-utilisation/)
+- Courriel: bonjour@27pm.org
+- Téléphone: +1 514 447-9286
+- Territoire servi: Québec, Canada
+
+## Indexation
+
+- [Plan du site XML](https://27pm.org/sitemap.xml)
+- [Politique robots](https://27pm.org/robots.txt)
