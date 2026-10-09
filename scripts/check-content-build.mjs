@@ -16,6 +16,7 @@ const checklistRoute = '/ressources/checklist-fin-projet-web/';
 const authorRoute = '/auteurs/alexis-boulet/';
 const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
 const authorId = `${siteMetadata.origin}${authorRoute}#person`;
+const activeGoogleProfile = 'https://www.google.com/maps?cid=5643245625813075394';
 assert.ok(routes.includes(creationSiteRoute), 'the creation-site pillar route must stay published');
 assert.ok(routes.includes(agencyRoute), 'the agency service route must be published');
 assert.ok(routes.includes(redesignRoute), 'the website-redesign service route must be published');
@@ -73,6 +74,16 @@ for (const [route, html] of documents) {
     `${route}: no unrequired AI-production disclosure in published copy`,
   );
   assert.doesNotMatch(html, /10340\s+Marie-Victorin|J3R\s*0K2|"streetAddress"/i, `${route}: private service-area address must not be published`);
+  assert.doesNotMatch(
+    html,
+    /https:\/\/www\.sortlist\.com\/agency\/27pm/i,
+    `${route}: the unavailable Sortlist profile must not be cited`,
+  );
+  assert.doesNotMatch(
+    html,
+    /14495857269817067604/,
+    `${route}: the permanently closed Google profile must not be cited`,
+  );
   assert.doesNotMatch(
     text(html),
     /(?:rencontres?|rendez-vous|visites?|recev(?:ons|oir|re)|reçus?)[^.!?]{0,60}au studio/i,
@@ -147,6 +158,12 @@ assert.ok(applications, 'the custom-application service page must be present in 
 assert.ok(automation, 'the automation service page must be present in the build');
 assert.ok(checklist, 'the end-of-project checklist resource must be present in the build');
 assert.ok(authorProfile, 'the Alexis Boulet author profile must be present in the build');
+for (const route of ['/', authorRoute, agencyRoute]) {
+  assert.ok(
+    documents.get(route)?.includes(`href="${activeGoogleProfile}"`),
+    `${route}: visible identity copy must link to the active Google Business Profile`,
+  );
+}
 
 const authorGraph = JSON.parse(
   authorProfile.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',

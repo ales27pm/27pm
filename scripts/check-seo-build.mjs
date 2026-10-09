@@ -56,7 +56,13 @@ assert.ok(homeStructuredDataText, 'home must publish JSON-LD');
 const homeGraph = JSON.parse(homeStructuredDataText)['@graph'];
 assert.ok(Array.isArray(homeGraph), 'home JSON-LD must publish a connected graph');
 assert.ok(homeGraph.some((node) => node['@type'] === 'Organization' && node['@id'] === 'https://27pm.org/#organization'), 'home graph must identify 27PM');
-assert.equal(homeGraph.find((node) => node['@type'] === 'Organization')?.address, undefined, 'service-area organization must not publish a customer-facing address');
+const homeOrganization = homeGraph.find((node) => node['@type'] === 'Organization');
+assert.equal(homeOrganization?.address, undefined, 'service-area organization must not publish a customer-facing address');
+assert.deepEqual(
+  homeOrganization?.sameAs,
+  ['https://www.google.com/maps?cid=5643245625813075394'],
+  'organization identity must cite the active Google Business Profile',
+);
 assert.match(home, /rencontres? chez le client, sur rendez-vous, dans les zones desservies/i, 'home must state the complete service-area meeting model');
 assert.doesNotMatch(home, /à distance uniquement/i, 'home must not describe an online-only business');
 assert.ok(homeGraph.some((node) => node['@type'] === 'Person' && node['@id'] === 'https://27pm.org/auteurs/alexis-boulet/#person' && node.name === 'Alexis Boulet'), 'home graph must identify the canonical author entity');
