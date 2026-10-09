@@ -50,6 +50,18 @@ const metaContent = (html, attribute, value) => {
 };
 
 assert.match(home, /<meta\s+name="robots"\s+content="index, follow"/i, 'home must remain indexable');
+const homeHead = home.match(/<head\b[^>]*>([\s\S]*?)<\/head>/i)?.[1];
+assert.ok(homeHead, 'home must publish a head element');
+assert.equal(
+  home.match(/<meta\s+[^>]*name="msvalidate\.01"[^>]*>/gi)?.length,
+  1,
+  'home must publish exactly one Bing Webmaster Tools verification tag',
+);
+assert.equal(
+  metaContent(homeHead, 'name', 'msvalidate.01'),
+  '7A5477F0660FC14521A95AB93B5ED998',
+  'home head must retain Bing Webmaster Tools ownership verification',
+);
 assert.match(home, /<link\s+rel="canonical"\s+href="https:\/\/27pm\.org\/"/i, 'home canonical must remain stable');
 const homeStructuredDataText = home.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
 assert.ok(homeStructuredDataText, 'home must publish JSON-LD');
