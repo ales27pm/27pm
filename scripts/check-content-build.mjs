@@ -464,6 +464,11 @@ assert.match(checklist, new RegExp(`href="${base}${checklistJsonDownload}"[^>]*\
 assert.match(checklist, /rel="alternate"\s+type="application\/json"\s+href="https:\/\/27pm\.org\/ressources\/checklist-fin-projet-web\.json"/, 'checklist page must advertise the JSON representation');
 assert.match(checklist, /property="og:type"\s+content="article"/, 'checklist must use the article social type');
 assert.match(checklist, new RegExp(`property="og:image"\\s+content="${origin}/${checklistImage}"`), 'checklist must publish its dedicated social image');
+assert.match(
+  checklist,
+  /<img\s+class="brand__mark"[^>]+alt="27PM"/,
+  'checklist brand image must publish explicit alternative text for Bing image processing',
+);
 const checklistImageBuffer = await readFile(resolve(root, 'dist', checklistImage));
 assert.equal(checklistImageBuffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', 'checklist social image must be a PNG');
 assert.equal(checklistImageBuffer.readUInt32BE(16), 1200, 'checklist social image width');
