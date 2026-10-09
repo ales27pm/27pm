@@ -51,7 +51,7 @@ describe('analytics consent contract', () => {
     expect(sanitizeAnalyticsReferrer('not a url')).toBe('');
   });
 
-  it('recognizes published service and study pages without retaining visitor input', () => {
+  it('recognizes published content pages without retaining visitor input', () => {
     for (const path of [
       '/services/creation-sites-web/',
       '/services/agence-web/',
@@ -59,6 +59,7 @@ describe('analytics consent contract', () => {
       '/services/sites-catalogues-fabricants/',
       '/services/applications-web-sur-mesure/',
       '/services/automatisation-ia/',
+      '/ressources/checklist-fin-projet-web/',
       '/etudes/boulet/',
       '/etudes/maisons-turner/',
     ]) {

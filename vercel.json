@@ -45,6 +45,11 @@
       "permanent": true
     },
     {
+      "source": "/ressources/checklist-fin-projet-web/index.html",
+      "destination": "/ressources/checklist-fin-projet-web/",
+      "permanent": true
+    },
+    {
       "source": "/etudes/boulet/index.html",
       "destination": "/etudes/boulet/",
       "permanent": true
