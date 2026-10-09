@@ -14,6 +14,7 @@ const applicationsRoute = '/services/applications-web-sur-mesure/';
 const automationRoute = '/services/automatisation-ia/';
 const checklistRoute = '/ressources/checklist-fin-projet-web/';
 const authorRoute = '/auteurs/alexis-boulet/';
+const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
 const authorId = `${siteMetadata.origin}${authorRoute}#person`;
 assert.ok(routes.includes(creationSiteRoute), 'the creation-site pillar route must stay published');
 assert.ok(routes.includes(agencyRoute), 'the agency service route must be published');
@@ -72,9 +73,22 @@ for (const [route, html] of documents) {
   assert.doesNotMatch(html, /10340\s+Marie-Victorin|J3R\s*0K2|"streetAddress"/i, `${route}: private service-area address must not be published`);
   assert.doesNotMatch(
     text(html),
-    /rencontres?\s+(?:en personne\s+)?(?:au studio|sur rendez-vous)|rencontres?\s+au studio/i,
+    /(?:rencontres?|rendez-vous|visites?|recev(?:ons|oir|re)|reçus?)[^.!?]{0,60}au studio/i,
     `${route}: site must not imply that clients are received at a physical location`,
   );
+  assert.doesNotMatch(html, /à distance uniquement/i, `${route}: site must not describe an online-only business`);
+  if (serviceAreaCopyRoutes.has(route)) {
+    assert.match(
+      text(html),
+      /chez le client,\s+sur rendez-vous,\s+dans les zones desservies/i,
+      `${route}: service-area meetings must be limited to the actual served areas`,
+    );
+    assert.match(
+      text(html),
+      /(?:de tout le Québec[^.!?]{0,80}à distance|à distance[^.!?]{0,80}(?:dans|partout au) tout le Québec)/i,
+      `${route}: remote service must remain available across Quebec`,
+    );
+  }
   const graphs = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
     .flatMap((match) => { const data = JSON.parse(match[1]); return data['@graph'] ?? [data]; });
   const webPage = graphs.find((node) => {
