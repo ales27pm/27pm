@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { access, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -12,12 +13,15 @@ const redesignRoute = '/services/refonte-site-web/';
 const applicationsRoute = '/services/applications-web-sur-mesure/';
 const automationRoute = '/services/automatisation-ia/';
 const checklistRoute = '/ressources/checklist-fin-projet-web/';
+const authorRoute = '/auteurs/alexis-boulet/';
+const authorId = `${siteMetadata.origin}${authorRoute}#person`;
 assert.ok(routes.includes(creationSiteRoute), 'the creation-site pillar route must stay published');
 assert.ok(routes.includes(agencyRoute), 'the agency service route must be published');
 assert.ok(routes.includes(redesignRoute), 'the website-redesign service route must be published');
 assert.ok(routes.includes(applicationsRoute), 'the custom-application service route must be published');
 assert.ok(routes.includes(automationRoute), 'the automation service route must be published');
 assert.ok(routes.includes(checklistRoute), 'the end-of-project checklist resource route must be published');
+assert.ok(routes.includes(authorRoute), 'the Alexis Boulet author profile must be published');
 const base = process.env.CONTENT_PREVIEW_BASE ?? '/';
 const preview = process.env.CONTENT_PREVIEW_BASE !== undefined;
 const origin = 'https://27pm.org';
@@ -43,6 +47,11 @@ for (const { url, path, lastModified } of sitemapEntries) {
 const text = (html) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const titles = new Set();
 const descriptions = new Set();
+const visiblyAuthoredRoutes = routes.filter((route) => (
+  route.startsWith('/services/')
+  || route.startsWith('/ressources/')
+  || route.startsWith('/etudes/')
+));
 
 for (const [route, html] of documents) {
   const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
@@ -62,11 +71,14 @@ for (const [route, html] of documents) {
   );
   const graphs = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
     .flatMap((match) => { const data = JSON.parse(match[1]); return data['@graph'] ?? [data]; });
-  const webPage = graphs.find((node) => node['@type'] === 'WebPage' && node.url === `${origin}${route}`);
+  const webPage = graphs.find((node) => {
+    const types = Array.isArray(node['@type']) ? node['@type'] : [node['@type']];
+    return types.includes('WebPage') && node.url === `${origin}${route}`;
+  });
   assert.ok(webPage, `${route}: WebPage schema`);
-  assert.equal(webPage.author?.['@id'], `${origin}/#alexis-boulet`, `${route}: WebPage author must be Alexis Boulet`);
+  assert.equal(webPage.author?.['@id'], authorId, `${route}: WebPage author must use the canonical Alexis Boulet entity`);
   const authorName = webPage.author?.name
-    ?? graphs.find((node) => node['@type'] === 'Person' && node['@id'] === `${origin}/#alexis-boulet`)?.name;
+    ?? graphs.find((node) => node['@type'] === 'Person' && node['@id'] === authorId)?.name;
   assert.equal(authorName, 'Alexis Boulet', `${route}: author name must stay explicit or resolve in the local graph`);
   if (!routes.includes(route)) continue;
   assert.match(html, /<html lang="fr-CA"/, `${route}: French Canadian document language`);
@@ -79,6 +91,13 @@ for (const [route, html] of documents) {
     assert.match(text(html), /non officiel/i, `${route}: unofficial concept disclosure`);
     assert.match(text(html), /non approuvé/i, `${route}: no implied endorsement`);
     assert.match(text(html), /non déployé/i, `${route}: no implied production deployment`);
+  }
+  if (visiblyAuthoredRoutes.includes(route)) {
+    assert.match(
+      html,
+      new RegExp(`<p\\s+class="editorial-byline"[\\s\\S]*?href="${base}${authorRoute.slice(1)}"[\\s\\S]*?Alexis Boulet[\\s\\S]*?Mis à jour le 9 octobre 2026`, 'i'),
+      `${route}: visible byline must link to the canonical author profile and publish the reviewed date`,
+    );
   }
   assert.ok(html.includes(`href="${base}#contact"`), `${route}: reachable contact CTA`);
   assert.match(html, /data-analytics-preferences/, `${route}: persistent consent controls`);
@@ -98,12 +117,32 @@ const redesign = documents.get(redesignRoute);
 const applications = documents.get(applicationsRoute);
 const automation = documents.get(automationRoute);
 const checklist = documents.get(checklistRoute);
+const authorProfile = documents.get(authorRoute);
 assert.ok(creationSite, 'the creation-site pillar must be present in the build');
 assert.ok(agency, 'the agency service page must be present in the build');
 assert.ok(redesign, 'the website-redesign service page must be present in the build');
 assert.ok(applications, 'the custom-application service page must be present in the build');
 assert.ok(automation, 'the automation service page must be present in the build');
 assert.ok(checklist, 'the end-of-project checklist resource must be present in the build');
+assert.ok(authorProfile, 'the Alexis Boulet author profile must be present in the build');
+
+const authorGraph = JSON.parse(
+  authorProfile.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
+)['@graph'];
+assert.ok(Array.isArray(authorGraph), 'author profile must publish a connected schema graph');
+const profilePage = authorGraph.find((node) => {
+  const types = Array.isArray(node['@type']) ? node['@type'] : [node['@type']];
+  return types.includes('ProfilePage');
+});
+const authorPerson = authorGraph.find((node) => node['@type'] === 'Person' && node['@id'] === authorId);
+assert.equal(profilePage?.mainEntity?.['@id'], authorId, 'ProfilePage must identify Alexis Boulet as its main entity');
+assert.equal(authorPerson?.name, 'Alexis Boulet', 'author entity must keep the verified public name');
+assert.equal(authorPerson?.jobTitle, 'Fondateur de 27PM', 'author profile must use the verified founder role');
+assert.equal(authorPerson?.affiliation?.['@id'], `${origin}/#organization`, 'author profile must connect Alexis to 27PM');
+assert.ok(authorPerson?.sameAs?.includes('https://github.com/ales27pm'), 'author profile must link to the verified public GitHub profile');
+assert.match(text(authorProfile), /fondateur de 27PM/i, 'author profile must visibly state the founder relationship');
+assert.match(authorProfile, /href="https:\/\/github\.com\/ales27pm"/, 'author profile must visibly link to the verified GitHub profile');
+assert.match(authorProfile, new RegExp(`href="${base}${checklistRoute.slice(1)}`), 'author profile must link to the authored checklist');
 
 const metaDescription = (html) => html.match(/<meta\s+name="description"\s+content="([^"]+)"/s)?.[1] ?? '';
 const primaryHeading = (html) => html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
@@ -204,10 +243,11 @@ const controlAreas = [
   ['sauvegardes-continuite', /sauvegardes.*continuité.*support/i],
 ];
 for (const [area, topic] of controlAreas) {
-  const section = checklist.match(new RegExp(`<section\\s+data-control-area="${area}">([\\s\\S]*?)<\\/section>`, 'i'))?.[1] ?? '';
+  const section = checklist.match(new RegExp(`<section\\s+id="${area}"\\s+data-control-area="${area}">([\\s\\S]*?)<\\/section>`, 'i'))?.[1] ?? '';
   assert.match(text(section), topic, `checklist must cover ${area}`);
   assert.match(text(section), /À vérifier\s*:/i, `${area} must state what to verify`);
   assert.match(text(section), /Preuves à conserver\s*:/i, `${area} must state which evidence to retain`);
+  assert.match(checklist, new RegExp(`href="#${area}"`), `checklist summary must deep-link to ${area}`);
 }
 
 const recoveryCheck = checklist.match(/<ol\s+data-recovery-check>([\s\S]*?)<\/ol>/i)?.[1] ?? '';
@@ -244,6 +284,8 @@ for (const [index, row] of checklistRows.entries()) {
   assert.equal(columns, 8, `checklist CSV row ${index + 1} must contain eight columns`);
 }
 for (const [, topic] of controlAreas) assert.match(checklistCsv, topic, `checklist CSV must cover ${topic}`);
+const checklistCsvBytes = Buffer.byteLength(checklistCsv);
+const checklistCsvSha256 = createHash('sha256').update(checklistCsv).digest('hex');
 
 const checklistGraph = JSON.parse(
   checklist.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
@@ -252,9 +294,9 @@ assert.ok(Array.isArray(checklistGraph), 'checklist schema must publish a graph'
 assert.ok(!checklistGraph.some((node) => node['@type'] === 'Service'), 'resource route must not use Service schema');
 const checklistWebPage = checklistGraph.find((node) => node['@type'] === 'WebPage');
 const checklistArticle = checklistGraph.find((node) => node['@type'] === 'TechArticle');
-assert.equal(checklistWebPage?.author?.['@id'], `${origin}/#alexis-boulet`, 'checklist WebPage must identify its author');
+assert.equal(checklistWebPage?.author?.['@id'], authorId, 'checklist WebPage must identify its canonical author entity');
 assert.equal(checklistWebPage?.mainEntity?.['@id'], `${origin}${checklistRoute}#article`, 'checklist WebPage must identify its article');
-assert.equal(checklistArticle?.author?.['@id'], `${origin}/#alexis-boulet`, 'checklist article must identify its author');
+assert.equal(checklistArticle?.author?.['@id'], authorId, 'checklist article must identify its canonical author entity');
 assert.equal(checklistArticle?.datePublished, '2026-10-08', 'checklist article must publish its release date');
 assert.equal(checklistArticle?.dateModified, '2026-10-09', 'checklist article must publish its revision date');
 assert.equal(
@@ -262,6 +304,10 @@ assert.equal(
   `${origin}/ressources/checklist-fin-projet-web.csv`,
   'checklist article must identify its downloadable CSV',
 );
+assert.equal(checklistArticle?.encoding?.contentSize, `${checklistCsvBytes} bytes`, 'checklist schema must publish the current CSV byte size');
+assert.equal(checklistArticle?.encoding?.sha256, checklistCsvSha256, 'checklist schema must publish the current CSV SHA-256');
+assert.match(checklistText, new RegExp(`${checklistCsvBytes} octets`, 'i'), 'checklist must visibly publish the CSV byte size');
+assert.match(checklistText, new RegExp(`SHA-256\\s*:\\s*${checklistCsvSha256}`, 'i'), 'checklist must visibly publish the CSV SHA-256');
 
 const creationGraph = JSON.parse(
   creationSite.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',

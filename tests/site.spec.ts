@@ -1046,7 +1046,7 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
     }),
     expect.objectContaining({
       '@type': 'Person',
-      '@id': 'https://27pm.org/#alexis-boulet',
+      '@id': 'https://27pm.org/auteurs/alexis-boulet/#person',
       name: 'Alexis Boulet',
       affiliation: { '@id': 'https://27pm.org/#organization' },
     }),
@@ -1072,6 +1072,7 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
   const sitemapText = await sitemap.text();
   expect(sitemapText).toContain('<loc>https://27pm.org/confidentialite/</loc>');
   expect(sitemapText).toContain('<loc>https://27pm.org/conditions-utilisation/</loc>');
+  expect(sitemapText).toContain('<loc>https://27pm.org/auteurs/alexis-boulet/</loc>');
   expect(sitemapText).toContain('<lastmod>2026-10-09</lastmod>');
 
   const llms = await request.get('/llms.txt');
@@ -1079,6 +1080,7 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
   const llmsText = await llms.text();
   expect(llmsText).toContain('# 27PM');
   expect(llmsText).toContain('https://27pm.org/ressources/checklist-fin-projet-web/');
+  expect(llmsText).toContain('https://27pm.org/auteurs/alexis-boulet/');
   expect(llmsText).toContain('concepts indépendants, non officiels, non approuvés et non déployés');
 
   await page.getByRole('link', { name: 'Conditions d’utilisation', exact: true }).click();

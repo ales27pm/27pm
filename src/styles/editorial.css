@@ -51,6 +51,19 @@
   line-height: 1.6;
 }
 
+.editorial-byline {
+  margin-top: 1.25rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.editorial-byline a {
+  color: var(--blue-deep);
+  font-weight: 650;
+  text-underline-offset: 0.25em;
+}
+
 .editorial-actions {
   display: flex;
   flex-wrap: wrap;
@@ -106,6 +119,16 @@
 
 .editorial-body strong {
   color: var(--ink);
+}
+
+.resource-integrity code {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.88em;
+}
+
+.editorial-body section[id] {
+  scroll-margin-top: 2rem;
 }
 
 .editorial-figure {

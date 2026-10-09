@@ -8,6 +8,7 @@ const pages = [
   ['/services/sites-catalogues-fabricants/', 'Sites web et catalogues pour fabricants québécois'],
   ['/services/applications-web-sur-mesure/', 'Applications web sur mesure pour PME au Québec'],
   ['/services/automatisation-ia/', 'Automatisation et IA pour PME au Québec'],
+  ['/auteurs/alexis-boulet/', 'Alexis Boulet, fondateur de 27PM'],
   ['/ressources/checklist-fin-projet-web/', 'Checklist de fin de projet web : garder le contrôle'],
   ['/etudes/boulet/', 'Boulet : un concept de catalogue de portes et fenêtres'],
   ['/etudes/maisons-turner/', 'Maisons S. Turner : un concept de catalogue de maisons'],
@@ -66,6 +67,43 @@ test('offers the editable end-of-project checklist CSV', async ({ page, request 
   const response = await request.get('/ressources/checklist-fin-projet-web.csv');
   expect(response.status()).toBe(200);
   expect(await response.text()).toContain('zone_de_controle,quoi_verifier,preuves_a_conserver');
+});
+
+test('publishes a canonical author profile and linked visible bylines', async ({ page }) => {
+  await page.goto('/auteurs/alexis-boulet/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://27pm.org/auteurs/alexis-boulet/',
+  );
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Alexis Boulet, fondateur de 27PM');
+  await expect(page.getByRole('link', { name: 'Voir le compte GitHub public' })).toHaveAttribute(
+    'href',
+    'https://github.com/ales27pm',
+  );
+
+  const schema = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  )['@graph'];
+  expect(schema).toEqual(expect.arrayContaining([
+    expect.objectContaining({
+      '@type': ['ProfilePage', 'WebPage'],
+      mainEntity: { '@id': 'https://27pm.org/auteurs/alexis-boulet/#person' },
+    }),
+    expect.objectContaining({
+      '@type': 'Person',
+      '@id': 'https://27pm.org/auteurs/alexis-boulet/#person',
+      name: 'Alexis Boulet',
+      jobTitle: 'Fondateur de 27PM',
+    }),
+  ]));
+
+  await page.goto('/services/agence-web/');
+  const byline = page.locator('.editorial-byline');
+  await expect(byline).toContainText('Mis à jour le 9 octobre 2026');
+  await expect(byline.getByRole('link', { name: 'Alexis Boulet' })).toHaveAttribute(
+    'href',
+    '/auteurs/alexis-boulet/',
+  );
 });
 
 test('keeps every detail page inside a 320px viewport', async ({ page, isMobile }) => {

@@ -6,6 +6,10 @@ Les pages ci-dessous sont les sources canoniques de 27PM. Le contenu est en fran
 
 Auteur des contenus: Alexis Boulet. Éditeur: 27PM.
 
+## Auteur
+
+- [Alexis Boulet](https://27pm.org/auteurs/alexis-boulet/): fondateur de 27PM et auteur identifié des contenus publiés sur le site; profil public et œuvres signées.
+
 ## Services
 
 - [Création de site web](https://27pm.org/services/creation-sites-web/): étapes, coûts, délais, plateformes, hébergement et responsabilités pour une PME québécoise.

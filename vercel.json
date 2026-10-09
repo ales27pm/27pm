@@ -45,6 +45,11 @@
       "permanent": true
     },
     {
+      "source": "/auteurs/alexis-boulet/index.html",
+      "destination": "/auteurs/alexis-boulet/",
+      "permanent": true
+    },
+    {
       "source": "/ressources/checklist-fin-projet-web/index.html",
       "destination": "/ressources/checklist-fin-projet-web/",
       "permanent": true

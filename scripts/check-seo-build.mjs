@@ -56,12 +56,12 @@ assert.ok(homeStructuredDataText, 'home must publish JSON-LD');
 const homeGraph = JSON.parse(homeStructuredDataText)['@graph'];
 assert.ok(Array.isArray(homeGraph), 'home JSON-LD must publish a connected graph');
 assert.ok(homeGraph.some((node) => node['@type'] === 'Organization' && node['@id'] === 'https://27pm.org/#organization'), 'home graph must identify 27PM');
-assert.ok(homeGraph.some((node) => node['@type'] === 'Person' && node['@id'] === 'https://27pm.org/#alexis-boulet' && node.name === 'Alexis Boulet'), 'home graph must identify the author');
-assert.ok(homeGraph.find((node) => node['@id'] === 'https://27pm.org/#alexis-boulet')?.sameAs?.includes('https://github.com/ales27pm'), 'author graph must link to the verified public profile');
+assert.ok(homeGraph.some((node) => node['@type'] === 'Person' && node['@id'] === 'https://27pm.org/auteurs/alexis-boulet/#person' && node.name === 'Alexis Boulet'), 'home graph must identify the canonical author entity');
+assert.ok(homeGraph.find((node) => node['@id'] === 'https://27pm.org/auteurs/alexis-boulet/#person')?.sameAs?.includes('https://github.com/ales27pm'), 'author graph must link to the verified public profile');
 assert.ok(homeGraph.some((node) => node['@type'] === 'WebSite' && node['@id'] === 'https://27pm.org/#website'), 'home graph must define the website referenced by detail pages');
 assert.ok(homeGraph.some((node) => node['@type'] === 'WebPage' && node['@id'] === 'https://27pm.org/#webpage'), 'home graph must define the homepage');
-assert.equal(homeGraph.find((node) => node['@type'] === 'WebSite')?.creator?.['@id'], 'https://27pm.org/#alexis-boulet', 'website creator must be Alexis Boulet');
-assert.equal(homeGraph.find((node) => node['@type'] === 'WebPage')?.author?.['@id'], 'https://27pm.org/#alexis-boulet', 'homepage author must be Alexis Boulet');
+assert.equal(homeGraph.find((node) => node['@type'] === 'WebSite')?.creator?.['@id'], 'https://27pm.org/auteurs/alexis-boulet/#person', 'website creator must be Alexis Boulet');
+assert.equal(homeGraph.find((node) => node['@type'] === 'WebPage')?.author?.['@id'], 'https://27pm.org/auteurs/alexis-boulet/#person', 'homepage author must be Alexis Boulet');
 
 for (const [name, html] of [['home', home], ['privacy', privacy], ['404', notFound]]) {
   assert.match(html, /data-analytics-consent/, `${name} must expose the optional analytics consent control`);
@@ -178,7 +178,7 @@ assert.deepEqual(
     url: 'https://27pm.org/confidentialite/',
     description,
     inLanguage: 'fr-CA',
-    author: { '@type': 'Person', '@id': 'https://27pm.org/#alexis-boulet', name: 'Alexis Boulet' },
+    author: { '@type': 'Person', '@id': 'https://27pm.org/auteurs/alexis-boulet/#person', name: 'Alexis Boulet' },
     dateModified: '2026-10-09',
   },
   'privacy JSON-LD must describe the visible page',

@@ -37,6 +37,11 @@
   font-size: 0.86rem;
 }
 
+.legal-date a {
+  color: inherit;
+  text-underline-offset: 0.25em;
+}
+
 .legal-aside img {
   width: clamp(7rem, 12vw, 12rem);
   margin-top: 28rem;
