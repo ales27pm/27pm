@@ -40,6 +40,7 @@ Les commandes `build:pages`, `check:pages` et leurs alias `preview` ne produisen
 
 - `index.html` : page principale, métadonnées SEO et contenu sémantique.
 - `confidentialite/index.html` : politique de confidentialité.
+- `conditions-utilisation/index.html` : utilisation du site et préparation des ententes de service.
 - `404.html` : page d’erreur de marque, exclue de l’indexation.
 - `src/` : styles, interactions et logique locale du contact et de ses fallbacks.
 - `public/assets/` : actifs de marque, images optimisées et aperçus des réalisations.

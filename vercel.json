@@ -58,6 +58,11 @@
       "source": "/etudes/maisons-turner/index.html",
       "destination": "/etudes/maisons-turner/",
       "permanent": true
+    },
+    {
+      "source": "/conditions-utilisation/index.html",
+      "destination": "/conditions-utilisation/",
+      "permanent": true
     }
   ],
   "headers": [

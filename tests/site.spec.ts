@@ -1023,6 +1023,10 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
     'href',
     '/confidentialite/',
   );
+  await expect(page.getByRole('link', { name: 'Conditions d’utilisation', exact: true })).toHaveAttribute(
+    'href',
+    '/conditions-utilisation/',
+  );
 
   const organization = await page.locator('script[type="application/ld+json"]').textContent();
   expect(organization).not.toBeNull();
@@ -1044,7 +1048,14 @@ test('publishes coherent production metadata and crawler files', async ({ page, 
 
   const sitemap = await request.get('/sitemap.xml');
   expect(sitemap.ok()).toBe(true);
-  expect(await sitemap.text()).toContain('<loc>https://27pm.org/confidentialite/</loc>');
+  const sitemapText = await sitemap.text();
+  expect(sitemapText).toContain('<loc>https://27pm.org/confidentialite/</loc>');
+  expect(sitemapText).toContain('<loc>https://27pm.org/conditions-utilisation/</loc>');
+
+  await page.getByRole('link', { name: 'Conditions d’utilisation', exact: true }).click();
+  await expect(page).toHaveURL(/\/conditions-utilisation\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Conditions d’utilisation' })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://27pm.org/conditions-utilisation/');
 });
 
 test('keeps all public routes inside the mobile viewport', async ({ page, isMobile }) => {
@@ -1052,7 +1063,7 @@ test('keeps all public routes inside the mobile viewport', async ({ page, isMobi
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 320, height: 844 });
 
-  for (const path of ['/', '/confidentialite/', '/404.html']) {
+  for (const path of ['/', '/confidentialite/', '/conditions-utilisation/', '/404.html']) {
     await page.goto(path);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
