@@ -286,12 +286,6 @@ assert.deepEqual(
       ],
     },
     {
-      source: '/ressources/barometre-consentement-2026/(.*)',
-      headers: [
-        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-      ],
-    },
-    {
       source: '/assets/generated/(.*)',
       headers: [
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },

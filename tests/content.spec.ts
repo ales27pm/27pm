@@ -126,25 +126,29 @@ test('offers the editable end-of-project checklist CSV', async ({ page, request 
   );
 });
 
-test('keeps the barometer non-publishable until the v2 recollection is reviewed', async ({ page, request }) => {
+test('publishes the reviewed consent barometer and aggregate downloads', async ({ page, request }) => {
   await page.goto('/ressources/barometre-consentement-2026/');
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
-  const publicationGuard = page.locator('[data-results-status="pending"][data-publication-ready="false"]');
-  await expect(publicationGuard).toContainText('Brouillon non publiable');
-  await expect(page.locator('[data-results-pending]')).toContainText('Aucun résultat');
-  await expect(page.locator('.barometer-summary')).toContainText('Aucun agrégat publié');
-  await expect(page.locator('[data-results-pending]')).not.toContainText(/55|19 sur 55|16 sur 19|13 sur 16/);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+  const publicationNotice = page.locator('[data-results-status="published"][data-publication-ready="true"][data-release-status="published"]');
+  await expect(publicationNotice).toContainText('Publication révisée — données agrégées seulement');
+  const results = page.locator('[data-results-reviewed]');
+  await expect(results).toContainText('20 des 53 pages analysables, soit 37,7');
+  await expect(results).toContainText('17 présentaient exactement une action de refus reconnue au premier niveau, soit 85');
+  await expect(results).toContainText('14/15 déterminables (93,3');
+  await expect(results).toContainText('2 indéterminés');
+  await expect(results).not.toContainText(/55 pages|19 sur 55|16 sur 19|13 sur 16/);
 
-  const csvLink = page.getByRole('link', { name: 'Télécharger le modèle CSV sans résultat' });
+  const csvLink = page.getByRole('link', { name: 'Télécharger les huit agrégats en CSV' });
   await expect(csvLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026-agregats.csv');
   const csvResponse = await request.get('/ressources/barometre-consentement-2026-agregats.csv');
   expect(csvResponse.status()).toBe(200);
   const csv = await csvResponse.text();
-  expect(csv.split(/\r?\n/).filter(Boolean)).toEqual([
-    'metric_id,denominator_n,measured_n,missing_n,count,pct,median,p25,p75,min,max',
-  ]);
+  const csvRows = csv.split(/\r?\n/).filter(Boolean);
+  expect(csvRows).toHaveLength(9);
+  expect(csvRows[0]).toBe('metric_id,denominator_n,measured_n,missing_n,count,pct,median,p25,p75,min,max');
+  expect(csvRows.at(-1)).toBe('reject_action_closed,17,15,2,14,93.3,,,,,');
 
-  const jsonLink = page.getByRole('link', { name: 'Télécharger la méthode et l’état du brouillon en JSON' });
+  const jsonLink = page.getByRole('link', { name: 'Télécharger la méthode et les agrégats en JSON' });
   await expect(jsonLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026.json');
   const jsonResponse = await request.get('/ressources/barometre-consentement-2026.json');
   expect(jsonResponse.status()).toBe(200);
@@ -152,22 +156,37 @@ test('keeps the barometer non-publishable until the v2 recollection is reviewed'
   const dataset = await jsonResponse.json();
   expect(dataset).toEqual(expect.objectContaining({
     schema_version: '1.0',
-    resource_version: '0.1.0-draft',
+    resource_version: '0.1.0',
+    status: 'published',
+    date_published: '2026-10-11',
+    date_modified: '2026-10-11',
     id: 'https://27pm.org/ressources/barometre-consentement-2026/#dataset',
     canonical_url: 'https://27pm.org/ressources/barometre-consentement-2026/',
   }));
   expect(dataset.scope).toEqual(expect.objectContaining({
-    status: 'planned',
-    target_homepages_n: 60,
+    status: 'observed',
+    sampled_homepages_n: 60,
+    http_responded_n: 59,
+    analyzable_homepages_n: 53,
+    not_analyzable_n: 7,
   }));
   expect(dataset.publication_policy).toEqual(expect.objectContaining({
     observations_published: false,
-    status: 'draft_pending_recollection',
-    publishable: false,
-    results_status: 'pending',
+    status: 'published',
+    content_reviewed: true,
+    release_approved: true,
+    publishable: true,
+    published: true,
+    results_status: 'reviewed',
   }));
-  expect(dataset.metric_definitions).toEqual([]);
-  expect(dataset.aggregates).toEqual([]);
+  expect(dataset.metric_definitions).toHaveLength(8);
+  expect(dataset.aggregates).toHaveLength(8);
+  expect(dataset.aggregates).toEqual(expect.arrayContaining([
+    expect.objectContaining({ metric_id: 'banner_detected', denominator_n: 53, measured_n: 53, count: 20, pct: 37.7 }),
+    expect.objectContaining({ metric_id: 'reject_first_layer', denominator_n: 20, measured_n: 20, count: 17, pct: 85 }),
+    expect.objectContaining({ metric_id: 'keyboard_reject_steps', denominator_n: 17, measured_n: 17, median: 3, p25: 3, p75: 4, min: 2, max: 39 }),
+    expect.objectContaining({ metric_id: 'reject_action_closed', denominator_n: 17, measured_n: 15, missing_n: 2, count: 14, pct: 93.3 }),
+  ]));
   expect(dataset).not.toHaveProperty('observations');
   expect(dataset.scope).not.toHaveProperty('selected_homepages_n');
   expect(dataset.scope).not.toHaveProperty('analyzed_homepages_n');
@@ -196,15 +215,23 @@ test('keeps the barometer non-publishable until the v2 recollection is reviewed'
     expect.objectContaining({
       '@type': 'Dataset',
       '@id': dataset.id,
-      creativeWorkStatus: 'Draft',
+      datePublished: '2026-10-11',
+      version: '0.1.0',
     }),
   ]));
+  for (const node of graph.filter((item: { '@type': string | string[] }) => (
+    item['@type'] === 'WebPage'
+    || item['@type'] === 'Dataset'
+    || (Array.isArray(item['@type']) && item['@type'].includes('Article'))
+  ))) {
+    expect(node).not.toHaveProperty('creativeWorkStatus');
+  }
 
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     'content',
-    'https://27pm.org/assets/barometre-consentement-2026-1200x630.png',
+    'https://27pm.org/assets/barometre-consentement-2026-resultats-1200x630.png',
   );
-  const imageResponse = await request.get('/assets/barometre-consentement-2026-1200x630.png');
+  const imageResponse = await request.get('/assets/barometre-consentement-2026-resultats-1200x630.png');
   expect(imageResponse.status()).toBe(200);
   expect(imageResponse.headers()['content-type']).toContain('image/png');
 });

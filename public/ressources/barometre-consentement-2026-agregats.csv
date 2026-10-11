@@ -1,1 +1,9 @@
 metric_id,denominator_n,measured_n,missing_n,count,pct,median,p25,p75,min,max
+banner_detected,53,53,0,20,37.7,,,,,
+reject_first_layer,20,20,0,17,85,,,,,
+keyboard_reject_steps,17,17,0,,,3,3,4,2,39
+axe_rule_count_banner,20,20,0,,,0,0,1,0,2
+external_hosts_before_choice_count,53,53,0,,,9,5,15,0,78
+cookies_before_choice_count,53,53,0,,,6,3,10,0,85
+document_storage_keys_before_choice_count,53,53,0,,,2,0,4,0,24
+reject_action_closed,17,15,2,14,93.3,,,,,

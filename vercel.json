@@ -55,6 +55,11 @@
       "permanent": true
     },
     {
+      "source": "/ressources/barometre-consentement-2026/index.html",
+      "destination": "/ressources/barometre-consentement-2026/",
+      "permanent": true
+    },
+    {
       "source": "/etudes/boulet/index.html",
       "destination": "/etudes/boulet/",
       "permanent": true
@@ -109,15 +114,6 @@
           "key": "Link",
           "value": "<https://27pm.org/ressources/barometre-consentement-2026/>; rel=\"canonical\""
         },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    },
-    {
-      "source": "/ressources/barometre-consentement-2026/(.*)",
-      "headers": [
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"

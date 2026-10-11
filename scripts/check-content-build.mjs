@@ -19,7 +19,7 @@ const checklistImage = 'assets/checklist-fin-projet-web-1200x630.png';
 const barometerRoute = '/ressources/barometre-consentement-2026/';
 const barometerJsonDownload = 'ressources/barometre-consentement-2026.json';
 const barometerCsvDownload = 'ressources/barometre-consentement-2026-agregats.csv';
-const barometerImage = 'assets/barometre-consentement-2026-1200x630.png';
+const barometerImage = 'assets/barometre-consentement-2026-resultats-1200x630.png';
 const authorRoute = '/auteurs/alexis-boulet/';
 const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
 const authorId = `${siteMetadata.origin}${authorRoute}#person`;
@@ -30,8 +30,8 @@ assert.ok(routes.includes(redesignRoute), 'the website-redesign service route mu
 assert.ok(routes.includes(applicationsRoute), 'the custom-application service route must be published');
 assert.ok(routes.includes(automationRoute), 'the automation service route must be published');
 assert.ok(routes.includes(checklistRoute), 'the end-of-project checklist resource route must be published');
-assert.ok(!routes.includes(barometerRoute), 'the pending consent barometer must not be a published route');
-assert.ok(draftRoutes.includes(barometerRoute), 'the pending consent barometer must remain an explicit draft route');
+assert.ok(routes.includes(barometerRoute), 'the consent barometer must be a published route');
+assert.ok(!draftRoutes.includes(barometerRoute), 'the published consent barometer must not remain a draft route');
 assert.ok(routes.includes(authorRoute), 'the Alexis Boulet author profile must be published');
 const base = process.env.CONTENT_PREVIEW_BASE ?? '/';
 const preview = process.env.CONTENT_PREVIEW_BASE !== undefined;
@@ -46,8 +46,8 @@ const sitemapEntries = [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc><lastmod>([
 const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
   .map(([, url]) => new URL(url).pathname);
 assert.deepEqual(sitemapPaths.sort(), [...documents.keys()].sort(), 'sitemap must enumerate exactly the published routes');
-assert.ok(!sitemapPaths.includes(barometerRoute), 'pending barometer must remain outside the sitemap');
-assert.ok(!llms.includes(`${siteMetadata.origin}${barometerRoute}`), 'pending barometer must remain outside llms.txt');
+assert.ok(sitemapPaths.includes(barometerRoute), 'published barometer must appear in the sitemap');
+assert.ok(llms.includes(`${siteMetadata.origin}${barometerRoute}`), 'published barometer must appear in llms.txt');
 assert.equal(sitemapEntries.length, sitemapPaths.length, 'every sitemap URL must provide a lastmod date');
 assert.deepEqual(
   Object.keys(siteMetadata.lastModified).sort(),
@@ -138,9 +138,15 @@ for (const [route, html] of documents) {
     assert.match(text(html), /non déployé/i, `${route}: no implied production deployment`);
   }
   if (visiblyAuthoredRoutes.includes(route)) {
+    const reviewedDate = new Intl.DateTimeFormat('fr-CA', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${siteMetadata.lastModified[route]}T00:00:00Z`));
     assert.match(
       html,
-      new RegExp(`<p\\s+class="editorial-byline"[\\s\\S]*?href="${base}${authorRoute.slice(1)}"[\\s\\S]*?Alexis Boulet[\\s\\S]*?Mis à jour le 9 octobre 2026`, 'i'),
+      new RegExp(`<p\\s+class="editorial-byline"[\\s\\S]*?href="${base}${authorRoute.slice(1)}"[\\s\\S]*?Alexis Boulet[\\s\\S]*?(?:Mis à jour|Publié) le ${reviewedDate}`, 'i'),
       `${route}: visible byline must link to the canonical author profile and publish the reviewed date`,
     );
   }
@@ -162,7 +168,7 @@ const redesign = documents.get(redesignRoute);
 const applications = documents.get(applicationsRoute);
 const automation = documents.get(automationRoute);
 const checklist = documents.get(checklistRoute);
-const barometer = await read(`dist${barometerRoute}index.html`);
+const barometer = documents.get(barometerRoute);
 const authorProfile = documents.get(authorRoute);
 assert.ok(creationSite, 'the creation-site pillar must be present in the build');
 assert.ok(agency, 'the agency service page must be present in the build');
@@ -493,18 +499,22 @@ assert.equal(
   'Le droit de refuser fonctionne-t-il au clavier?',
   'barometer H1 must state the research question',
 );
-assert.match(metaDescription(barometer), /Brouillon méthodologique/i, 'barometer description must disclose draft status');
-assert.match(barometer, /<meta\s+name="robots"\s+content="noindex, nofollow"/i, 'pending barometer must remain non-indexable');
-assert.match(barometerText, /Brouillon non publiable — recollecte v2 requise/i, 'barometer must visibly require recollection before publication');
-assert.match(barometer, /data-results-status="pending"\s+data-publication-ready="false"/, 'barometer must expose the pending publication guard');
-assert.match(barometerText, /Aucun résultat, dénominateur observé, pourcentage, médiane ou classement n’est publié/i, 'barometer must state that results are absent');
+assert.match(metaDescription(barometer), /observation automatisée/i, 'barometer description must identify the observation method');
+assert.match(barometer, /<meta\s+name="robots"\s+content="index, follow"/i, 'published barometer must be indexable');
+assert.match(barometerText, /Publication révisée — données agrégées seulement/i, 'barometer must visibly disclose its reviewed aggregate-only scope');
+assert.match(barometer, /data-results-status="published"\s+data-publication-ready="true"\s+data-release-status="published"/, 'barometer must expose the published release state');
+assert.match(barometerText, /(?:Soixante|60) pages ont été échantillonnées, 59 ont répondu en HTTP et 53 ont satisfait les critères d’analyse/i, 'barometer must disclose the sampling cascade');
 assert.match(barometerText, /ne représente ni toutes les PME ni l’ensemble des sites du Québec/i, 'barometer must prohibit broad extrapolation');
-assert.match(barometerText, /Aucun site ne sera nommé ou classé/i, 'barometer must prohibit naming and rankings');
+assert.match(barometerText, /Aucun site n’est nommé ou classé/i, 'barometer must prohibit naming and rankings');
 assert.match(barometerText, /ni un avis juridique, ni un verdict de conformité/i, 'barometer must state its legal limit');
 const barometerResults = barometer.match(/<section id="resultats"[^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
-assert.match(barometerResults, /data-results-pending/, 'barometer results section must remain an explicit placeholder');
-assert.doesNotMatch(barometerResults, /\b(?:55|19|16|13)\b/, 'barometer results placeholder must not retain v1 figures');
+assert.match(barometerResults, /data-results-reviewed/, 'barometer results section must identify reviewed results');
+assert.match(barometerResults, /20 des 53 pages analysables, soit 37,7/i, 'barometer must qualify detected banners with the correct denominator');
+assert.match(barometerResults, /17 présentaient exactement une action de refus reconnue au premier niveau, soit 85/i, 'barometer must qualify recognized rejection actions');
+assert.match(barometerResults, /15 activations dont l’effet a pu être déterminé[\s\S]*14 ont fermé la bannière[\s\S]*Deux autres cas parmi les 17 sont restés indéterminés/i, 'barometer must preserve the measured and missing closure denominators');
+assert.match(barometerResults, /médiane de <strong>9 hôtes externes observés<\/strong>, de <strong>6 témoins<\/strong> et de <strong>2 clés de stockage<\/strong>/i, 'barometer must report the three pre-choice medians');
 assert.doesNotMatch(barometerText, /55 pages|19 sur 55|16 sur 19|13 sur 16|médiane est de/i, 'barometer must not retain any v1 public assertion');
+assert.doesNotMatch(barometerText, /(?:sites québécois|sites du Québec) (?:ont|chargent|permettent)/i, 'barometer must not generalize results to Quebec sites');
 
 const barometerJsonBuffer = await readFile(resolve(root, 'dist', barometerJsonDownload));
 const barometerCsvBuffer = await readFile(resolve(root, 'dist', barometerCsvDownload));
@@ -515,23 +525,45 @@ const barometerCsvBytes = barometerCsvBuffer.byteLength;
 const barometerJsonSha256 = createHash('sha256').update(barometerJsonBuffer).digest('hex');
 const barometerCsvSha256 = createHash('sha256').update(barometerCsvBuffer).digest('hex');
 assert.equal(barometerJson.schema_version, '1.0', 'barometer JSON schema version');
-assert.equal(barometerJson.resource_version, '0.1.0-draft', 'barometer JSON resource version');
+assert.equal(barometerJson.resource_version, '0.1.0', 'barometer JSON resource version');
 assert.equal(barometerJson.id, `${origin}${barometerRoute}#dataset`, 'barometer JSON dataset identifier');
 assert.equal(barometerJson.canonical_url, `${origin}${barometerRoute}`, 'barometer JSON canonical URL');
 assert.equal(barometerJson.author?.name, 'Alexis Boulet', 'barometer JSON author');
 assert.equal(barometerJson.publisher?.name, '27PM', 'barometer JSON publisher');
-assert.equal(barometerJson.scope?.status, 'planned', 'barometer JSON scope must remain planned');
-assert.equal(barometerJson.scope?.target_homepages_n, 60, 'barometer JSON may describe only the planned target size');
+assert.equal(barometerJson.scope?.status, 'observed', 'barometer JSON scope status');
+assert.equal(barometerJson.scope?.sampled_homepages_n, 60, 'barometer sampled count');
+assert.equal(barometerJson.scope?.http_responded_n, 59, 'barometer HTTP response count');
+assert.equal(barometerJson.scope?.analyzable_homepages_n, 53, 'barometer analyzable count');
+assert.equal(barometerJson.scope?.not_analyzable_n, 7, 'barometer non-analyzable count');
 assert.equal(barometerJson.publication_policy?.observations_published, false, 'individual observations must remain private');
-assert.equal(barometerJson.publication_policy?.status, 'draft_pending_recollection', 'barometer public data must remain marked as a draft');
-assert.equal(barometerJson.publication_policy?.publishable, false, 'pending barometer data must be explicitly non-publishable');
-assert.equal(barometerJson.publication_policy?.results_status, 'pending', 'barometer results must remain pending');
-assert.equal(barometerJson.publication_policy?.aggregates_published, false, 'pending barometer must not publish aggregates');
-assert.equal(barometerJson.publication_policy?.metric_definitions_published, false, 'pending barometer must not publish metric definitions');
-assert.deepEqual(barometerJson.metric_definitions, [], 'pending barometer definitions must remain empty');
-assert.deepEqual(barometerJson.aggregates, [], 'pending barometer aggregates must remain empty');
+assert.equal(barometerJson.status, 'published', 'barometer JSON resource must identify the published state');
+assert.equal(barometerJson.date_published, '2026-10-11', 'barometer JSON publication date');
+assert.equal(barometerJson.date_modified, '2026-10-11', 'barometer JSON modification date');
+assert.equal(barometerJson.publication_policy?.status, 'published', 'barometer publication policy status');
+assert.equal(barometerJson.publication_policy?.content_reviewed, true, 'barometer content must identify the completed review');
+assert.equal(barometerJson.publication_policy?.release_approved, true, 'barometer release must identify explicit approval');
+assert.equal(barometerJson.publication_policy?.publishable, true, 'barometer data must be publishable');
+assert.equal(barometerJson.publication_policy?.published, true, 'barometer data must identify the published state');
+assert.equal(barometerJson.publication_policy?.results_status, 'reviewed', 'barometer results review status');
+assert.equal(barometerJson.metric_definitions?.length, 8, 'barometer must expose eight reviewed metric definitions');
+assert.equal(barometerJson.aggregates?.length, 8, 'barometer must expose eight reviewed aggregates');
+const expectedBarometerAggregates = [
+  ['banner_detected', 53, 53, 0, 20, 37.7, null, null, null, null, null],
+  ['reject_first_layer', 20, 20, 0, 17, 85, null, null, null, null, null],
+  ['keyboard_reject_steps', 17, 17, 0, null, null, 3, 3, 4, 2, 39],
+  ['axe_rule_count_banner', 20, 20, 0, null, null, 0, 0, 1, 0, 2],
+  ['external_hosts_before_choice_count', 53, 53, 0, null, null, 9, 5, 15, 0, 78],
+  ['cookies_before_choice_count', 53, 53, 0, null, null, 6, 3, 10, 0, 85],
+  ['document_storage_keys_before_choice_count', 53, 53, 0, null, null, 2, 0, 4, 0, 24],
+  ['reject_action_closed', 17, 15, 2, 14, 93.3, null, null, null, null, null],
+];
+assert.deepEqual(
+  barometerJson.aggregates.map((row) => [row.metric_id, row.denominator_n, row.measured_n, row.missing_n, row.count, row.pct, row.median, row.p25, row.p75, row.min, row.max]),
+  expectedBarometerAggregates,
+  'barometer JSON aggregate values and denominators',
+);
 const serializedBarometerJson = JSON.stringify(barometerJson);
-for (const forbiddenKey of ['"observations"', '"site_id"', '"selected_homepages_n"', '"analyzed_homepages_n"', '"not_analyzed_n"', '"selection_seed"', '"selection_seed_sha256"', '"sample_manifest_sha256"', '"git_sha"']) {
+for (const forbiddenKey of ['"observations"', '"site_id"', '"selected_homepages_n"', '"analyzed_homepages_n"', '"not_analyzed_n"', '"selection_seed"', '"selection_seed_sha256"', '"sample_manifest_sha256"', '"git_sha"', '"navigation_ledger"', '"errors"']) {
   assert.ok(!serializedBarometerJson.includes(forbiddenKey), `barometer JSON must not expose ${forbiddenKey}`);
 }
 for (const forbiddenMetricId of ['dialog_accessible_name', 'privacy_link_in_banner', 'third_party_origins_after_reject_count', 'cookies_after_reject_count', 'storage_items_after_reject_count', 'focus_visible', 'mobile_overflow_px']) {
@@ -540,8 +572,13 @@ for (const forbiddenMetricId of ['dialog_accessible_name', 'privacy_link_in_bann
 }
 const barometerRows = barometerCsv.trim().split(/\r?\n/).map(parseCsvRow);
 assert.deepEqual(barometerRows[0], ['metric_id', 'denominator_n', 'measured_n', 'missing_n', 'count', 'pct', 'median', 'p25', 'p75', 'min', 'max'], 'barometer CSV contract');
-assert.equal(barometerRows.length, 1, 'pending barometer CSV must contain its header only');
+assert.equal(barometerRows.length, 9, 'barometer CSV must contain its header and eight aggregates');
 assert.ok(barometerRows.every((row) => row.length === 11), 'every barometer CSV row must contain eleven columns');
+assert.deepEqual(
+  barometerRows.slice(1),
+  expectedBarometerAggregates.map((row) => row.map((value) => value === null ? '' : String(value))),
+  'barometer CSV must match the reviewed JSON aggregates exactly',
+);
 
 const barometerGraph = JSON.parse(
   barometer.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
@@ -559,9 +596,12 @@ assert.equal(barometerArticle?.author?.['@id'], authorId, 'barometer article mus
 assert.equal(barometerArticle?.hasPart?.['@id'], barometerJson.id, 'barometer article must link to the dataset');
 assert.equal(barometerDataset?.['@id'], barometerJson.id, 'barometer JSON and JSON-LD dataset IDs must match');
 assert.equal(barometerDataset?.version, barometerJson.resource_version, 'barometer dataset version must match the public JSON');
-assert.equal(barometerWebPage?.creativeWorkStatus, 'Draft', 'pending WebPage schema must remain Draft');
-assert.equal(barometerArticle?.creativeWorkStatus, 'Draft', 'pending Article schema must remain Draft');
-assert.equal(barometerDataset?.creativeWorkStatus, 'Draft', 'pending Dataset schema must remain Draft');
+assert.equal(barometerWebPage?.datePublished, '2026-10-11', 'barometer WebPage publication date');
+assert.equal(barometerArticle?.datePublished, '2026-10-11', 'barometer Article publication date');
+assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset publication date');
+assert.ok(!barometerWebPage?.creativeWorkStatus, 'published WebPage schema must not remain Draft');
+assert.ok(!barometerArticle?.creativeWorkStatus, 'published Article schema must not remain Draft');
+assert.ok(!barometerDataset?.creativeWorkStatus, 'published Dataset schema must not remain Draft');
 const barometerDistributions = barometerDataset?.distribution ?? [];
 const barometerCsvDistribution = barometerDistributions.find((item) => item.encodingFormat === 'text/csv');
 const barometerJsonDistribution = barometerDistributions.find((item) => item.encodingFormat === 'application/json');
@@ -583,9 +623,10 @@ const barometerImageBuffer = await readFile(resolve(root, 'dist', barometerImage
 assert.equal(barometerImageBuffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', 'barometer social image must be a PNG');
 assert.equal(barometerImageBuffer.readUInt32BE(16), 1200, 'barometer social image width');
 assert.equal(barometerImageBuffer.readUInt32BE(20), 630, 'barometer social image height');
-for (const [route, html] of documents) {
-  assert.ok(!html.includes(`href="${base}${barometerRoute.slice(1)}"`), `${route}: published pages must not link to the pending barometer`);
-}
+const barometerInbound = [...documents].filter(([route, html]) => (
+  route !== barometerRoute && html.includes(`href="${base}${barometerRoute.slice(1)}"`)
+));
+assert.ok(barometerInbound.length >= 2, 'published barometer must receive links from at least two public pages');
 
 const creationGraph = JSON.parse(
   creationSite.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',

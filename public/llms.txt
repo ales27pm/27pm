@@ -19,9 +19,10 @@ Auteur des contenus: Alexis Boulet. Éditeur: 27PM.
 - [Applications web sur mesure](https://27pm.org/services/applications-web-sur-mesure/): portails, intégrations et outils métier.
 - [Automatisation et IA](https://27pm.org/services/automatisation-ia/): automatisations avec validation humaine et reprise manuelle.
 
-## Ressource originale
+## Ressources originales
 
 - [Checklist de fin de projet web](https://27pm.org/ressources/checklist-fin-projet-web/): référentiel 27PM version 1.0.0 avec huit zones de contrôle, quatre états, quatre niveaux de preuve et représentations CSV et JSON pour documenter une remise de projet web.
+- [Baromètre du consentement 2026](https://27pm.org/ressources/barometre-consentement-2026/): huit agrégats revus sur le refus au clavier et l’activité technique observée avant tout choix, issus de 60 pages d’accueil échantillonnées; aucune observation individuelle ni identité de site n’est publiée.
 
 ## Concepts indépendants
 

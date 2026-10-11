@@ -1,12 +1,14 @@
 {
   "schema_version": "1.0",
-  "resource_version": "0.1.0-draft",
+  "resource_version": "0.1.0",
+  "date_published": "2026-10-11",
+  "date_modified": "2026-10-11",
   "id": "https://27pm.org/ressources/barometre-consentement-2026/#dataset",
   "canonical_url": "https://27pm.org/ressources/barometre-consentement-2026/",
-  "title": "Baromètre 27PM 2026 — protocole sur le refus au clavier",
-  "description": "Brouillon méthodologique en attente d’une recollecte complète. Aucun résultat ni agrégat n’est publié dans cette version.",
+  "title": "Baromètre 27PM 2026 — le refus au clavier sur 60 pages d’accueil",
+  "description": "Huit agrégats revus issus d’une observation automatisée de 60 pages d’accueil d’établissements répertoriés dans SIT Québec. Aucun site ni résultat individuel n’est publié.",
   "language": "fr-CA",
-  "status": "draft",
+  "status": "published",
   "author": {
     "name": "Alexis Boulet",
     "id": "https://27pm.org/auteurs/alexis-boulet/#person"
@@ -16,10 +18,14 @@
     "id": "https://27pm.org/#organization"
   },
   "scope": {
-    "status": "planned",
-    "target_homepages_n": 60,
+    "status": "observed",
+    "sampled_homepages_n": 60,
+    "http_responded_n": 59,
+    "analyzable_homepages_n": 53,
+    "not_analyzable_n": 7,
     "unit": "Hôte Web admissible associé à une page d’accueil d’un établissement répertorié dans SIT Québec.",
     "frame": "Trois jeux de données publics SIT Québec : restauration, hébergements collectifs, puis culture, art et patrimoine.",
+    "selection": "Échantillon déterministe équilibré par source et région, à parts égales entre les trois sources. Il n’est pas pondéré selon la population réelle des établissements.",
     "sources": [
       {
         "id": "sit-quebec-restauration",
@@ -38,60 +44,249 @@
       }
     ],
     "interpretation_limits": [
-      "Le cadre est un échantillon méthodologique; il ne représente ni toutes les PME ni l’ensemble des sites du Québec.",
-      "L’unité prévue est un hôte Web admissible, pas une entreprise statistique.",
-      "Aucun site ne sera nommé ou classé dans la ressource publique."
+      "Les fichiers SIT Québec sont des aperçus non exhaustifs et ne constituent pas un registre de toutes les entreprises québécoises.",
+      "L’unité observée est un hôte Web admissible, pas une entreprise statistique.",
+      "L’échantillon n’est ni probabiliste ni pondéré; les résultats ne représentent ni toutes les PME ni l’ensemble des sites du Québec.",
+      "Aucun site n’est nommé ou classé dans la ressource publique."
     ]
   },
   "method": {
-    "status": "under_revision",
-    "recollection_required": true,
-    "browser_context": "Contexte Chromium neuf, profil mobile de 390 × 844 pixels, tactile, en français canadien et dans le fuseau America/Toronto.",
+    "status": "reviewed",
+    "collection_mode": "full_sample",
+    "observation_start": "2026-10-11T21:32:37.487Z",
+    "observation_end": "2026-10-11T21:37:49.119Z",
+    "browser_context": "Contexte Chromium neuf par page, profil mobile de 390 × 844 pixels, tactile, en français canadien et dans le fuseau America/Toronto.",
     "steps": [
       "Charger chaque page d’accueil dans un contexte navigateur neuf et attendre la fenêtre d’observation prévue.",
-      "Revalider la destination finale après cette attente et exclure les chemins qui ne correspondent plus au protocole d’accueil.",
+      "Revalider la destination finale après cette attente et exclure les chemins, statuts, contenus ou interstitiels qui ne satisfont pas les critères d’analyse.",
       "Détecter les conteneurs et contrôles rendus à partir de leur structure et de leurs libellés accessibles, y compris dans les racines Shadow DOM ouvertes.",
-      "Lorsque le protocole reconnaît une action de refus unique au premier niveau, la rejoindre avec Tab puis l’activer avec Entrée.",
-      "Soumettre les agrégats candidats à une revue indépendante avant toute publication."
-    ],
-    "publication_gate": [
-      "Recollecte complète terminée avec le collecteur corrigé.",
-      "Dénominateurs et agrégats recalculés à partir du nouveau lot seulement.",
-      "Revue des définitions, des limites et de chaque assertion publique.",
-      "Empreintes des téléchargements recalculées après approbation."
+      "Lorsqu’une action de refus unique est reconnue au premier niveau, repartir du début du document, la rejoindre avec Tab puis l’activer avec Entrée.",
+      "Calculer seulement les huit agrégats globaux autorisés, puis les soumettre à un recalcul et à une revue indépendants."
     ]
   },
   "publication_policy": {
-    "status": "draft_pending_recollection",
-    "publishable": false,
-    "results_status": "pending",
-    "aggregates_published": false,
-    "metric_definitions_published": false,
+    "status": "published",
+    "content_reviewed": true,
+    "release_approved": true,
+    "publishable": true,
+    "published": true,
+    "results_status": "reviewed",
+    "aggregates_included": true,
+    "metric_definitions_included": true,
     "observations_published": false,
-    "future_publication_allowlist": [
-      "Méthode révisée",
-      "Définitions approuvées",
-      "Dénominateurs du lot v2",
-      "Agrégats du lot v2 approuvés"
+    "public_content_allowlist": [
+      "Méthode et limites revues",
+      "Définitions des huit métriques approuvées",
+      "Dénominateurs globaux du lot complet",
+      "Agrégats globaux des huit métriques approuvées"
     ],
     "never_publish": [
       "Noms, hôtes et URL des établissements",
       "Graine et registre de sélection",
-      "Observations individuelles",
-      "Identifiant Git d’un collecteur non commité"
+      "Observations individuelles, erreurs et parcours de navigation",
+      "Identifiants pseudonymes, ventilations par secteur ou région et provenance Git détaillée"
     ],
-    "status_note": "Le lot initial a été retiré du brouillon public. Les champs de résultats demeurent vides jusqu’à la recollecte v2 et à sa revue."
+    "status_note": "Le contenu, les agrégats et les limites ont passé une double revue avant leur publication le 11 octobre 2026."
   },
   "limitations": [
-    "La détection automatisée peut manquer un conteneur ou un contrôle rendu autrement.",
-    "Une mesure technique ne qualifie ni la finalité d’un traitement ni sa conformité.",
-    "Les résultats futurs décriront une observation ponctuelle et non un comportement permanent.",
-    "La ressource ne constituera ni un avis juridique ni un verdict de conformité."
+    "Observation ponctuelle de la page d’accueil dans un navigateur neuf; le comportement peut varier selon le moment, la région ou la personnalisation.",
+    "Une bannière tardive, personnalisée ou structurée autrement peut ne pas être détectée.",
+    "Un hôte externe observé n’est pas nécessairement un tiers ni un traceur et aucune finalité n’est attribuée.",
+    "Le décompte de témoins ou de stockage ne détermine ni leur finalité, ni leur nécessité, ni leur conformité.",
+    "Axe ne détecte qu’une partie des problèmes d’accessibilité; zéro règle signalée ne vaut pas conformité.",
+    "La fermeture d’une bannière ne prouve ni la conservation du choix après rechargement ni l’arrêt de tous les traitements.",
+    "Les résultats ne constituent ni un audit individuel, ni un avis juridique, ni un verdict de conformité."
   ],
-  "metric_definitions": [],
-  "aggregates": [],
+  "metric_definitions": [
+    {
+      "id": "banner_detected",
+      "label": "Bannière de consentement détectée",
+      "type": "categorical",
+      "unit": "site",
+      "collection_method": "automated",
+      "denominator_rule": "Pages d’accueil incluses classées analysables après validation de la destination, du statut, du type HTML et de l’absence d’interstitiel.",
+      "interpretation_limit": "Une bannière tardive, personnalisée ou non reconnue peut ne pas être détectée.",
+      "reference_url": "https://www.priv.gc.ca/en/about-the-opc/what-we-do/international-collaboration/international-privacy-networks/international-privacy-sweep/2024_sweep/opc-sweep-report-2024/"
+    },
+    {
+      "id": "reject_first_layer",
+      "label": "Action de refus unique reconnue au premier niveau",
+      "type": "categorical",
+      "unit": "site",
+      "collection_method": "automated",
+      "denominator_rule": "Sites inclus avec une bannière détectée.",
+      "interpretation_limit": "Le libellé accessible doit correspondre au dictionnaire publié par la méthode; zéro action vaut non et plusieurs actions restent indéterminées.",
+      "reference_url": "https://www.priv.gc.ca/en/about-the-opc/what-we-do/international-collaboration/international-privacy-networks/international-privacy-sweep/2024_sweep/opc-sweep-report-2024/"
+    },
+    {
+      "id": "keyboard_reject_steps",
+      "label": "Nombre de tabulations avant activation du refus",
+      "type": "number",
+      "unit": "tabulations",
+      "collection_method": "automated",
+      "denominator_rule": "Sites avec une action de refus unique au premier niveau; measured_n indique combien ont été atteints au clavier.",
+      "interpretation_limit": "Le résultat dépend du point de départ du focus et du contenu rendu lors de l’observation.",
+      "reference_url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html"
+    },
+    {
+      "id": "axe_rule_count_banner",
+      "label": "Règles Axe signalées dans la bannière",
+      "type": "number",
+      "unit": "règles",
+      "collection_method": "automated",
+      "denominator_rule": "Sites avec une bannière détectée.",
+      "interpretation_limit": "Axe ne détecte qu’une partie des problèmes d’accessibilité et ne produit pas un verdict de conformité.",
+      "reference_url": "https://www.deque.com/axe/core-documentation/api-documentation/"
+    },
+    {
+      "id": "external_hosts_before_choice_count",
+      "label": "Hôtes externes observés avant tout choix",
+      "type": "number",
+      "unit": "hôtes",
+      "collection_method": "automated",
+      "denominator_rule": "Pages d’accueil incluses classées analysables après validation de la destination, du statut, du type HTML et de l’absence d’interstitiel.",
+      "interpretation_limit": "Un hôte externe observé n’est pas nécessairement un tiers ni un traceur; aucune classification de finalité n’est inférée.",
+      "reference_url": "https://developer.mozilla.org/en-US/docs/Glossary/Origin"
+    },
+    {
+      "id": "cookies_before_choice_count",
+      "label": "Témoins présents avant tout choix",
+      "type": "number",
+      "unit": "témoins",
+      "collection_method": "automated",
+      "denominator_rule": "Pages d’accueil incluses classées analysables après validation de la destination, du statut, du type HTML et de l’absence d’interstitiel.",
+      "interpretation_limit": "Le décompte ne détermine ni la finalité, ni la nécessité, ni la conformité d’un témoin.",
+      "reference_url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies"
+    },
+    {
+      "id": "document_storage_keys_before_choice_count",
+      "label": "Clés de stockage du document principal avant tout choix",
+      "type": "number",
+      "unit": "clés",
+      "collection_method": "automated",
+      "denominator_rule": "Pages d’accueil incluses classées analysables après validation de la destination, du statut, du type HTML et de l’absence d’interstitiel.",
+      "interpretation_limit": "Le décompte vise uniquement les clés localStorage et sessionStorage accessibles au document principal, sans attribuer de finalité.",
+      "reference_url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"
+    },
+    {
+      "id": "reject_action_closed",
+      "label": "La bannière se ferme après activation du refus",
+      "type": "categorical",
+      "unit": "site",
+      "collection_method": "automated",
+      "denominator_rule": "Sites avec une action de refus unique au premier niveau.",
+      "interpretation_limit": "La fermeture observée ne prouve pas que le choix est conservé après rechargement ni que tous les traitements ont cessé.",
+      "reference_url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html"
+    }
+  ],
+  "aggregates": [
+    {
+      "metric_id": "banner_detected",
+      "denominator_n": 53,
+      "measured_n": 53,
+      "missing_n": 0,
+      "count": 20,
+      "pct": 37.7,
+      "median": null,
+      "p25": null,
+      "p75": null,
+      "min": null,
+      "max": null
+    },
+    {
+      "metric_id": "reject_first_layer",
+      "denominator_n": 20,
+      "measured_n": 20,
+      "missing_n": 0,
+      "count": 17,
+      "pct": 85,
+      "median": null,
+      "p25": null,
+      "p75": null,
+      "min": null,
+      "max": null
+    },
+    {
+      "metric_id": "keyboard_reject_steps",
+      "denominator_n": 17,
+      "measured_n": 17,
+      "missing_n": 0,
+      "count": null,
+      "pct": null,
+      "median": 3,
+      "p25": 3,
+      "p75": 4,
+      "min": 2,
+      "max": 39
+    },
+    {
+      "metric_id": "axe_rule_count_banner",
+      "denominator_n": 20,
+      "measured_n": 20,
+      "missing_n": 0,
+      "count": null,
+      "pct": null,
+      "median": 0,
+      "p25": 0,
+      "p75": 1,
+      "min": 0,
+      "max": 2
+    },
+    {
+      "metric_id": "external_hosts_before_choice_count",
+      "denominator_n": 53,
+      "measured_n": 53,
+      "missing_n": 0,
+      "count": null,
+      "pct": null,
+      "median": 9,
+      "p25": 5,
+      "p75": 15,
+      "min": 0,
+      "max": 78
+    },
+    {
+      "metric_id": "cookies_before_choice_count",
+      "denominator_n": 53,
+      "measured_n": 53,
+      "missing_n": 0,
+      "count": null,
+      "pct": null,
+      "median": 6,
+      "p25": 3,
+      "p75": 10,
+      "min": 0,
+      "max": 85
+    },
+    {
+      "metric_id": "document_storage_keys_before_choice_count",
+      "denominator_n": 53,
+      "measured_n": 53,
+      "missing_n": 0,
+      "count": null,
+      "pct": null,
+      "median": 2,
+      "p25": 0,
+      "p75": 4,
+      "min": 0,
+      "max": 24
+    },
+    {
+      "metric_id": "reject_action_closed",
+      "denominator_n": 17,
+      "measured_n": 15,
+      "missing_n": 2,
+      "count": 14,
+      "pct": 93.3,
+      "median": null,
+      "p25": null,
+      "p75": null,
+      "min": null,
+      "max": null
+    }
+  ],
   "citation": {
-    "status": "draft",
-    "suggested_after_publication": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition pilote 2026. https://27pm.org/ressources/barometre-consentement-2026/"
+    "status": "published",
+    "suggested": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.0. https://27pm.org/ressources/barometre-consentement-2026/"
   }
 }
