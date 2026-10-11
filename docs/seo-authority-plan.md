@@ -13,6 +13,19 @@ Ce document prépare les contenus et suit les démarches autorisées. Aucun prof
 - Les citations Sortlist du site et des données structurées doivent être remplacées par la fiche Google active. Les renseignements canoniques restent 27PM, Sorel-Tracy, services à distance partout au Québec et rencontres chez le client, sur rendez-vous, dans les zones desservies.
 - Les mentions historiques de l’adresse privée ont été retirées de ce document public. Cette correction ne réécrit pas l’historique Git antérieur.
 
+## Mise à jour du 11 octobre 2026 — actifs citables et démarches
+
+- Les pages canoniques `/services/creation-sites-web/`, `/services/agence-web/` et `/services/refonte-site-web/` répondent publiquement en `200`.
+- La ressource `/ressources/checklist-fin-projet-web/` est devenue le référentiel 27PM version 1.0.0 : huit zones de contrôle, quatre états de suivi et quatre niveaux de preuve, avec représentations HTML, CSV et JSON. Alexis Boulet en est l’auteur et 27PM l’éditeur.
+- Le `/ressources/barometre-consentement-2026/`, version 0.1.2, publie une méthode reproductible, huit agrégats revus issus de 60 pages d’accueil échantillonnées et aucune observation individuelle. Le texte, l’infographie, le CSV agrégé et le JSON public sont réutilisables sous licence CC BY 4.0.
+- Google Search Console et Bing Webmaster Tools reconnaissent le domaine. Les sitemaps ont été soumis et IndexNow a accusé réception des URL canoniques. Une soumission acceptée établit seulement la réception technique; elle ne prouve ni l’indexation, ni la visibilité, ni un meilleur classement.
+- L’inspection directe de Google du 11 octobre confirme l’indexation de la page « agence web », de la checklist, du baromètre et des conditions d’utilisation. L’étude Maisons Turner reste « découverte, actuellement non indexée » et la nouvelle page auteur reste inconnue de Google; ces deux états doivent être revérifiés après le prochain retraitement du sitemap.
+- Des propositions distinctes ont été envoyées à Grenier, à la CCIST et à Revue Gestion HEC Montréal. Le brouillon destiné à SorelTracy Magazine reste préparé mais non envoyé. L’état « envoyé » ne prouve ni le placement en boîte principale, ni la lecture, ni l’acceptation éditoriale; aucune relance ne doit être dupliquée ou devancée.
+- L’article complet et l’infographie « Le test du mardi matin » restent dans une archive privée tant que Grenier n’a pas clarifié ses règles d’exclusivité et de republication. Ils ne sont ni publiés sur le site, ni versés dans le dépôt public.
+- L’instantané SiteGuru du 11 octobre affiche une santé technique de 97 / 100, aucun problème SEO ouvert et 36 domaines référents. Ces valeurs décrivent cet instantané; elles ne démontrent pas à elles seules un gain de classement. Les métriques Ahrefs demeurent indisponibles avec le forfait connecté.
+
+La séquence opérationnelle est maintenant de laisser les moteurs retraiter les nouvelles ressources, mesurer séparément les requêtes de marque et hors marque, attendre les réponses éditoriales avant toute relance, puis chercher une première citation québécoise réellement publiée vers l’une des ressources originales.
+
 ## Mise à jour du 14 septembre 2026 — campagne liée aux pages « création » et « agence »
 
 SiteGuru signale toujours l’autorité comme le principal manque de 27pm.org : rang de domaine **0 / 100**. Son analyse d’intersection du 14 septembre compare `lawebshop.ca`, `altitudestrategies.ca` et `webici.ca`, et retourne 14 domaines qui lient au moins deux de ces concurrents. Cette liste est un point de départ, pas une autorisation de publier ni une preuve de qualité.
