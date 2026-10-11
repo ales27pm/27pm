@@ -26,6 +26,31 @@ Ce document prépare les contenus et suit les démarches autorisées. Aucun prof
 
 La séquence opérationnelle est maintenant de laisser les moteurs retraiter les nouvelles ressources, mesurer séparément les requêtes de marque et hors marque, attendre les réponses éditoriales avant toute relance, puis chercher une première citation québécoise réellement publiée vers l’une des ressources originales.
 
+## Couverture multi-moteurs au 11 octobre 2026
+
+Le site public autorise tous les robots dans `robots.txt`, expose un sitemap XML et un fichier `llms.txt`, et renvoie un statut `200` aux requêtes de test portant les chaînes user-agent Googlebot, Bingbot, Applebot, DuckDuckBot, DuckAssistBot, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot, MistralAI-Index et Bytespider. Ce contrôle montre l'absence de blocage différencié pour ces chaînes; il ne vérifie ni l'identité IP d'un robot réel, ni son exploration, ni l'indexation, ni une citation.
+
+| Canal | Voie réelle | État et prochain contrôle |
+| --- | --- | --- |
+| [Google Search et fonctions IA](https://developers.google.com/search/docs/appearance/ai-features) | Search Console, sitemap et inspection d'URL. Les fonctions IA utilisent l'index Google et n'exigent aucun balisage « IA » spécial. | Propriété active. Mesurer séparément le rapport Web et le [rapport Search generative AI](https://support.google.com/webmasters/answer/16984139), par page et au Canada. |
+| [Bing et Copilot](https://www.bing.com/webmasters/help/url-submission-62f2860b) | Bing Webmaster Tools, sitemap, soumission d'URL et IndexNow. | La balise de propriété est publique, le sitemap et IndexNow ont été acceptés. Contrôler Search Performance, Indexed Pages, IndexNow et [AI Performance](https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview) lorsque les données sont traitées. |
+| DuckDuckGo et Yahoo | Yahoo renvoie explicitement vers Bing Webmaster; [DuckDuckGo](https://duckduckgo.com/duckduckgo-help-pages/results/sources) combine plusieurs sources et utilise notamment Bing pour les liens traditionnels. | Aucun portail distinct à maintenir. La priorité reste la qualité dans Bing et l'accès de DuckDuckBot et DuckAssistBot. |
+| Ecosia | Les résultats peuvent venir de Google, Bing ou EUSP selon la région, l'appareil et le consentement. | Aucun portail éditeur distinct. La couverture passe par Google et Bing. |
+| [Brave Search](https://search.brave.com/help/brave-search-crawler) | Index indépendant et robot propre; formulaire de [nouvelle exploration d'URL](https://search.brave.com/submit-url) limité aux cas documentés où Brave doit retraiter une page changée ou retirée. | Aucun canal général de découverte ni console de classement pour éditeur. Utiliser le formulaire seulement pour corriger un résultat Brave périmé observable. |
+| Apple Search, Siri, Spotlight et Safari | [Applebot](https://support.apple.com/en-ca/119829) alimente l'index Web d'Apple. Apple Business exige une adresse publique réellement visitable pour une fiche Plans. | Aucune règle publique de 27pm.org ne bloque Applebot. Ne pas créer de faux point Plans tant que 27PM ne possède pas de lieu d'accueil public. |
+| ChatGPT, Claude, Perplexity et Mistral | Robots de recherche et visites déclenchées par l'utilisateur; aucun portail général de soumission d'URL. | Aucune règle publique ne bloque leurs chaînes user-agent documentées; seul un journal avec IP validée pourrait prouver une visite réelle. Contrôler périodiquement les journaux et mesurer les références plutôt que promettre une présence. |
+| Grok, DeepSeek et Qwen | Recherche Web documentée, mais aucun portail éditeur, robot de recherche ou fournisseur d'index suffisamment documenté pour une soumission propre. | Aucun chantier spécifique. Conserver le site ouvert, citable et bien référencé dans les index établis. |
+
+### Séquence d'autorité retenue
+
+1. **Données Québec.** Proposer le baromètre à la vitrine des applications comme réutilisation documentée de jeux ouverts, avec lien vers l'outil et vers chaque jeu source. L'acceptation et le lien restent éditoriaux; le texte doit être factuel et non promotionnel.
+2. **Décision d'adhésion locale ou sectorielle.** La CCIST affiche 125 $ par an pour un travailleur autonome et 200 $ pour 2 à 10 employés. La page [Devenir membre de NUMERI](https://numeri.quebec/devenir-membre/) affiche 90 $ plus taxes au prorata pour la période observée; le [répertoire public NUMERI](https://numeri.quebec/membres/) publie des liens directs vers les sites des membres. Une dépense doit se justifier par le réseau et les activités, pas uniquement par un lien.
+3. **Dépôt pérenne du baromètre.** Préparer un PDF figé cohérent avec la version 0.1.2 pour le [dépôt légal numérique de BAnQ](https://www.banq.qc.ca/notre-institution/bibliotheque-nationale/depot-legal-des-publications-numeriques/), puis envisager [Zenodo](https://help.zenodo.org/docs/deposit/about-records/) pour une archive ouverte avec DOI. Ne pas créer deux identifiants concurrents pour la même version sans stratégie de versionnement.
+4. **Média local.** Le brouillon SorelTracy Magazine est prêt mais non envoyé. Son angle doit être la publication locale d'une ressource ouverte et reproductible, pas une annonce commerciale.
+5. **Démarches déjà ouvertes.** Attendre les réponses de Grenier, de la CCIST et de Revue Gestion avant toute relance ou republication qui pourrait compromettre une exclusivité.
+
+Les 36 domaines référents affichés par SiteGuru ne constituent pas 36 preuves d'autorité : la liste visible est majoritairement composée de domaines automatisés, génériques ou sans rapport avec les PME québécoises. L'objectif opérationnel est donc d'obtenir quelques citations légitimes et thématiques, pas d'augmenter artificiellement le nombre brut de liens.
+
 ## Mise à jour du 14 septembre 2026 — campagne liée aux pages « création » et « agence »
 
 SiteGuru signale toujours l’autorité comme le principal manque de 27pm.org : rang de domaine **0 / 100**. Son analyse d’intersection du 14 septembre compare `lawebshop.ca`, `altitudestrategies.ca` et `webici.ca`, et retourne 14 domaines qui lient au moins deux de ces concurrents. Cette liste est un point de départ, pas une autorisation de publier ni une preuve de qualité.
