@@ -624,6 +624,10 @@ assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset p
 assert.equal(barometerDataset?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Dataset must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Article must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.image?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer infographic must expose the approved CC BY 4.0 license');
+assert.equal(barometerArticle?.image?.acquireLicensePage, `${origin}${barometerRoute}`, 'barometer infographic must link to its human-readable license page');
+assert.equal(barometerArticle?.image?.copyrightNotice, '© 2026 Alexis Boulet et 27PM', 'barometer infographic must publish its copyright notice');
+assert.equal(barometerArticle?.image?.creditText, 'Alexis Boulet et 27PM', 'barometer infographic must publish its attribution credit');
+assert.equal(barometerArticle?.image?.creator?.['@id'], authorId, 'barometer infographic must identify its creator');
 assert.ok(barometerDataset?.distribution?.every((distribution) => distribution.license === 'https://creativecommons.org/licenses/by/4.0/'), 'barometer downloads must expose the approved CC BY 4.0 license');
 assert.ok(!barometerWebPage?.license, 'barometer license must not apply to the site WebPage shell');
 assert.ok(!barometerOrganization?.license, 'barometer license must not apply to the publisher organization');

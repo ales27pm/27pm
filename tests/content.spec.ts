@@ -230,6 +230,14 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
       license: 'https://creativecommons.org/licenses/by/4.0/',
       image: expect.objectContaining({
         license: 'https://creativecommons.org/licenses/by/4.0/',
+        acquireLicensePage: 'https://27pm.org/ressources/barometre-consentement-2026/',
+        copyrightNotice: '© 2026 Alexis Boulet et 27PM',
+        creditText: 'Alexis Boulet et 27PM',
+        creator: {
+          '@type': 'Person',
+          '@id': 'https://27pm.org/auteurs/alexis-boulet/#person',
+          name: 'Alexis Boulet',
+        },
       }),
     }),
     expect.objectContaining({
