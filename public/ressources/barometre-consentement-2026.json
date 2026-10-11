@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "resource_version": "0.1.0",
+  "resource_version": "0.1.1",
   "date_published": "2026-10-11",
   "date_modified": "2026-10-11",
   "id": "https://27pm.org/ressources/barometre-consentement-2026/#dataset",
@@ -61,7 +61,7 @@
       "Revalider la destination finale après cette attente et exclure les chemins, statuts, contenus ou interstitiels qui ne satisfont pas les critères d’analyse.",
       "Détecter les conteneurs et contrôles rendus à partir de leur structure et de leurs libellés accessibles, y compris dans les racines Shadow DOM ouvertes.",
       "Lorsqu’une action de refus unique est reconnue au premier niveau, repartir du début du document, la rejoindre avec Tab puis l’activer avec Entrée.",
-      "Calculer seulement les huit agrégats globaux autorisés, puis les soumettre à un recalcul et à une revue indépendants."
+      "Retenir pour publication seulement les huit agrégats globaux autorisés, puis les soumettre à un recalcul et à une revue indépendants."
     ]
   },
   "publication_policy": {
@@ -287,6 +287,6 @@
   ],
   "citation": {
     "status": "published",
-    "suggested": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.0. https://27pm.org/ressources/barometre-consentement-2026/"
+    "suggested": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.1. https://27pm.org/ressources/barometre-consentement-2026/"
   }
 }

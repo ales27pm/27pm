@@ -507,6 +507,8 @@ assert.match(barometerText, /(?:Soixante|60) pages ont été échantillonnées, 
 assert.match(barometerText, /ne représente ni toutes les PME ni l’ensemble des sites du Québec/i, 'barometer must prohibit broad extrapolation');
 assert.match(barometerText, /Aucun site n’est nommé ou classé/i, 'barometer must prohibit naming and rankings');
 assert.match(barometerText, /ni un avis juridique, ni un verdict de conformité/i, 'barometer must state its legal limit');
+assert.doesNotMatch(barometerText, /Calculer seulement les huit agrégats globaux autorisés/i, 'barometer must not imply that private calculations were limited to the eight published aggregates');
+assert.match(barometerText, /Retenir pour publication seulement les huit agrégats globaux autorisés/i, 'barometer must describe the eight-aggregate publication boundary accurately');
 const barometerResults = barometer.match(/<section id="resultats"[^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
 assert.match(barometerResults, /data-results-reviewed/, 'barometer results section must identify reviewed results');
 assert.match(barometerResults, /20 des 53 pages analysables, soit 37,7/i, 'barometer must qualify detected banners with the correct denominator');
@@ -525,7 +527,7 @@ const barometerCsvBytes = barometerCsvBuffer.byteLength;
 const barometerJsonSha256 = createHash('sha256').update(barometerJsonBuffer).digest('hex');
 const barometerCsvSha256 = createHash('sha256').update(barometerCsvBuffer).digest('hex');
 assert.equal(barometerJson.schema_version, '1.0', 'barometer JSON schema version');
-assert.equal(barometerJson.resource_version, '0.1.0', 'barometer JSON resource version');
+assert.equal(barometerJson.resource_version, '0.1.1', 'barometer JSON resource version');
 assert.equal(barometerJson.id, `${origin}${barometerRoute}#dataset`, 'barometer JSON dataset identifier');
 assert.equal(barometerJson.canonical_url, `${origin}${barometerRoute}`, 'barometer JSON canonical URL');
 assert.equal(barometerJson.author?.name, 'Alexis Boulet', 'barometer JSON author');
@@ -539,6 +541,10 @@ assert.equal(barometerJson.publication_policy?.observations_published, false, 'i
 assert.equal(barometerJson.status, 'published', 'barometer JSON resource must identify the published state');
 assert.equal(barometerJson.date_published, '2026-10-11', 'barometer JSON publication date');
 assert.equal(barometerJson.date_modified, '2026-10-11', 'barometer JSON modification date');
+assert.ok(
+  barometerJson.method?.steps?.includes('Retenir pour publication seulement les huit agrégats globaux autorisés, puis les soumettre à un recalcul et à une revue indépendants.'),
+  'barometer JSON must describe the eight-aggregate publication boundary accurately',
+);
 assert.equal(barometerJson.publication_policy?.status, 'published', 'barometer publication policy status');
 assert.equal(barometerJson.publication_policy?.content_reviewed, true, 'barometer content must identify the completed review');
 assert.equal(barometerJson.publication_policy?.release_approved, true, 'barometer release must identify explicit approval');
@@ -591,6 +597,7 @@ const barometerArticle = barometerGraph.find((node) => {
   return types.includes('Article');
 });
 const barometerDataset = barometerGraph.find((node) => node['@type'] === 'Dataset');
+const barometerOrganization = barometerGraph.find((node) => node['@type'] === 'Organization');
 assert.equal(barometerWebPage?.mainEntity?.['@id'], `${origin}${barometerRoute}#article`, 'barometer WebPage must identify its article');
 assert.equal(barometerArticle?.author?.['@id'], authorId, 'barometer article must identify Alexis Boulet');
 assert.equal(barometerArticle?.hasPart?.['@id'], barometerJson.id, 'barometer article must link to the dataset');
@@ -599,6 +606,9 @@ assert.equal(barometerDataset?.version, barometerJson.resource_version, 'baromet
 assert.equal(barometerWebPage?.datePublished, '2026-10-11', 'barometer WebPage publication date');
 assert.equal(barometerArticle?.datePublished, '2026-10-11', 'barometer Article publication date');
 assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset publication date');
+assert.equal(barometerDataset?.publisher?.['@id'], `${origin}/#organization`, 'barometer Dataset must identify its publisher');
+assert.equal(barometerOrganization?.['@id'], `${origin}/#organization`, 'barometer graph must define its publisher as an Organization');
+assert.equal(barometerOrganization?.name, '27PM', 'barometer graph must name its publisher');
 assert.ok(!barometerWebPage?.creativeWorkStatus, 'published WebPage schema must not remain Draft');
 assert.ok(!barometerArticle?.creativeWorkStatus, 'published Article schema must not remain Draft');
 assert.ok(!barometerDataset?.creativeWorkStatus, 'published Dataset schema must not remain Draft');

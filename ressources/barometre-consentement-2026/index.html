@@ -34,6 +34,16 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "@id": "https://27pm.org/#organization",
+      "name": "27PM",
+      "url": "https://27pm.org/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://27pm.org/assets/brand-v4/27pm-mark-1024.webp"
+      }
+    },
+    {
       "@type": "WebPage",
       "@id": "https://27pm.org/ressources/barometre-consentement-2026/#webpage",
       "name": "Le droit de refuser fonctionne-t-il au clavier? | 27PM",
@@ -72,7 +82,7 @@
       "inLanguage": "fr-CA",
       "datePublished": "2026-10-11",
       "dateModified": "2026-10-11",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "isAccessibleForFree": true,
       "author": {
         "@type": "Person",
@@ -107,7 +117,7 @@
       "name": "Baromètre 27PM 2026 — agrégats sur le refus au clavier",
       "description": "Huit agrégats globaux revus issus de 60 pages d’accueil échantillonnées; aucune observation individuelle ni identité de site n’est publiée.",
       "url": "https://27pm.org/ressources/barometre-consentement-2026/",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "inLanguage": "fr-CA",
       "datePublished": "2026-10-11",
       "dateModified": "2026-10-11",
@@ -133,8 +143,8 @@
           "name": "Baromètre 27PM 2026 — méthode, définitions et agrégats en JSON",
           "contentUrl": "https://27pm.org/ressources/barometre-consentement-2026.json",
           "encodingFormat": "application/json",
-          "contentSize": "12755 bytes",
-          "sha256": "c70340f99a974d442e792e616244e9ceff678de2b28f21a105303cd8ddf154cf"
+          "contentSize": "12771 bytes",
+          "sha256": "8d473ea6f9f0f4c191c7c2937d444d72a423f9a78f944fa489e8a5d5f8cef95d"
         }
       ]
     },
@@ -177,7 +187,7 @@
           <span aria-hidden="true">/</span>
           <span aria-current="page">Baromètre du consentement 2026</span>
         </nav>
-        <p class="editorial-kicker">Baromètre 27PM · édition 2026 · version 0.1.0</p>
+        <p class="editorial-kicker">Baromètre 27PM · édition 2026 · version 0.1.1</p>
         <h1>Le droit de refuser fonctionne-t-il au clavier?</h1>
         <p class="editorial-lead">Sur 60 pages d’accueil d’établissements répertoriés dans SIT Québec, 53 ont satisfait les critères d’analyse. Notre protocole automatisé a détecté une bannière de consentement sur 20 d’entre elles. Dans 17 de ces 20 bannières, une action de refus unique apparaissait au premier niveau et pouvait être atteinte au clavier, avec une médiane de trois tabulations.</p>
         <p class="editorial-byline">Par <a href="%BASE_URL%auteurs/alexis-boulet/" rel="author">Alexis Boulet</a>, fondateur de 27PM · Publié le 11 octobre 2026 · Observation réalisée le 11 octobre 2026</p>
@@ -308,7 +318,7 @@
             <li>Attendre la fenêtre d’observation, puis revalider la destination finale. Exclure les chemins, statuts, contenus ou interstitiels qui ne satisfont pas les critères d’analyse.</li>
             <li>Détecter les conteneurs et contrôles rendus à partir de leur structure et de leurs libellés accessibles, y compris dans les racines Shadow DOM ouvertes.</li>
             <li>Lorsqu’une action de refus unique est reconnue au premier niveau, repartir du début du document, avancer avec Tab et activer le contrôle avec Entrée.</li>
-            <li>Calculer seulement les huit agrégats globaux autorisés, puis vérifier séparément les définitions, dénominateurs, empreintes et assertions éditoriales.</li>
+            <li>Retenir pour publication seulement les huit agrégats globaux autorisés, puis vérifier séparément les définitions, dénominateurs, empreintes et assertions éditoriales.</li>
           </ol>
           <p>La collecte n’a rempli aucun formulaire, créé aucun compte ni contourné une protection. Une absence détectée ne prouve pas une absence réelle; une réponse technique ponctuelle ne prouve pas un comportement permanent.</p>
           <h3>Repères techniques</h3>
@@ -365,14 +375,14 @@
           <p>Le <a href="%BASE_URL%ressources/barometre-consentement-2026-agregats.csv" download>CSV des huit agrégats</a> expose les dénominateurs, valeurs mesurées, valeurs manquantes, comptes, pourcentages, médianes, quartiles et étendues selon le type de métrique.</p>
           <p class="resource-integrity"><strong>Intégrité du CSV :</strong> 450 octets · SHA-256 : <code>b805cab2f83bb9b88117ea19adbada8e717955d3f8b54b07b6102105e80d3fcb</code>.</p>
           <p>Le <a href="%BASE_URL%ressources/barometre-consentement-2026.json" download>JSON du baromètre</a> ajoute la portée, la méthode, les huit définitions, les limites et la politique de diffusion.</p>
-          <p class="resource-integrity"><strong>Intégrité du JSON :</strong> 12&nbsp;755 octets · SHA-256 : <code>c70340f99a974d442e792e616244e9ceff678de2b28f21a105303cd8ddf154cf</code>.</p>
+          <p class="resource-integrity"><strong>Intégrité du JSON :</strong> 12&nbsp;771 octets · SHA-256 : <code>8d473ea6f9f0f4c191c7c2937d444d72a423f9a78f944fa489e8a5d5f8cef95d</code>.</p>
           <p>Aucun nom, hôte ou URL d’établissement, aucune graine ou registre de sélection, aucune observation individuelle, erreur privée ou donnée de navigation ne sont inclus.</p>
         </section>
 
         <section id="citer-cette-ressource">
           <h2>Citer cette ressource</h2>
-          <p><cite>Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.0. https://27pm.org/ressources/barometre-consentement-2026/</cite></p>
-          <p><strong>Auteur : Alexis Boulet.</strong> <strong>Éditeur : 27PM.</strong> <strong>Version : 0.1.0.</strong></p>
+          <p><cite>Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.1. https://27pm.org/ressources/barometre-consentement-2026/</cite></p>
+          <p><strong>Auteur : Alexis Boulet.</strong> <strong>Éditeur : 27PM.</strong> <strong>Version : 0.1.1.</strong></p>
         </section>
 
         <section id="limites">

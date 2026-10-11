@@ -156,7 +156,7 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   const dataset = await jsonResponse.json();
   expect(dataset).toEqual(expect.objectContaining({
     schema_version: '1.0',
-    resource_version: '0.1.0',
+    resource_version: '0.1.1',
     status: 'published',
     date_published: '2026-10-11',
     date_modified: '2026-10-11',
@@ -210,13 +210,19 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
     (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
   )['@graph'];
   expect(graph).toEqual(expect.arrayContaining([
+    expect.objectContaining({
+      '@type': 'Organization',
+      '@id': 'https://27pm.org/#organization',
+      name: '27PM',
+    }),
     expect.objectContaining({ '@type': 'WebPage' }),
     expect.objectContaining({ '@type': ['Article', 'TechArticle'] }),
     expect.objectContaining({
       '@type': 'Dataset',
       '@id': dataset.id,
       datePublished: '2026-10-11',
-      version: '0.1.0',
+      version: '0.1.1',
+      publisher: { '@id': 'https://27pm.org/#organization' },
     }),
   ]));
   for (const node of graph.filter((item: { '@type': string | string[] }) => (
