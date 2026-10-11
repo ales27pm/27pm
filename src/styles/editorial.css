@@ -51,6 +51,15 @@
   line-height: 1.6;
 }
 
+.editorial-kicker {
+  margin-bottom: 1rem;
+  color: var(--blue-deep);
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
 .editorial-byline {
   margin-top: 1.25rem;
   color: var(--muted);
@@ -70,6 +79,21 @@
   align-items: center;
   gap: 1.5rem 2rem;
   margin-top: 2rem;
+}
+
+.editorial-notice {
+  max-width: 52rem;
+  margin: 2rem auto 0;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line-strong);
+  border-left: 0.45rem solid var(--blue);
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.editorial-notice strong {
+  color: var(--ink);
 }
 
 .editorial-body {
@@ -125,6 +149,109 @@
   overflow-wrap: anywhere;
   color: var(--ink);
   font-size: 0.88em;
+}
+
+.editorial-body cite {
+  overflow-wrap: anywhere;
+}
+
+.barometer-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2rem;
+  border-block: 1px solid var(--line-strong);
+}
+
+.barometer-summary > div {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.barometer-summary > div:nth-child(odd) {
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--line);
+}
+
+.barometer-summary > div:nth-child(even) {
+  padding-left: 1.5rem;
+}
+
+.barometer-summary dt,
+.definition-ledger dt {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.barometer-summary dd {
+  margin-top: 0.35rem;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 650;
+  line-height: 1;
+}
+
+.data-table-scroll {
+  max-width: 100%;
+  margin-top: 2rem;
+  overflow-x: auto;
+  border-block: 1px solid var(--line-strong);
+}
+
+.data-table-scroll:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+}
+
+.data-table caption {
+  padding: 1rem 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.9rem 1rem 0.9rem 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.45;
+  text-align: left;
+  vertical-align: top;
+}
+
+.data-table th {
+  color: var(--ink);
+  font-weight: 680;
+}
+
+.definition-ledger {
+  margin-top: 1rem;
+}
+
+.definition-ledger > div {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.35fr);
+  gap: 1.5rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.definition-ledger dd {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
 }
 
 .editorial-body section[id] {
@@ -193,5 +320,19 @@
 
   .editorial-actions .button {
     width: 100%;
+  }
+
+  .barometer-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .barometer-summary > div:nth-child(n) {
+    padding-inline: 0;
+    border-right: 0;
+  }
+
+  .definition-ledger > div {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
   }
 }

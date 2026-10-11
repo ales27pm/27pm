@@ -10,6 +10,7 @@ const pages = [
   ['/services/automatisation-ia/', 'Automatisation et IA pour PME au Québec'],
   ['/auteurs/alexis-boulet/', 'Alexis Boulet, fondateur de 27PM'],
   ['/ressources/checklist-fin-projet-web/', 'Checklist de fin de projet web : garder le contrôle'],
+  ['/ressources/barometre-consentement-2026/', 'Le droit de refuser fonctionne-t-il au clavier?'],
   ['/etudes/boulet/', 'Boulet : un concept de catalogue de portes et fenêtres'],
   ['/etudes/maisons-turner/', 'Maisons S. Turner : un concept de catalogue de maisons'],
 ] as const;
@@ -123,6 +124,89 @@ test('offers the editable end-of-project checklist CSV', async ({ page, request 
     'href',
     '/ressources/checklist-fin-projet-web/',
   );
+});
+
+test('keeps the barometer non-publishable until the v2 recollection is reviewed', async ({ page, request }) => {
+  await page.goto('/ressources/barometre-consentement-2026/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  const publicationGuard = page.locator('[data-results-status="pending"][data-publication-ready="false"]');
+  await expect(publicationGuard).toContainText('Brouillon non publiable');
+  await expect(page.locator('[data-results-pending]')).toContainText('Aucun résultat');
+  await expect(page.locator('.barometer-summary')).toContainText('Aucun agrégat publié');
+  await expect(page.locator('[data-results-pending]')).not.toContainText(/55|19 sur 55|16 sur 19|13 sur 16/);
+
+  const csvLink = page.getByRole('link', { name: 'Télécharger le modèle CSV sans résultat' });
+  await expect(csvLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026-agregats.csv');
+  const csvResponse = await request.get('/ressources/barometre-consentement-2026-agregats.csv');
+  expect(csvResponse.status()).toBe(200);
+  const csv = await csvResponse.text();
+  expect(csv.split(/\r?\n/).filter(Boolean)).toEqual([
+    'metric_id,denominator_n,measured_n,missing_n,count,pct,median,p25,p75,min,max',
+  ]);
+
+  const jsonLink = page.getByRole('link', { name: 'Télécharger la méthode et l’état du brouillon en JSON' });
+  await expect(jsonLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026.json');
+  const jsonResponse = await request.get('/ressources/barometre-consentement-2026.json');
+  expect(jsonResponse.status()).toBe(200);
+  expect(jsonResponse.headers()['content-type']).toContain('application/json');
+  const dataset = await jsonResponse.json();
+  expect(dataset).toEqual(expect.objectContaining({
+    schema_version: '1.0',
+    resource_version: '0.1.0-draft',
+    id: 'https://27pm.org/ressources/barometre-consentement-2026/#dataset',
+    canonical_url: 'https://27pm.org/ressources/barometre-consentement-2026/',
+  }));
+  expect(dataset.scope).toEqual(expect.objectContaining({
+    status: 'planned',
+    target_homepages_n: 60,
+  }));
+  expect(dataset.publication_policy).toEqual(expect.objectContaining({
+    observations_published: false,
+    status: 'draft_pending_recollection',
+    publishable: false,
+    results_status: 'pending',
+  }));
+  expect(dataset.metric_definitions).toEqual([]);
+  expect(dataset.aggregates).toEqual([]);
+  expect(dataset).not.toHaveProperty('observations');
+  expect(dataset.scope).not.toHaveProperty('selected_homepages_n');
+  expect(dataset.scope).not.toHaveProperty('analyzed_homepages_n');
+  expect(dataset.scope).not.toHaveProperty('not_analyzed_n');
+  expect(JSON.stringify(dataset)).not.toContain('selection_seed');
+  expect(JSON.stringify(dataset)).not.toContain('git_sha');
+  for (const excludedMetric of [
+    'dialog_accessible_name',
+    'privacy_link_in_banner',
+    'third_party_origins_after_reject_count',
+    'cookies_after_reject_count',
+    'storage_items_after_reject_count',
+    'focus_visible',
+    'mobile_overflow_px',
+  ]) {
+    expect(JSON.stringify(dataset)).not.toContain(excludedMetric);
+    expect(csv).not.toContain(excludedMetric);
+  }
+
+  const graph = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  )['@graph'];
+  expect(graph).toEqual(expect.arrayContaining([
+    expect.objectContaining({ '@type': 'WebPage' }),
+    expect.objectContaining({ '@type': ['Article', 'TechArticle'] }),
+    expect.objectContaining({
+      '@type': 'Dataset',
+      '@id': dataset.id,
+      creativeWorkStatus: 'Draft',
+    }),
+  ]));
+
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://27pm.org/assets/barometre-consentement-2026-1200x630.png',
+  );
+  const imageResponse = await request.get('/assets/barometre-consentement-2026-1200x630.png');
+  expect(imageResponse.status()).toBe(200);
+  expect(imageResponse.headers()['content-type']).toContain('image/png');
 });
 
 test('publishes a canonical author profile and linked visible bylines', async ({ page }) => {

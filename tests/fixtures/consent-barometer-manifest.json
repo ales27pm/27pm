@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1.0",
+  "study": {
+    "id": "fixture-controlled",
+    "resource_version": "0.1.0",
+    "title": "Fixture contrôlée",
+    "language": "fr-CA",
+    "scope": "Page locale contrôlée.",
+    "author": "Alexis Boulet",
+    "publisher": "27PM",
+    "citation": "Fixture contrôlée, non publiée.",
+    "sampling_frame": [
+      {
+        "source_url": "http://127.0.0.1:4178/",
+        "retrieved_at": "2026-10-09"
+      }
+    ],
+    "selection_rule": "Une fixture locale déterministe."
+  },
+  "sites": [
+    {
+      "site_id": "fixture-001",
+      "url": "http://127.0.0.1:4178/",
+      "region": "test",
+      "sector": "test",
+      "eligibility": "included"
+    }
+  ]
+}

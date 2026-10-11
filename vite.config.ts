@@ -2,9 +2,11 @@ import { rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import contentRoutes from './src/content-routes.json' with { type: 'json' };
+import draftRoutes from './src/draft-routes.json' with { type: 'json' };
 import siteMetadata from './src/site-metadata.json' with { type: 'json' };
 
 const publicPaths = ['/', '/confidentialite/', ...contentRoutes];
+const buildRoutes = [...contentRoutes, ...draftRoutes];
 const lastModified: Record<string, string> = siteMetadata.lastModified;
 const metadataPaths = Object.keys(lastModified);
 if (metadataPaths.length !== publicPaths.length || publicPaths.some((path) => !metadataPaths.includes(path))) {
@@ -77,7 +79,7 @@ export default defineConfig(({ mode }) => {
           main: resolve(process.cwd(), 'index.html'),
           confidentialite: resolve(process.cwd(), 'confidentialite/index.html'),
           notFound: resolve(process.cwd(), '404.html'),
-          ...Object.fromEntries(contentRoutes.map((route) => [
+          ...Object.fromEntries(buildRoutes.map((route) => [
             route.slice(1, -1).replaceAll('/', '-'),
             resolve(process.cwd(), `${route.slice(1)}index.html`),
           ])),

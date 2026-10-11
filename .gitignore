@@ -1,4 +1,5 @@
 node_modules/
+artifacts/barometre-consentement/
 dist/
 .vite/
 .venv/

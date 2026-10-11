@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1.0",
+  "study": {
+    "id": "barometre-consentement-quebec-2026-pilote",
+    "resource_version": "0.1.0",
+    "title": "Le droit de refuser fonctionne-t-il au clavier?",
+    "language": "fr-CA",
+    "scope": "Observation de la page d’accueil publique dans un navigateur mobile neuf.",
+    "author": "Alexis Boulet",
+    "publisher": "27PM",
+    "citation": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition pilote 2026.",
+    "sampling_frame": [
+      {
+        "source_url": "https://example.org/repertoire-public",
+        "retrieved_at": "2026-10-09",
+        "description": "Remplacer par le cadre d’échantillonnage public retenu avant la collecte."
+      }
+    ],
+    "selection_rule": "Décrire ici la règle déterministe, le tri, le point de départ et toutes les exclusions avant la collecte."
+  },
+  "sites": [
+    {
+      "site_id": "exemple-001",
+      "url": "https://example.com/",
+      "region": "exemple",
+      "sector": "exemple",
+      "eligibility": "included"
+    }
+  ]
+}

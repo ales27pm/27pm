@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fixture de bannière de consentement</title>
+    <style>
+      body { font-family: sans-serif; margin: 2rem; }
+      .cookie-consent { position: fixed; inset: auto 1rem 1rem; max-width: 32rem; padding: 1rem; background: white; border: 2px solid #111; }
+      button { padding: .75rem 1rem; }
+      button:focus-visible { outline: 4px solid #2846b8; outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main><h1>Page contrôlée pour le test du collecteur</h1></main>
+    <section class="cookie-consent" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+      <h2 id="consent-title">Choix des témoins</h2>
+      <p>Cette fixture vérifie uniquement le comportement du collecteur.</p>
+      <a href="/confidentialite">Politique de confidentialité</a>
+      <button type="button">Accepter</button>
+      <button id="reject" type="button">Refuser</button>
+    </section>
+    <script>
+      document.cookie = 'fixture_before_choice=1; SameSite=Lax';
+      document.querySelector('#reject').addEventListener('click', () => {
+        localStorage.setItem('fixture_consent', 'rejected');
+        document.querySelector('.cookie-consent').hidden = true;
+      });
+    </script>
+  </body>
+</html>

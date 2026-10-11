@@ -272,6 +272,26 @@ assert.deepEqual(
       ],
     },
     {
+      source: '/ressources/barometre-consentement-2026-agregats.csv',
+      headers: [
+        { key: 'Link', value: '<https://27pm.org/ressources/barometre-consentement-2026/>; rel="canonical"' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      ],
+    },
+    {
+      source: '/ressources/barometre-consentement-2026.json',
+      headers: [
+        { key: 'Link', value: '<https://27pm.org/ressources/barometre-consentement-2026/>; rel="canonical"' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      ],
+    },
+    {
+      source: '/ressources/barometre-consentement-2026/(.*)',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      ],
+    },
+    {
       source: '/assets/generated/(.*)',
       headers: [
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },

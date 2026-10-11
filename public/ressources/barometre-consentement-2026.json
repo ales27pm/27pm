@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "resource_version": "0.1.0-draft",
+  "id": "https://27pm.org/ressources/barometre-consentement-2026/#dataset",
+  "canonical_url": "https://27pm.org/ressources/barometre-consentement-2026/",
+  "title": "Baromètre 27PM 2026 — protocole sur le refus au clavier",
+  "description": "Brouillon méthodologique en attente d’une recollecte complète. Aucun résultat ni agrégat n’est publié dans cette version.",
+  "language": "fr-CA",
+  "status": "draft",
+  "author": {
+    "name": "Alexis Boulet",
+    "id": "https://27pm.org/auteurs/alexis-boulet/#person"
+  },
+  "publisher": {
+    "name": "27PM",
+    "id": "https://27pm.org/#organization"
+  },
+  "scope": {
+    "status": "planned",
+    "target_homepages_n": 60,
+    "unit": "Hôte Web admissible associé à une page d’accueil d’un établissement répertorié dans SIT Québec.",
+    "frame": "Trois jeux de données publics SIT Québec : restauration, hébergements collectifs, puis culture, art et patrimoine.",
+    "sources": [
+      {
+        "id": "sit-quebec-restauration",
+        "license": "CC BY 4.0",
+        "source_url": "https://www.donneesquebec.ca/recherche/dataset/17dfa825-9515-4fac-be6b-3964d25194c3"
+      },
+      {
+        "id": "sit-quebec-hebergements-collectifs",
+        "license": "CC BY 4.0",
+        "source_url": "https://www.donneesquebec.ca/recherche/dataset/e9e2429f-7f23-41f2-bd0e-e41a6e349aa5"
+      },
+      {
+        "id": "sit-quebec-culture-art-patrimoine",
+        "license": "CC BY 4.0",
+        "source_url": "https://www.donneesquebec.ca/recherche/dataset/8184607d-4969-4d29-ab12-7a1e0109bc46"
+      }
+    ],
+    "interpretation_limits": [
+      "Le cadre est un échantillon méthodologique; il ne représente ni toutes les PME ni l’ensemble des sites du Québec.",
+      "L’unité prévue est un hôte Web admissible, pas une entreprise statistique.",
+      "Aucun site ne sera nommé ou classé dans la ressource publique."
+    ]
+  },
+  "method": {
+    "status": "under_revision",
+    "recollection_required": true,
+    "browser_context": "Contexte Chromium neuf, profil mobile de 390 × 844 pixels, tactile, en français canadien et dans le fuseau America/Toronto.",
+    "steps": [
+      "Charger chaque page d’accueil dans un contexte navigateur neuf et attendre la fenêtre d’observation prévue.",
+      "Revalider la destination finale après cette attente et exclure les chemins qui ne correspondent plus au protocole d’accueil.",
+      "Détecter les conteneurs et contrôles rendus à partir de leur structure et de leurs libellés accessibles, y compris dans les racines Shadow DOM ouvertes.",
+      "Lorsque le protocole reconnaît une action de refus unique au premier niveau, la rejoindre avec Tab puis l’activer avec Entrée.",
+      "Soumettre les agrégats candidats à une revue indépendante avant toute publication."
+    ],
+    "publication_gate": [
+      "Recollecte complète terminée avec le collecteur corrigé.",
+      "Dénominateurs et agrégats recalculés à partir du nouveau lot seulement.",
+      "Revue des définitions, des limites et de chaque assertion publique.",
+      "Empreintes des téléchargements recalculées après approbation."
+    ]
+  },
+  "publication_policy": {
+    "status": "draft_pending_recollection",
+    "publishable": false,
+    "results_status": "pending",
+    "aggregates_published": false,
+    "metric_definitions_published": false,
+    "observations_published": false,
+    "future_publication_allowlist": [
+      "Méthode révisée",
+      "Définitions approuvées",
+      "Dénominateurs du lot v2",
+      "Agrégats du lot v2 approuvés"
+    ],
+    "never_publish": [
+      "Noms, hôtes et URL des établissements",
+      "Graine et registre de sélection",
+      "Observations individuelles",
+      "Identifiant Git d’un collecteur non commité"
+    ],
+    "status_note": "Le lot initial a été retiré du brouillon public. Les champs de résultats demeurent vides jusqu’à la recollecte v2 et à sa revue."
+  },
+  "limitations": [
+    "La détection automatisée peut manquer un conteneur ou un contrôle rendu autrement.",
+    "Une mesure technique ne qualifie ni la finalité d’un traitement ni sa conformité.",
+    "Les résultats futurs décriront une observation ponctuelle et non un comportement permanent.",
+    "La ressource ne constituera ni un avis juridique ni un verdict de conformité."
+  ],
+  "metric_definitions": [],
+  "aggregates": [],
+  "citation": {
+    "status": "draft",
+    "suggested_after_publication": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition pilote 2026. https://27pm.org/ressources/barometre-consentement-2026/"
+  }
+}
