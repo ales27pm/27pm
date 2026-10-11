@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "resource_version": "0.1.1",
+  "resource_version": "0.1.2",
   "date_published": "2026-10-11",
   "date_modified": "2026-10-11",
   "id": "https://27pm.org/ressources/barometre-consentement-2026/#dataset",
@@ -16,6 +16,26 @@
   "publisher": {
     "name": "27PM",
     "id": "https://27pm.org/#organization"
+  },
+  "license": {
+    "identifier": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "applies_to": [
+      "article_text",
+      "results_infographic",
+      "aggregate_csv",
+      "public_json"
+    ],
+    "attribution": "Alexis Boulet et 27PM",
+    "attribution_url": "https://27pm.org/ressources/barometre-consentement-2026/",
+    "excludes": [
+      "rest_of_site",
+      "source_code",
+      "trademarks_and_logos",
+      "private_observations",
+      "source_dataset_rights"
+    ]
   },
   "scope": {
     "status": "observed",
@@ -287,6 +307,6 @@
   ],
   "citation": {
     "status": "published",
-    "suggested": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.1. https://27pm.org/ressources/barometre-consentement-2026/"
+    "suggested": "Boulet, Alexis. « Le droit de refuser fonctionne-t-il au clavier? ». Baromètre 27PM, édition 2026, version 0.1.2. https://27pm.org/ressources/barometre-consentement-2026/"
   }
 }

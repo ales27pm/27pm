@@ -509,6 +509,11 @@ assert.match(barometerText, /Aucun site n’est nommé ou classé/i, 'barometer 
 assert.match(barometerText, /ni un avis juridique, ni un verdict de conformité/i, 'barometer must state its legal limit');
 assert.doesNotMatch(barometerText, /Calculer seulement les huit agrégats globaux autorisés/i, 'barometer must not imply that private calculations were limited to the eight published aggregates');
 assert.match(barometerText, /Retenir pour publication seulement les huit agrégats globaux autorisés/i, 'barometer must describe the eight-aggregate publication boundary accurately');
+assert.match(barometer, /<a\s+href="https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"\s+rel="license noopener noreferrer">Creative Commons Attribution 4\.0 International \(CC BY 4\.0\)<\/a>/i, 'barometer must visibly link its CC BY 4.0 license');
+assert.match(barometerText, /Le texte et l’infographie de cette édition du Baromètre 27PM 2026, son CSV agrégé et son JSON public sont mis à disposition/i, 'barometer must scope CC BY 4.0 to the public article, infographic, and downloads');
+assert.match(barometerText, /attribuez la ressource à Alexis Boulet et 27PM, fournissez un lien vers la licence et, lorsque cela est raisonnablement possible, vers cette page, puis indiquez si vous avez apporté des modifications/i, 'barometer must state the approved CC BY attribution conditions without adding restrictions');
+assert.match(barometerText, /ne s’applique pas au reste du site ni au code de 27PM/i, 'barometer must exclude the site and code from the resource license');
+assert.match(barometerText, /n’accorde aucun droit sur les marques ou logos de 27PM, ne couvre aucune observation privée/i, 'barometer must exclude trademarks, logos, and private observations');
 const barometerResults = barometer.match(/<section id="resultats"[^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
 assert.match(barometerResults, /data-results-reviewed/, 'barometer results section must identify reviewed results');
 assert.match(barometerResults, /20 des 53 pages analysables, soit 37,7/i, 'barometer must qualify detected banners with the correct denominator');
@@ -527,11 +532,20 @@ const barometerCsvBytes = barometerCsvBuffer.byteLength;
 const barometerJsonSha256 = createHash('sha256').update(barometerJsonBuffer).digest('hex');
 const barometerCsvSha256 = createHash('sha256').update(barometerCsvBuffer).digest('hex');
 assert.equal(barometerJson.schema_version, '1.0', 'barometer JSON schema version');
-assert.equal(barometerJson.resource_version, '0.1.1', 'barometer JSON resource version');
+assert.equal(barometerJson.resource_version, '0.1.2', 'barometer JSON resource version');
 assert.equal(barometerJson.id, `${origin}${barometerRoute}#dataset`, 'barometer JSON dataset identifier');
 assert.equal(barometerJson.canonical_url, `${origin}${barometerRoute}`, 'barometer JSON canonical URL');
 assert.equal(barometerJson.author?.name, 'Alexis Boulet', 'barometer JSON author');
 assert.equal(barometerJson.publisher?.name, '27PM', 'barometer JSON publisher');
+assert.deepEqual(barometerJson.license, {
+  identifier: 'CC-BY-4.0',
+  name: 'Creative Commons Attribution 4.0 International',
+  url: 'https://creativecommons.org/licenses/by/4.0/',
+  applies_to: ['article_text', 'results_infographic', 'aggregate_csv', 'public_json'],
+  attribution: 'Alexis Boulet et 27PM',
+  attribution_url: `${origin}${barometerRoute}`,
+  excludes: ['rest_of_site', 'source_code', 'trademarks_and_logos', 'private_observations', 'source_dataset_rights'],
+}, 'barometer JSON must publish the approved license and its exact scope');
 assert.equal(barometerJson.scope?.status, 'observed', 'barometer JSON scope status');
 assert.equal(barometerJson.scope?.sampled_homepages_n, 60, 'barometer sampled count');
 assert.equal(barometerJson.scope?.http_responded_n, 59, 'barometer HTTP response count');
@@ -598,6 +612,7 @@ const barometerArticle = barometerGraph.find((node) => {
 });
 const barometerDataset = barometerGraph.find((node) => node['@type'] === 'Dataset');
 const barometerOrganization = barometerGraph.find((node) => node['@type'] === 'Organization');
+const barometerWebSite = barometerGraph.find((node) => node['@type'] === 'WebSite');
 assert.equal(barometerWebPage?.mainEntity?.['@id'], `${origin}${barometerRoute}#article`, 'barometer WebPage must identify its article');
 assert.equal(barometerArticle?.author?.['@id'], authorId, 'barometer article must identify Alexis Boulet');
 assert.equal(barometerArticle?.hasPart?.['@id'], barometerJson.id, 'barometer article must link to the dataset');
@@ -606,6 +621,13 @@ assert.equal(barometerDataset?.version, barometerJson.resource_version, 'baromet
 assert.equal(barometerWebPage?.datePublished, '2026-10-11', 'barometer WebPage publication date');
 assert.equal(barometerArticle?.datePublished, '2026-10-11', 'barometer Article publication date');
 assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset publication date');
+assert.equal(barometerDataset?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Dataset must expose the approved CC BY 4.0 license');
+assert.equal(barometerArticle?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Article must expose the approved CC BY 4.0 license');
+assert.equal(barometerArticle?.image?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer infographic must expose the approved CC BY 4.0 license');
+assert.ok(barometerDataset?.distribution?.every((distribution) => distribution.license === 'https://creativecommons.org/licenses/by/4.0/'), 'barometer downloads must expose the approved CC BY 4.0 license');
+assert.ok(!barometerWebPage?.license, 'barometer license must not apply to the site WebPage shell');
+assert.ok(!barometerOrganization?.license, 'barometer license must not apply to the publisher organization');
+assert.ok(!barometerWebSite?.license, 'barometer license must not apply to the whole WebSite');
 assert.equal(barometerDataset?.publisher?.['@id'], `${origin}/#organization`, 'barometer Dataset must identify its publisher');
 assert.equal(barometerOrganization?.['@id'], `${origin}/#organization`, 'barometer graph must define its publisher as an Organization');
 assert.equal(barometerOrganization?.name, '27PM', 'barometer graph must name its publisher');

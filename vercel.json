@@ -99,7 +99,7 @@
       "headers": [
         {
           "key": "Link",
-          "value": "<https://27pm.org/ressources/barometre-consentement-2026/>; rel=\"canonical\""
+          "value": "<https://27pm.org/ressources/barometre-consentement-2026/>; rel=\"canonical\", <https://creativecommons.org/licenses/by/4.0/>; rel=\"license\""
         },
         {
           "key": "X-Robots-Tag",
@@ -112,7 +112,7 @@
       "headers": [
         {
           "key": "Link",
-          "value": "<https://27pm.org/ressources/barometre-consentement-2026/>; rel=\"canonical\""
+          "value": "<https://27pm.org/ressources/barometre-consentement-2026/>; rel=\"canonical\", <https://creativecommons.org/licenses/by/4.0/>; rel=\"license\""
         },
         {
           "key": "X-Robots-Tag",

@@ -156,7 +156,7 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   const dataset = await jsonResponse.json();
   expect(dataset).toEqual(expect.objectContaining({
     schema_version: '1.0',
-    resource_version: '0.1.1',
+    resource_version: '0.1.2',
     status: 'published',
     date_published: '2026-10-11',
     date_modified: '2026-10-11',
@@ -170,6 +170,15 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
     analyzable_homepages_n: 53,
     not_analyzable_n: 7,
   }));
+  expect(dataset.license).toEqual({
+    identifier: 'CC-BY-4.0',
+    name: 'Creative Commons Attribution 4.0 International',
+    url: 'https://creativecommons.org/licenses/by/4.0/',
+    applies_to: ['article_text', 'results_infographic', 'aggregate_csv', 'public_json'],
+    attribution: 'Alexis Boulet et 27PM',
+    attribution_url: 'https://27pm.org/ressources/barometre-consentement-2026/',
+    excludes: ['rest_of_site', 'source_code', 'trademarks_and_logos', 'private_observations', 'source_dataset_rights'],
+  });
   expect(dataset.publication_policy).toEqual(expect.objectContaining({
     observations_published: false,
     status: 'published',
@@ -216,15 +225,37 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
       name: '27PM',
     }),
     expect.objectContaining({ '@type': 'WebPage' }),
-    expect.objectContaining({ '@type': ['Article', 'TechArticle'] }),
+    expect.objectContaining({
+      '@type': ['Article', 'TechArticle'],
+      license: 'https://creativecommons.org/licenses/by/4.0/',
+      image: expect.objectContaining({
+        license: 'https://creativecommons.org/licenses/by/4.0/',
+      }),
+    }),
     expect.objectContaining({
       '@type': 'Dataset',
       '@id': dataset.id,
       datePublished: '2026-10-11',
-      version: '0.1.1',
+      version: '0.1.2',
+      license: 'https://creativecommons.org/licenses/by/4.0/',
       publisher: { '@id': 'https://27pm.org/#organization' },
+      distribution: expect.arrayContaining([
+        expect.objectContaining({
+          encodingFormat: 'text/csv',
+          license: 'https://creativecommons.org/licenses/by/4.0/',
+        }),
+        expect.objectContaining({
+          encodingFormat: 'application/json',
+          license: 'https://creativecommons.org/licenses/by/4.0/',
+        }),
+      ]),
     }),
   ]));
+  expect(graph.find((item: { '@type': string }) => item['@type'] === 'WebPage')).not.toHaveProperty('license');
+  expect(graph.find((item: { '@type': string }) => item['@type'] === 'Organization')).not.toHaveProperty('license');
+  expect(graph.some((item: { '@type': string; license?: string }) => (
+    item['@type'] === 'WebSite' && Boolean(item.license)
+  ))).toBe(false);
   for (const node of graph.filter((item: { '@type': string | string[] }) => (
     item['@type'] === 'WebPage'
     || item['@type'] === 'Dataset'
@@ -236,6 +267,13 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     'content',
     'https://27pm.org/assets/barometre-consentement-2026-resultats-1200x630.png',
+  );
+  await expect(page.locator('a[rel~="license"]')).toHaveAttribute(
+    'href',
+    'https://creativecommons.org/licenses/by/4.0/',
+  );
+  await expect(page.locator('a[rel~="license"]')).toHaveText(
+    'Creative Commons Attribution 4.0 International (CC BY 4.0)',
   );
   const imageResponse = await request.get('/assets/barometre-consentement-2026-resultats-1200x630.png');
   expect(imageResponse.status()).toBe(200);
