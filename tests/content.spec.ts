@@ -148,6 +148,13 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   expect(csvRows[0]).toBe('metric_id,denominator_n,measured_n,missing_n,count,pct,median,p25,p75,min,max');
   expect(csvRows.at(-1)).toBe('reject_action_closed,17,15,2,14,93.3,,,,,');
 
+  const pdfLink = page.getByRole('link', { name: 'Télécharger la publication permanente en PDF' });
+  await expect(pdfLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026.pdf');
+  const pdfResponse = await request.get('/ressources/barometre-consentement-2026.pdf');
+  expect(pdfResponse.status()).toBe(200);
+  expect(pdfResponse.headers()['content-type']).toContain('application/pdf');
+  expect((await pdfResponse.body()).subarray(0, 5).toString('ascii')).toBe('%PDF-');
+
   const jsonLink = page.getByRole('link', { name: 'Télécharger la méthode et les agrégats en JSON' });
   await expect(jsonLink).toHaveAttribute('href', '/ressources/barometre-consentement-2026.json');
   const jsonResponse = await request.get('/ressources/barometre-consentement-2026.json');
@@ -174,7 +181,7 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
     identifier: 'CC-BY-4.0',
     name: 'Creative Commons Attribution 4.0 International',
     url: 'https://creativecommons.org/licenses/by/4.0/',
-    applies_to: ['article_text', 'results_infographic', 'aggregate_csv', 'public_json'],
+    applies_to: ['article_text', 'results_infographic', 'archival_pdf', 'aggregate_csv', 'public_json'],
     attribution: 'Alexis Boulet et 27PM',
     attribution_url: 'https://27pm.org/ressources/barometre-consentement-2026/',
     excludes: ['rest_of_site', 'source_code', 'trademarks_and_logos', 'private_observations', 'source_dataset_rights'],
@@ -248,6 +255,11 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
       license: 'https://creativecommons.org/licenses/by/4.0/',
       publisher: { '@id': 'https://27pm.org/#organization' },
       distribution: expect.arrayContaining([
+        expect.objectContaining({
+          encodingFormat: 'application/pdf',
+          contentUrl: 'https://27pm.org/ressources/barometre-consentement-2026.pdf',
+          license: 'https://creativecommons.org/licenses/by/4.0/',
+        }),
         expect.objectContaining({
           encodingFormat: 'text/csv',
           license: 'https://creativecommons.org/licenses/by/4.0/',

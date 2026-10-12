@@ -24,6 +24,7 @@
     "applies_to": [
       "article_text",
       "results_infographic",
+      "archival_pdf",
       "aggregate_csv",
       "public_json"
     ],

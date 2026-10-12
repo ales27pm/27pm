@@ -17,6 +17,7 @@ const checklistRoute = '/ressources/checklist-fin-projet-web/';
 const checklistJsonDownload = 'ressources/checklist-fin-projet-web.json';
 const checklistImage = 'assets/checklist-fin-projet-web-1200x630.png';
 const barometerRoute = '/ressources/barometre-consentement-2026/';
+const barometerPdfDownload = 'ressources/barometre-consentement-2026.pdf';
 const barometerJsonDownload = 'ressources/barometre-consentement-2026.json';
 const barometerCsvDownload = 'ressources/barometre-consentement-2026-agregats.csv';
 const barometerImage = 'assets/barometre-consentement-2026-resultats-1200x630.png';
@@ -510,7 +511,7 @@ assert.match(barometerText, /ni un avis juridique, ni un verdict de conformité/
 assert.doesNotMatch(barometerText, /Calculer seulement les huit agrégats globaux autorisés/i, 'barometer must not imply that private calculations were limited to the eight published aggregates');
 assert.match(barometerText, /Retenir pour publication seulement les huit agrégats globaux autorisés/i, 'barometer must describe the eight-aggregate publication boundary accurately');
 assert.match(barometer, /<a\s+href="https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"\s+rel="license noopener noreferrer">Creative Commons Attribution 4\.0 International \(CC BY 4\.0\)<\/a>/i, 'barometer must visibly link its CC BY 4.0 license');
-assert.match(barometerText, /Le texte et l’infographie de cette édition du Baromètre 27PM 2026, son CSV agrégé et son JSON public sont mis à disposition/i, 'barometer must scope CC BY 4.0 to the public article, infographic, and downloads');
+assert.match(barometerText, /Le texte, l’infographie et le PDF de cette édition du Baromètre 27PM 2026, son CSV agrégé et son JSON public sont mis à disposition/i, 'barometer must scope CC BY 4.0 to the public article, infographic, PDF, and data downloads');
 assert.match(barometerText, /attribuez la ressource à Alexis Boulet et 27PM, fournissez un lien vers la licence et, lorsque cela est raisonnablement possible, vers cette page, puis indiquez si vous avez apporté des modifications/i, 'barometer must state the approved CC BY attribution conditions without adding restrictions');
 assert.match(barometerText, /ne s’applique pas au reste du site ni au code de 27PM/i, 'barometer must exclude the site and code from the resource license');
 assert.match(barometerText, /n’accorde aucun droit sur les marques ou logos de 27PM, ne couvre aucune observation privée/i, 'barometer must exclude trademarks, logos, and private observations');
@@ -525,12 +526,16 @@ assert.doesNotMatch(barometerText, /(?:sites québécois|sites du Québec) (?:on
 
 const barometerJsonBuffer = await readFile(resolve(root, 'dist', barometerJsonDownload));
 const barometerCsvBuffer = await readFile(resolve(root, 'dist', barometerCsvDownload));
+const barometerPdfBuffer = await readFile(resolve(root, 'dist', barometerPdfDownload));
 const barometerJson = JSON.parse(barometerJsonBuffer.toString('utf8'));
 const barometerCsv = barometerCsvBuffer.toString('utf8');
 const barometerJsonBytes = barometerJsonBuffer.byteLength;
 const barometerCsvBytes = barometerCsvBuffer.byteLength;
+const barometerPdfBytes = barometerPdfBuffer.byteLength;
 const barometerJsonSha256 = createHash('sha256').update(barometerJsonBuffer).digest('hex');
 const barometerCsvSha256 = createHash('sha256').update(barometerCsvBuffer).digest('hex');
+const barometerPdfSha256 = createHash('sha256').update(barometerPdfBuffer).digest('hex');
+assert.equal(barometerPdfBuffer.subarray(0, 5).toString('ascii'), '%PDF-', 'barometer permanent publication must be a PDF');
 assert.equal(barometerJson.schema_version, '1.0', 'barometer JSON schema version');
 assert.equal(barometerJson.resource_version, '0.1.2', 'barometer JSON resource version');
 assert.equal(barometerJson.id, `${origin}${barometerRoute}#dataset`, 'barometer JSON dataset identifier');
@@ -541,7 +546,7 @@ assert.deepEqual(barometerJson.license, {
   identifier: 'CC-BY-4.0',
   name: 'Creative Commons Attribution 4.0 International',
   url: 'https://creativecommons.org/licenses/by/4.0/',
-  applies_to: ['article_text', 'results_infographic', 'aggregate_csv', 'public_json'],
+  applies_to: ['article_text', 'results_infographic', 'archival_pdf', 'aggregate_csv', 'public_json'],
   attribution: 'Alexis Boulet et 27PM',
   attribution_url: `${origin}${barometerRoute}`,
   excludes: ['rest_of_site', 'source_code', 'trademarks_and_logos', 'private_observations', 'source_dataset_rights'],
@@ -639,20 +644,28 @@ assert.ok(!barometerWebPage?.creativeWorkStatus, 'published WebPage schema must 
 assert.ok(!barometerArticle?.creativeWorkStatus, 'published Article schema must not remain Draft');
 assert.ok(!barometerDataset?.creativeWorkStatus, 'published Dataset schema must not remain Draft');
 const barometerDistributions = barometerDataset?.distribution ?? [];
+const barometerPdfDistribution = barometerDistributions.find((item) => item.encodingFormat === 'application/pdf');
 const barometerCsvDistribution = barometerDistributions.find((item) => item.encodingFormat === 'text/csv');
 const barometerJsonDistribution = barometerDistributions.find((item) => item.encodingFormat === 'application/json');
+assert.equal(barometerPdfDistribution?.contentUrl, `${origin}/${barometerPdfDownload}`, 'barometer schema PDF URL');
+assert.equal(barometerPdfDistribution?.contentSize, `${barometerPdfBytes} bytes`, 'barometer schema PDF size');
+assert.equal(barometerPdfDistribution?.sha256, barometerPdfSha256, 'barometer schema PDF integrity');
 assert.equal(barometerCsvDistribution?.contentUrl, `${origin}/${barometerCsvDownload}`, 'barometer schema CSV URL');
 assert.equal(barometerCsvDistribution?.contentSize, `${barometerCsvBytes} bytes`, 'barometer schema CSV size');
 assert.equal(barometerCsvDistribution?.sha256, barometerCsvSha256, 'barometer schema CSV integrity');
 assert.equal(barometerJsonDistribution?.contentUrl, `${origin}/${barometerJsonDownload}`, 'barometer schema JSON URL');
 assert.equal(barometerJsonDistribution?.contentSize, `${barometerJsonBytes} bytes`, 'barometer schema JSON size');
 assert.equal(barometerJsonDistribution?.sha256, barometerJsonSha256, 'barometer schema JSON integrity');
+assert.match(barometerText.replaceAll('&nbsp;', ''), new RegExp(`${barometerPdfBytes} octets`, 'i'), 'barometer must visibly publish the PDF byte size');
+assert.match(barometerText, new RegExp(String.raw`SHA-256\s*:\s*${barometerPdfSha256}`, 'i'), 'barometer must visibly publish the PDF SHA-256');
 assert.match(barometerText, new RegExp(`${barometerCsvBytes} octets`, 'i'), 'barometer must visibly publish the CSV byte size');
 assert.match(barometerText, new RegExp(String.raw`SHA-256\s*:\s*${barometerCsvSha256}`, 'i'), 'barometer must visibly publish the CSV SHA-256');
 assert.match(barometerText.replaceAll('&nbsp;', ''), new RegExp(`${barometerJsonBytes} octets`, 'i'), 'barometer must visibly publish the JSON byte size');
 assert.match(barometerText, new RegExp(String.raw`SHA-256\s*:\s*${barometerJsonSha256}`, 'i'), 'barometer must visibly publish the JSON SHA-256');
+assert.match(barometer, new RegExp(`href="${base}${barometerPdfDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the permanent PDF');
 assert.match(barometer, new RegExp(`href="${base}${barometerCsvDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the aggregate CSV');
 assert.match(barometer, new RegExp(`href="${base}${barometerJsonDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the cleaned JSON');
+assert.match(barometer, /rel="alternate"\s+type="application\/pdf"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.pdf"/, 'barometer must advertise its permanent PDF');
 assert.match(barometer, /rel="alternate"\s+type="application\/json"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.json"/, 'barometer must advertise its JSON representation');
 assert.match(barometer, new RegExp(`property="og:image"\\s+content="${origin}/${barometerImage}"`), 'barometer must publish its dedicated social image');
 const barometerImageBuffer = await readFile(resolve(root, 'dist', barometerImage));
