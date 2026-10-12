@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { access, mkdir, mkdtemp, readFile, rm, stat, symlink, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, realpath, rm, stat, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -48,7 +48,7 @@ describe('consent barometer contract', () => {
     expect(() => resolvePrivateArtifactsPath('public/ressources/barometre')).toThrow(/artifacts\/barometre-consentement/);
   });
   it('rejects symlink escapes and accepts only a fresh direct private child', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'barometer-private-root-'));
+    const directory = await mkdtemp(join(await realpath(tmpdir()), 'barometer-private-root-'));
     const root = join(directory, 'artifacts', 'barometre-consentement');
     const outside = join(directory, 'outside');
     await mkdir(root, { recursive: true, mode: 0o700 });
