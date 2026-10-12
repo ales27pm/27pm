@@ -20,6 +20,19 @@ const validDraft: PublicIntakeDraft = {
 };
 
 describe('public CRM intake contract', () => {
+  it('rejects oversize values visibly instead of truncating them in the payload', () => {
+    const draft = { ...validDraft, message: 'x'.repeat(5004) };
+    expect(validatePublicIntakeDraft(draft).message).toMatch(/5.?000/);
+    expect(() => createPublicIntakePayload(draft)).toThrow();
+    expect(validatePublicIntakeDraft({ ...validDraft, contactName: 'x'.repeat(121) }).contactName).toBeTruthy();
+    expect(validatePublicIntakeDraft({ ...validDraft, contactEmail: 'x'.repeat(315) + '@e.test' }).contactEmail).toBeTruthy();
+  });
+
+  it('preserves complete Unicode at the boundary and rejects malformed text', () => {
+    const message = 'x'.repeat(4998) + '😀';
+    expect(createPublicIntakePayload({ ...validDraft, message }).message).toBe(message);
+    expect(validatePublicIntakeDraft({ ...validDraft, message: '\uD83D' }).message).toBeTruthy();
+  });
   it('normalizes the exact public payload without adding client-only fields', () => {
     expect(createPublicIntakePayload(validDraft)).toEqual({
       organizationName: 'Atelier Exemple',

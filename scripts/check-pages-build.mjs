@@ -63,7 +63,7 @@ assert.match(home, /<title>27PM \| Sites web, applications et IA pour PME au Qu�
 assert.match(home, /Une idée\. Plusieurs métiers\./, 'home must publish the v5 capabilities section');
 assert.match(home, /data-scenario-form/, 'home must publish the local scenario builder');
 assert.match(home, /data-contact-form/, 'home must publish the contextual contact brief');
-assert.match(home, /Les choix saisis.+ne sont pas transmis à 27PM/, 'scenario builder must disclose its local-only behavior');
+assert.match(home, /Vos choix restent locaux[\s\S]*ne seront transmis que si vous envoyez ensuite votre demande/, 'scenario builder must disclose local choices and explicit submission');
 assert.match(home, /data-crm-intake/, 'home must publish the progressively enhanced CRM controls');
 assert.match(home, /data-crm-unavailable/, 'home must preserve the no-configuration fallback');
 assert.match(home, /name="website"/, 'home must publish the empty honeypot field');

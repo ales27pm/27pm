@@ -13,6 +13,16 @@
 
 > Ce rapport documente une évaluation opérationnelle adaptée à un site vitrine. Il ne constitue pas un avis juridique. Tant que l’entité juridique et le contact DPA ne sont pas complétés dans l’administration Google, il ne faut pas activer Google Analytics en production.
 
+## Addendum de traçabilité — 12 octobre 2026
+
+Les décisions et constats datés des 29 et 30 août ci-dessous sont conservés comme état historique. Le [README](../README.md) consigne une demande d’activation du propriétaire datée du 11 septembre; la commande de production de [Vercel](../vercel.json) fixe désormais `VITE_ANALYTICS_APPROVED=true`. La garde locale demeure fermée sans cette valeur, mais la configuration de production du dépôt ne doit plus être décrite comme bloquée par défaut.
+
+Cette constatation technique ne clôture pas la condition DPA de la section 12. La complétion actuelle de l’entité juridique et du contact, les réglages administratifs GA4 et les preuves réseau/Realtime de la section 10 ne sont pas confirmés par cet addendum. Aucune administration Google n’a été consultée pour le rédiger; il ne faut ni déduire leur réalisation de l’activation technique, ni présenter les lacunes historiques comme un état administratif actuel vérifié.
+
+Le [code analytique](../src/analytics.ts) autorise aujourd’hui les routes publiées de [content-routes.json](../src/content-routes.json), en plus de l’accueil, de la confidentialité et de la 404. La liste de trois routes citée à la section 8 est donc historique. La suppression des paramètres et fragments et la réduction du référent à son origine restent présentes dans le code.
+
+Le rapprochement reste à documenter : rattacher la décision du 11 septembre aux preuves DPA, aux réglages datés et au contrôle réseau du profil publié. Les cases et mentions « à faire » conservées ci-dessous ne valent pas preuve d’un échec actuel; aucune condition n’est déclarée satisfaite par le présent addendum et l’approbation signée d’août n’est pas réécrite.
+
 ## 1. Résumé de la décision
 
 27PM souhaite mesurer les pages consultées, les sessions et la provenance générale des visites afin d’améliorer son site. Google Analytics 4 peut atteindre cet objectif, mais traite des identifiants et des données techniques susceptibles de constituer des renseignements personnels à l’extérieur du Québec.

@@ -155,7 +155,9 @@ for (const [route, html] of documents) {
       `${route}: visible byline must link to the canonical author profile and publish the reviewed date`,
     );
   }
-  assert.ok(html.includes(`href="${base}#contact"`), `${route}: reachable contact CTA`);
+  const contactLinks = [...html.matchAll(/href="([^"]*#contact)"/g)].map((match) => match[1]);
+  const contextSources = new Set(['creation', 'agence', 'refonte', 'fabricants', 'applications', 'automatisation', 'checklist', 'barometre']);
+  assert.ok(contactLinks.some((href) => href === `${base}#contact` || [...contextSources].some((source) => href === `${base}?demande=${source}#contact`)), `${route}: reachable contact CTA with only an allowlisted source`);
   assert.match(html, /data-analytics-preferences/, `${route}: persistent consent controls`);
   assert.doesNotMatch(html, /%BASE_URL%/, `${route}: base placeholders must be resolved`);
   const inbound = [...documents].filter(([source, body]) => source !== route && body.includes(`href="${base}${route.slice(1)}"`));
@@ -422,7 +424,8 @@ assert.equal(checklistJson.resource_version, '1.0.0', 'checklist JSON must publi
 assert.equal(checklistJson.id, `${origin}${checklistRoute}#referentiel`, 'checklist JSON must use the stable dataset identifier');
 assert.equal(checklistJson.canonical_url, `${origin}${checklistRoute}`, 'checklist JSON must identify the canonical HTML page');
 assert.equal(checklistJson.date_published, '2026-10-08', 'checklist JSON must publish the visible release date');
-assert.equal(checklistJson.date_modified, siteMetadata.lastModified[checklistRoute], 'checklist JSON date must match the sitemap date');
+// The contact CTA changed on the HTML page; the versioned reference files did not.
+assert.equal(checklistJson.date_modified, '2026-10-09', 'checklist 1.0.0 JSON revision must remain unchanged');
 assert.equal(checklistJson.author?.name, 'Alexis Boulet', 'checklist JSON must identify its author');
 assert.equal(checklistJson.publisher?.name, '27PM', 'checklist JSON must identify its publisher');
 assert.equal(checklistJson.method?.default_state, 'a_verifier', 'checklist JSON must define the initial state');
@@ -488,6 +491,7 @@ assert.equal(checklistWebPage?.mainEntity?.['@id'], `${origin}${checklistRoute}#
 assert.equal(checklistArticle?.author?.['@id'], authorId, 'checklist article must identify its canonical author entity');
 assert.equal(checklistArticle?.datePublished, '2026-10-08', 'checklist article must publish its release date');
 assert.equal(checklistArticle?.dateModified, '2026-10-09', 'checklist article must publish its revision date');
+assert.equal(checklistArticle?.dateModified, checklistJson.date_modified, 'reference Article and JSON must retain the same revision');
 assert.equal(checklistArticle?.version, '1.0.0', 'checklist article must publish the visible resource version');
 assert.equal(checklistArticle?.image?.contentUrl, `${origin}/assets/checklist-fin-projet-web-1200x630.png`, 'checklist article must publish its dedicated image');
 assert.equal(checklistArticle?.image?.width, 1200, 'checklist article image width');
@@ -536,7 +540,7 @@ assert.equal(
 );
 assert.match(metaDescription(barometer), /observation automatisée/i, 'barometer description must identify the observation method');
 assert.match(barometer, /<meta\s+name="robots"\s+content="index, follow"/i, 'published barometer must be indexable');
-assert.match(barometerText, /Publication révisée — données agrégées seulement/i, 'barometer must visibly disclose its reviewed aggregate-only scope');
+assert.match(barometerText, /Publication — données agrégées seulement/i, 'barometer must visibly disclose its aggregate-only scope');
 assert.match(barometer, /data-results-status="published"\s+data-publication-ready="true"\s+data-release-status="published"/, 'barometer must expose the published release state');
 assert.match(barometerText, /(?:Soixante|60) pages ont été échantillonnées, 59 ont répondu en HTTP et 53 ont satisfait les critères d’analyse/i, 'barometer must disclose the sampling cascade');
 assert.match(barometerText, /ne représente ni toutes les PME ni l’ensemble des sites du Québec/i, 'barometer must prohibit broad extrapolation');
@@ -549,6 +553,21 @@ assert.match(barometerText, /Le texte, l’infographie et le PDF de cette éditi
 assert.match(barometerText, /attribuez la ressource à Alexis Boulet et 27PM, fournissez un lien vers la licence et, lorsque cela est raisonnablement possible, vers cette page, puis indiquez si vous avez apporté des modifications/i, 'barometer must state the approved CC BY attribution conditions without adding restrictions');
 assert.match(barometerText, /ne s’applique pas au reste du site ni au code de 27PM/i, 'barometer must exclude the site and code from the resource license');
 assert.match(barometerText, /n’accorde aucun droit sur les marques ou logos de 27PM, ne couvre aucune observation privée/i, 'barometer must exclude trademarks, logos, and private observations');
+const barometerMethodSupplement = barometer.match(/<section id="precision-methodologique"[^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
+assert.ok(barometerMethodSupplement, 'barometer must publish a separate dated methodology clarification');
+assert.match(barometerMethodSupplement, /<time datetime="2026-10-12">/, 'methodology clarification must have its own date');
+assert.doesNotMatch(barometerText, /Avant toute interaction/i, 'pre-choice measurements must not be presented as interaction-free');
+assert.match(barometerMethodSupplement, /fenêtre d’observation varie/i, 'methodology must disclose variable pre-choice observation windows');
+assert.match(barometerMethodSupplement, /parcours clavier[\s\S]*avant l’activation/i, 'methodology must disclose that pre-choice capture includes keyboard traversal');
+assert.match(barometerMethodSupplement, /2\s*500\s*ms[\s\S]*DOMContentLoaded/, 'methodology must disclose the current initial delay and its starting event');
+assert.match(barometerMethodSupplement, /50 tabulations[\s\S]*1\s*500\s*ms/, 'methodology must disclose the current traversal cap and post-action delay');
+assert.match(barometerMethodSupplement, /id="dictionnaire-refus"/, 'methodology must publish the rejection label dictionary');
+assert.match(barometerMethodSupplement, /refuser[\s\S]*rejeter[\s\S]*reject[\s\S]*decline[\s\S]*deny[\s\S]*nécessaires[\s\S]*essentiels[\s\S]*necessary[\s\S]*essential/, 'dictionary must disclose the French and English recognized label families');
+assert.match(barometerMethodSupplement, /https:\/\/github\.com\/ales27pm\/27pm\/blob\/b75584baa2464fc4c92a14fb936b73845a43f25c\/scripts\/collect-consent-barometer\.mjs/, 'current collector reference must be pinned to the inspected source revision');
+assert.match(barometerMethodSupplement, /ne certifie pas[\s\S]*lot du 11 octobre/, 'current source inspection must not be presented as historical run provenance');
+assert.match(barometerMethodSupplement, /aucune attestation[\s\S]*indépendance/i, 'historical review independence must remain explicitly unattested');
+assert.match(barometerMethodSupplement, /évaluation scientifique par les pairs/, 'methodology must distinguish the review claim from peer review');
+assert.match(barometerMethodSupplement, /PDF, le CSV et le JSON[\s\S]*inchangés/, 'methodology clarification must preserve the archival release');
 const barometerResults = barometer.match(/<section id="resultats"[^>]*>[\s\S]*?<\/section>/i)?.[0] ?? '';
 assert.match(barometerResults, /data-results-reviewed/, 'barometer results section must identify reviewed results');
 assert.match(barometerResults, /20 des 53 pages analysables, soit 37,7/i, 'barometer must qualify detected banners with the correct denominator');
@@ -596,11 +615,11 @@ assert.equal(barometerJson.date_published, '2026-10-11', 'barometer JSON publica
 assert.equal(barometerJson.date_modified, '2026-10-11', 'barometer JSON modification date');
 assert.ok(
   barometerJson.method?.steps?.includes('Retenir pour publication seulement les huit agrégats globaux autorisés, puis les soumettre à un recalcul et à une revue indépendants.'),
-  'barometer JSON must describe the eight-aggregate publication boundary accurately',
+  'archived JSON review statement must remain unchanged; it is not an independent attestation',
 );
 assert.equal(barometerJson.publication_policy?.status, 'published', 'barometer publication policy status');
-assert.equal(barometerJson.publication_policy?.content_reviewed, true, 'barometer content must identify the completed review');
-assert.equal(barometerJson.publication_policy?.release_approved, true, 'barometer release must identify explicit approval');
+assert.equal(barometerJson.publication_policy?.content_reviewed, true, 'archived content review declaration must remain unchanged');
+assert.equal(barometerJson.publication_policy?.release_approved, true, 'archived release approval declaration must remain unchanged');
 assert.equal(barometerJson.publication_policy?.publishable, true, 'barometer data must be publishable');
 assert.equal(barometerJson.publication_policy?.published, true, 'barometer data must identify the published state');
 assert.equal(barometerJson.publication_policy?.results_status, 'reviewed', 'barometer results review status');
@@ -660,6 +679,10 @@ assert.equal(barometerDataset?.version, barometerJson.resource_version, 'baromet
 assert.equal(barometerWebPage?.datePublished, '2026-10-11', 'barometer WebPage publication date');
 assert.equal(barometerArticle?.datePublished, '2026-10-11', 'barometer Article publication date');
 assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset publication date');
+assert.equal(barometerWebPage?.dateModified, '2026-10-12', 'barometer WebPage must date the methodology clarification');
+assert.equal(barometerArticle?.dateModified, '2026-10-12', 'barometer Article must date the methodology clarification');
+assert.equal(barometerDataset?.dateModified, '2026-10-11', 'archived Dataset date must remain unchanged');
+assert.doesNotMatch(barometerDataset?.measurementTechnique ?? '', /revue indépendante/i, 'Dataset schema must not assert unattested review independence');
 assert.equal(barometerDataset?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Dataset must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Article must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.identifier, barometerDoi, 'barometer Article must expose its version DOI');

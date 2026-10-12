@@ -457,7 +457,7 @@
             </form>
 
             <p class="scenario-note">
-              Cette démonstration s’exécute dans votre navigateur. Les choix saisis servent uniquement au résultat affiché et ne sont pas transmis à 27PM. Le résultat ne constitue pas une estimation de projet.
+              Cette démonstration s’exécute dans votre navigateur. Vos choix restent locaux. Vous pouvez les reprendre dans un brouillon modifiable; ils ne seront transmis que si vous envoyez ensuite votre demande. Le résultat ne constitue pas une estimation de projet.
             </p>
           </div>
 
@@ -473,6 +473,7 @@
                 <li>Recommandations contextualisées</li>
                 <li>Suivi structuré</li>
               </ul>
+              <a class="button" href="#contact" data-scenario-contact>Discuter de ce scénario</a>
             </div>
             <svg class="scenario-map" viewBox="0 0 620 320" role="img" aria-labelledby="scenario-map-title scenario-map-desc">
               <title id="scenario-map-title">Esquisse d’interface pour la piste composée</title>
@@ -508,25 +509,25 @@
             <li>
               <span>01</span>
               <h3>Brief</h3>
-              <p>On aligne objectifs, audiences, contraintes et critères de succès.</p>
+              <p>On précise ce que votre projet doit améliorer, pour qui et comment vérifier le résultat.</p>
             </li>
             <li>
               <span>02</span>
               <h3>Architecture</h3>
-              <p>On structure l’information, les flux et les données pour évoluer vite.</p>
+              <p>On organise vos contenus, vos outils et vos données pour clarifier le parcours de vos clients et le travail de votre équipe.</p>
             </li>
             <li>
               <span>03</span>
               <h3>Prototype</h3>
-              <p>On conçoit les interfaces et les interactions, testées tôt avec de vrais utilisateurs.</p>
+              <p>Vous examinez les parcours essentiels avant le développement complet. Les points à valider sont identifiés tôt.</p>
             </li>
             <li>
               <span>04</span>
-              <h3>QA &amp; mise en ligne</h3>
-              <p>On assure qualité, performance et déploiement sans surprises.</p>
+              <h3>Vérification &amp; remise</h3>
+              <p>On vérifie les parcours convenus et on documente les accès, les responsabilités et les prochaines étapes pour garder le contrôle après la mise en ligne.</p>
             </li>
           </ol>
-          <p class="method-resource">Avant la réception, vérifiez les comptes, les accès, le domaine et les sauvegardes avec notre <a href="%BASE_URL%ressources/checklist-fin-projet-web/">checklist de fin de projet web</a>.</p>
+          <p class="method-resource">Ce que vous devez pouvoir reprendre en main : les comptes, le domaine, les sources et les sauvegardes. Notre <a href="%BASE_URL%ressources/checklist-fin-projet-web/">checklist de fin de projet web</a> aide à préparer cette remise. Le <a href="%BASE_URL%ressources/barometre-consentement-2026/">baromètre du consentement</a> explique aussi comment observer l’accès au refus au clavier, avec les limites de la méthode.</p>
         </div>
       </section>
 
@@ -555,9 +556,17 @@
 
         <div class="closing-contact" id="contact" data-reveal>
           <h2>On commence<br />par une conversation.</h2>
-          <p>Décrivez ce que vous voulez clarifier, construire ou automatiser.</p>
+          <p>Que voulez-vous améliorer pour vos clients ou votre équipe? Décrivez ce qui vous bloque et, si vous la connaissez, votre échéance.</p>
+          <p id="contact-priorities-help">Vous avez consulté notre checklist ou notre baromètre? Mentionnez jusqu’à trois points à examiner ensemble. « Je ne sais pas encore » est une réponse utile. Ne transmettez ni mot de passe, ni code d’accès, ni données confidentielles.</p>
 
           <form class="contact-brief" data-contact-form novalidate>
+            <section hidden data-brief-proposal aria-labelledby="brief-proposal-title">
+              <h3 id="brief-proposal-title">Conserver votre texte et ajouter ce contexte?</h3>
+              <p>Votre brouillon n’a pas été remplacé. Relisez la proposition avant de l’ajouter.</p>
+              <pre data-brief-proposal-text></pre>
+              <button class="button" type="button" data-brief-append>Ajouter à mon brouillon</button>
+              <button type="button" data-brief-dismiss>Ignorer cette proposition</button>
+            </section>
             <fieldset class="project-options">
               <legend>De quoi voulez-vous parler?</legend>
               <label data-project-option="site"><input type="radio" name="project" value="site" data-label="Un site web" checked /><span>Un site web</span></label>
@@ -567,22 +576,26 @@
             </fieldset>
 
             <label class="contact-field contact-field--message">
-              <span>Votre projet</span>
-              <textarea name="message" rows="4" maxlength="5000" placeholder="Ce que vous voulez bâtir, améliorer ou débloquer…" required data-contact-context></textarea>
+              <span id="contact-message-label">Votre projet</span>
+              <textarea name="message" rows="4" placeholder="Votre objectif, vos priorités et les points à éclaircir…" aria-labelledby="contact-message-label" aria-describedby="contact-priorities-help contact-length-help" required data-contact-context></textarea>
+              <small id="contact-length-help" data-brief-length>5 000 caractères maximum. Rien ne sera coupé automatiquement.</small>
+              <small>Ce brouillon reste dans cette page jusqu’à l’envoi. Un rechargement peut le perdre; copiez-le pour le conserver.</small>
             </label>
+            <button type="button" data-copy-brief>Copier mon brouillon</button>
+            <p role="status" aria-live="polite" data-copy-brief-status></p>
             <div class="contact-field-row">
               <label class="contact-field">
                 <span>Votre organisation</span>
-                <input type="text" name="organizationName" autocomplete="organization" maxlength="200" required data-contact-organization />
+                <input type="text" name="organizationName" autocomplete="organization" required data-contact-organization />
               </label>
               <label class="contact-field">
                 <span>Votre nom</span>
-                <input type="text" name="contactName" autocomplete="name" maxlength="120" required data-contact-name />
+                <input type="text" name="contactName" autocomplete="name" required data-contact-name />
               </label>
             </div>
             <label class="contact-field">
               <span>Votre courriel</span>
-              <input type="email" name="contactEmail" autocomplete="email" inputmode="email" maxlength="320" required data-contact-reply />
+              <input type="email" name="contactEmail" autocomplete="email" inputmode="email" required data-contact-reply />
             </label>
 
             <div class="contact-honeypot" aria-hidden="true">
@@ -599,7 +612,7 @@
               </div>
               <div class="turnstile-widget" data-turnstile-widget role="group" aria-label="Vérification antirobot"></div>
               <p class="crm-intake-note">
-                Un statut « reçu » signifie uniquement que la demande est placée dans une file d’examen; aucun message ni suivi n’est envoyé automatiquement.
+                Votre demande sera examinée par le studio. Le formulaire ne réserve pas de rendez-vous et ne déclenche aucun suivi automatique.
               </p>
               <button class="button crm-submit" type="button" disabled data-crm-submit>
                 <span data-crm-submit-label>Envoyer pour examen</span>
@@ -608,11 +621,12 @@
             </div>
 
             <p class="crm-unavailable" data-crm-unavailable>
-              L’envoi direct est indisponible tant que la vérification sécurisée n’est pas configurée. Utilisez le courriel préparé ci-dessous.
+              L’envoi direct nécessite le chargement d’une vérification sécurisée. Vous pouvez aussi préparer un courriel ci-dessous.
             </p>
+            <button class="button" type="button" hidden data-crm-retry>Réessayer la vérification</button>
 
             <p class="project-mail-note" id="project-mail-note">
-              Le courriel préparé reste disponible si l’envoi direct ou le service CRM ne fonctionne pas.
+              Le courriel préparé ouvre votre messagerie : vous pourrez le relire et l’envoyer vous-même.
             </p>
             <a
               class="button project-mail"

@@ -1037,6 +1037,21 @@
   font-weight: 450;
 }
 
+[data-brief-proposal] {
+  padding: 1rem;
+  border: 1px solid currentColor;
+}
+
+[data-brief-proposal-text] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+[data-scenario-contact] {
+  margin-top: 1rem;
+}
+
 .contact-field textarea,
 .contact-field input {
   width: 100%;
@@ -1192,7 +1207,9 @@
   text-underline-offset: 0.25em;
 }
 
-.contact-fallback button {
+.contact-fallback button,
+[data-copy-brief],
+[data-brief-dismiss] {
   min-height: 2.4rem;
   padding: 0.35rem 0.7rem;
   border: 1px solid var(--line-strong);
@@ -1205,7 +1222,11 @@
 }
 
 .contact-fallback button:hover,
-.contact-fallback button:focus-visible {
+.contact-fallback button:focus-visible,
+[data-copy-brief]:hover,
+[data-copy-brief]:focus-visible,
+[data-brief-dismiss]:hover,
+[data-brief-dismiss]:focus-visible {
   border-color: var(--blue);
   background: var(--blue);
   color: var(--ivory);

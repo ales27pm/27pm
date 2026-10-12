@@ -6,17 +6,21 @@ import {
   buildProjectMailto,
   copyEmailAddress,
   isProjectKind,
+  isContactEmail,
+  validateBriefLimits,
   type ProjectBrief,
   type ProjectKind,
 } from './contact';
 import {
   createIdempotencyKey,
   createPublicIntakePayload,
+  intakeDraftIdentity,
   submitPublicIntake,
   TURNSTILE_ACTION,
   validatePublicIntakeDraft,
   type PublicIntakeDraft,
 } from './crm-intake';
+import { appendBrief, scenarioBrief, sourceBrief, type BriefSuggestion } from './discovery-brief';
 
 document.documentElement.classList.add('js');
 if (import.meta.env.VITE_ANALYTICS_APPROVED === 'true') {
@@ -313,6 +317,8 @@ const crmIntake = document.querySelector<HTMLElement>('[data-crm-intake]');
 const crmUnavailable = document.querySelector<HTMLElement>('[data-crm-unavailable]');
 const crmSubmit = document.querySelector<HTMLButtonElement>('[data-crm-submit]');
 const crmSubmitLabel = document.querySelector<HTMLElement>('[data-crm-submit-label]');
+const crmRetry = document.querySelector<HTMLButtonElement>('[data-crm-retry]');
+const briefLength = document.querySelector<HTMLElement>('[data-brief-length]');
 const turnstileContainer = document.querySelector<HTMLElement>('[data-turnstile-widget]');
 let selectedProject: ProjectKind = 'site';
 
@@ -325,8 +331,18 @@ function currentBrief(): ProjectBrief {
   };
 }
 
-function syncMailLink(): void {
-  if (mailLink) mailLink.href = buildProjectMailto(selectedProject, currentBrief());
+function syncMailLink(): boolean {
+  const brief = currentBrief();
+  const error = Object.values(validateBriefLimits(brief))[0];
+  if (briefLength) {
+    briefLength.textContent = error ?? `${(brief.context ?? '').trim().length.toLocaleString('fr-CA')} / 5 000 caractères. Rien ne sera coupé automatiquement.`;
+  }
+  if (error) {
+    mailLink?.removeAttribute('href');
+    return false;
+  }
+  if (mailLink) mailLink.href = buildProjectMailto(selectedProject, brief);
+  return true;
 }
 
 function selectProject(project: ProjectKind, announce = false): void {
@@ -341,7 +357,7 @@ function selectProject(project: ProjectKind, announce = false): void {
   syncMailLink();
 
   if (announce && projectStatus) {
-    projectStatus.textContent = `Choix sélectionné : ${option.dataset.label ?? option.value}.`;
+    setContactStatus(`Choix sélectionné : ${option.dataset.label ?? option.value}.`);
   }
 }
 
@@ -359,24 +375,30 @@ projectOptions.forEach((option) => {
 });
 
 mailLink?.addEventListener('click', (event) => {
+  if (!syncMailLink()) {
+    event.preventDefault();
+    setContactStatus(Object.values(validateBriefLimits(currentBrief()))[0] ?? 'Vérifiez la longueur du brouillon.', 'error');
+    contactContext?.focus();
+    return;
+  }
   if (!contactContext?.value.trim()) {
     event.preventDefault();
     contactContext?.setAttribute('aria-invalid', 'true');
-    if (projectStatus) projectStatus.textContent = 'Décrivez brièvement votre projet avant de préparer le courriel.';
+    setContactStatus('Décrivez brièvement votre projet avant de préparer le courriel.', 'error');
     contactContext?.focus();
     return;
   }
 
-  if (contactReply?.value && !contactReply.checkValidity()) {
+  if (contactReply?.value && !isContactEmail(contactReply.value)) {
     event.preventDefault();
     contactReply.setAttribute('aria-invalid', 'true');
-    if (projectStatus) projectStatus.textContent = 'Vérifiez le format du courriel indiqué.';
+    setContactStatus('Vérifiez le format du courriel indiqué.', 'error');
     contactReply.focus();
     return;
   }
 
   syncMailLink();
-  if (projectStatus) projectStatus.textContent = 'Le courriel est prêt à ouvrir.';
+  setContactStatus('Le courriel est prêt à ouvrir. Son envoi reste à effectuer dans votre messagerie.');
 });
 
 selectProject('site');
@@ -411,13 +433,15 @@ const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? '';
 let turnstileApi: TurnstileApi | undefined;
 let turnstileWidgetId: string | undefined;
 let turnstileToken = '';
-let submissionKey: string | undefined;
+const submissionAttempts = new Map<string, { key: string; accepted: boolean }>();
+const receivedMessage = 'Réception confirmée pour cette demande. Elle attend son examen par le studio; aucun rendez-vous ni suivi automatique n’est confirmé.';
 let submissionAccepted = false;
 let submissionInFlight = false;
 let preserveTurnstileStatus = false;
 
 function setContactStatus(message: string, state: 'idle' | 'loading' | 'success' | 'error' = 'idle'): void {
   if (!projectStatus) return;
+  if (submissionAccepted && state !== 'success') return;
   projectStatus.textContent = message;
   projectStatus.dataset.state = state;
 }
@@ -450,11 +474,12 @@ function clearIntakeInvalidState(): void {
 }
 
 function publicIntakeDraft(): PublicIntakeDraft {
+  const checkedProject = projectOptions.find((option) => option.checked)?.value ?? selectedProject;
   return {
     organizationName: contactOrganization?.value ?? '',
     contactName: contactName?.value ?? '',
     contactEmail: contactReply?.value ?? '',
-    projectType: selectedProject,
+    projectType: isProjectKind(checkedProject) ? checkedProject : selectedProject,
     message: contactContext?.value ?? '',
     privacyAcknowledged: contactPrivacy?.checked ?? false,
     turnstileToken,
@@ -467,6 +492,7 @@ function resetTurnstileToken(
   resetWidget = true,
   preserveMessageAfterRenewal = true,
 ): void {
+  if (submissionAccepted || submissionInFlight) return;
   turnstileToken = '';
   preserveTurnstileStatus = preserveMessageAfterRenewal;
   updateCrmSubmitAvailability();
@@ -483,16 +509,25 @@ function loadTurnstile(): Promise<TurnstileApi> {
     script.async = true;
     script.defer = true;
     script.dataset.turnstileScript = 'true';
-    script.addEventListener('load', () => {
-      if (window.turnstile) resolve(window.turnstile);
-      else reject(new Error('Turnstile API unavailable'));
-    });
-    script.addEventListener('error', () => reject(new Error('Turnstile script unavailable')));
+    const finish = (api?: TurnstileApi): void => {
+      window.clearTimeout(timeout);
+      script.onload = null;
+      script.onerror = null;
+      if (api) resolve(api);
+      else {
+        script.remove();
+        reject(new Error('Turnstile script unavailable'));
+      }
+    };
+    const timeout = window.setTimeout(() => finish(), 12_000);
+    script.onload = () => finish(window.turnstile);
+    script.onerror = () => finish();
     document.head.append(script);
   });
 }
 
 async function enableCrmIntake(): Promise<void> {
+  if (document.documentElement.dataset.crmIntake === 'loading') return;
   if (
     !crmIntakeApproved
     || !turnstileSiteKey
@@ -502,10 +537,14 @@ async function enableCrmIntake(): Promise<void> {
     || !turnstileContainer
   ) {
     document.documentElement.dataset.crmIntake = 'disabled';
+    if (crmUnavailable) crmUnavailable.textContent = 'L’envoi direct n’est pas disponible ici. Vous pouvez préparer un courriel.';
     return;
   }
 
   try {
+    document.documentElement.dataset.crmIntake = 'loading';
+    if (crmRetry) crmRetry.hidden = true;
+    crmUnavailable.textContent = 'Chargement de la vérification sécurisée… Le courriel préparé reste disponible.';
     turnstileApi = await loadTurnstile();
     crmIntake.hidden = false;
     crmUnavailable.hidden = true;
@@ -521,7 +560,7 @@ async function enableCrmIntake(): Promise<void> {
       callback: (token) => {
         turnstileToken = token;
         updateCrmSubmitAvailability();
-        if (!submissionAccepted && !preserveTurnstileStatus) {
+        if (!submissionAccepted && !submissionInFlight && !preserveTurnstileStatus) {
           setContactStatus('Vérification antirobot complétée. Le formulaire peut être envoyé.');
         }
       },
@@ -541,16 +580,22 @@ async function enableCrmIntake(): Promise<void> {
     crmIntake.hidden = true;
     crmUnavailable.hidden = false;
     document.documentElement.dataset.crmIntake = 'disabled';
+    crmUnavailable.textContent = 'La vérification est momentanément indisponible. Réessayez son chargement ou préparez un courriel.';
+    if (crmRetry) crmRetry.hidden = false;
     setContactStatus('La vérification sécurisée ne peut pas être chargée. Utilisez le courriel préparé.', 'error');
   }
 }
 
+crmRetry?.addEventListener('click', () => { void enableCrmIntake(); });
+
 contactForm?.addEventListener('input', (event) => {
   if (event.target instanceof HTMLElement) event.target.removeAttribute('aria-invalid');
   if (submissionInFlight) return;
-  submissionKey = undefined;
+  const wasAccepted = submissionAccepted;
+  submissionAccepted = submissionAttempts.get(intakeDraftIdentity(publicIntakeDraft()))?.accepted ?? false;
   if (submissionAccepted) {
-    submissionAccepted = false;
+    setContactStatus(receivedMessage, 'success');
+  } else if (wasAccepted) {
     resetTurnstileToken(
       'Le formulaire a changé. Complétez de nouveau la vérification antirobot.',
       true,
@@ -594,7 +639,9 @@ contactForm?.addEventListener('submit', async (event) => {
     return;
   }
 
-  submissionKey ??= createIdempotencyKey();
+  const identity = intakeDraftIdentity(draft);
+  const attempt = submissionAttempts.get(identity) ?? { key: createIdempotencyKey(), accepted: false };
+  submissionAttempts.set(identity, attempt);
   submissionInFlight = true;
   setIntakeControlsDisabled(true);
   if (contactForm) contactForm.setAttribute('aria-busy', 'true');
@@ -604,7 +651,7 @@ contactForm?.addEventListener('submit', async (event) => {
 
   let result: Awaited<ReturnType<typeof submitPublicIntake>>;
   try {
-    result = await submitPublicIntake(createPublicIntakePayload(draft), submissionKey);
+    result = await submitPublicIntake(createPublicIntakePayload(draft), attempt.key);
   } finally {
     submissionInFlight = false;
     setIntakeControlsDisabled(false);
@@ -614,20 +661,18 @@ contactForm?.addEventListener('submit', async (event) => {
   }
 
   if (result.accepted) {
+    attempt.accepted = true;
     submissionAccepted = true;
     turnstileToken = '';
     updateCrmSubmitAvailability();
-    setContactStatus(
-      'Demande reçue et placée dans la file d’examen. Aucun message ni suivi n’est envoyé automatiquement.',
-      'success',
-    );
+    setContactStatus(receivedMessage, 'success');
     return;
   }
 
   resetTurnstileToken(
     result.status === 429
       ? 'Trop de tentatives ont été reçues. Réessayez plus tard ou utilisez le courriel préparé.'
-      : 'L’envoi direct n’a pas abouti. Réessayez ou utilisez le courriel préparé.',
+      : 'Réception non confirmée. Votre demande a peut-être été reçue. Réessayez ce même brouillon; si vous passez au courriel, signalez cette première tentative.',
   );
 });
 
@@ -667,6 +712,72 @@ function scheduleCrmIntake(): void {
 }
 
 scheduleCrmIntake();
+
+const briefProposal = document.querySelector<HTMLElement>('[data-brief-proposal]');
+const briefProposalText = document.querySelector<HTMLElement>('[data-brief-proposal-text]');
+let pendingBrief: BriefSuggestion | undefined;
+
+function applyBrief(suggestion: BriefSuggestion): void {
+  if (!contactContext || submissionInFlight) return;
+  contactContext.value = appendBrief(contactContext.value, suggestion.text);
+  // Existing writing keeps its project category; only an empty draft takes the suggestion's category.
+  contactContext.dispatchEvent(new Event('input', { bubbles: true }));
+  contactContext.focus({ preventScroll: true });
+  if (briefProposal) briefProposal.hidden = true;
+  pendingBrief = undefined;
+  setContactStatus('Brouillon préparé. Relisez-le et modifiez-le avant de décider de l’envoyer.');
+}
+
+function offerBrief(suggestion: BriefSuggestion): void {
+  if (!contactContext || submissionInFlight) return;
+  if (!contactContext.value.trim()) {
+    selectProject(suggestion.project);
+    applyBrief(suggestion);
+  } else if (!contactContext.value.includes(suggestion.text.trim())) {
+    pendingBrief = suggestion;
+    if (briefProposalText) briefProposalText.textContent = suggestion.text;
+    if (briefProposal) briefProposal.hidden = false;
+    document.querySelector<HTMLButtonElement>('[data-brief-append]')?.focus({ preventScroll: true });
+  } else {
+    contactContext.focus({ preventScroll: true });
+  }
+}
+
+document.querySelector('[data-scenario-contact]')?.addEventListener('click', (event) => {
+  if (event instanceof MouseEvent && (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)) return;
+  const suggestion = scenarioBrief(checkedScenarioValue('scenario-need') ?? '', checkedScenarioValue('scenario-interface') ?? '', checkedScenarioValue('scenario-intelligence') ?? '');
+  if (!suggestion || !contactContext || submissionInFlight) return;
+  // Native fragment navigation would move focus away from the prepared field or
+  // proposal button. Keep the anchor fallback, but own this enhanced transition.
+  event.preventDefault();
+  if (window.location.hash !== '#contact') window.history.pushState(null, '', '#contact');
+  offerBrief(suggestion);
+  if (document.activeElement instanceof HTMLElement) document.activeElement.scrollIntoView({ block: 'center' });
+});
+document.querySelector('[data-brief-append]')?.addEventListener('click', () => {
+  if (pendingBrief) applyBrief(pendingBrief);
+});
+document.querySelector('[data-brief-dismiss]')?.addEventListener('click', () => {
+  pendingBrief = undefined;
+  if (briefProposal) briefProposal.hidden = true;
+  contactContext?.focus({ preventScroll: true });
+});
+document.querySelector('[data-copy-brief]')?.addEventListener('click', async () => {
+  const status = document.querySelector<HTMLElement>('[data-copy-brief-status]');
+  const copied = await copyEmailAddress(contactContext?.value ?? '', navigator.clipboard?.writeText.bind(navigator.clipboard));
+  if (status) status.textContent = copied ? 'Brouillon copié.' : 'Copie indisponible. Sélectionnez le texte du brouillon pour le copier.';
+  if (!copied) { contactContext?.focus(); contactContext?.select(); }
+});
+
+// Only a fixed source identifier crosses pages. Free text and answers never enter the URL.
+const contactUrl = new URL(window.location.href);
+const source = contactUrl.searchParams.get('demande');
+if (source !== null) {
+  contactUrl.searchParams.delete('demande');
+  window.history.replaceState(window.history.state, '', `${contactUrl.pathname}${contactUrl.search}${contactUrl.hash}`);
+  const suggestion = sourceBrief(source);
+  if (suggestion) offerBrief(suggestion);
+}
 
 const contactEmail = document.querySelector<HTMLAnchorElement>('[data-contact-email]');
 const copyEmailButton = document.querySelector<HTMLButtonElement>('[data-copy-email]');

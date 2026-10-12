@@ -1,4 +1,4 @@
-import type { ProjectKind } from './contact';
+import { isContactEmail, validateBriefLimits, type ProjectKind } from './contact';
 
 // Public intake must reach the Worker directly to preserve the visitor IP used by Turnstile and rate limits.
 export const CRM_INTAKE_ENDPOINT = 'https://api.crm.27pm.org/api/public/intake';
@@ -33,8 +33,23 @@ export interface SubmitPublicIntakeOptions {
 
 export type PublicIntakeErrors = Partial<Record<keyof PublicIntakeDraft, string>>;
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const clean = (value: string, limit: number): string => value.trim().slice(0, limit);
+const clean = (value: string): string => value.trim();
+
+function draftLimitErrors(draft: PublicIntakeDraft): PublicIntakeErrors {
+  const limits = validateBriefLimits({ context: draft.message, organization: draft.organizationName, name: draft.contactName, replyEmail: draft.contactEmail });
+  const errors: PublicIntakeErrors = {};
+  if (limits.context) errors.message = limits.context;
+  if (limits.organization) errors.organizationName = limits.organization;
+  if (limits.name) errors.contactName = limits.name;
+  if (limits.replyEmail) errors.contactEmail = limits.replyEmail;
+  return errors;
+}
+
+// Same business content identifies the same attempt, independently of token renewal
+// or acknowledgement UI events. This value stays in page memory, never in analytics.
+export function intakeDraftIdentity(draft: PublicIntakeDraft): string {
+  return JSON.stringify([draft.organizationName.trim(), draft.contactName.trim(), draft.contactEmail.trim().toLowerCase(), draft.projectType, draft.message.trim()]);
+}
 
 export function validatePublicIntakeDraft(draft: PublicIntakeDraft): PublicIntakeErrors {
   const errors: PublicIntakeErrors = {};
@@ -45,7 +60,7 @@ export function validatePublicIntakeDraft(draft: PublicIntakeDraft): PublicIntak
   if (!draft.contactName.trim()) {
     errors.contactName = 'Indiquez votre nom.';
   }
-  if (!emailPattern.test(draft.contactEmail.trim())) {
+  if (!isContactEmail(draft.contactEmail)) {
     errors.contactEmail = 'Vérifiez le format de votre courriel.';
   }
   if (!draft.message.trim()) {
@@ -62,23 +77,25 @@ export function validatePublicIntakeDraft(draft: PublicIntakeDraft): PublicIntak
     errors.website = 'Soumission non valide.';
   }
 
-  return errors;
+  return { ...errors, ...draftLimitErrors(draft) };
 }
 
 export function createPublicIntakePayload(draft: PublicIntakeDraft): PublicIntakePayload {
   if (!draft.privacyAcknowledged) {
     throw new Error('Privacy acknowledgement is required before creating the CRM payload.');
   }
+  const limitError = Object.values(draftLimitErrors(draft))[0];
+  if (limitError) throw new RangeError(limitError);
 
   return {
-    organizationName: clean(draft.organizationName, 200),
-    contactName: clean(draft.contactName, 120),
-    contactEmail: clean(draft.contactEmail, 320),
+    organizationName: clean(draft.organizationName),
+    contactName: clean(draft.contactName),
+    contactEmail: clean(draft.contactEmail).toLowerCase(),
     projectType: draft.projectType,
-    message: clean(draft.message, 5_000),
+    message: clean(draft.message),
     privacyAcknowledged: draft.privacyAcknowledged,
     turnstileToken: draft.turnstileToken,
-    website: clean(draft.website, 500),
+    website: clean(draft.website),
   };
 }
 

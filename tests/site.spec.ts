@@ -59,6 +59,39 @@ test('renders the complete French v5 landing page', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'On commence par une conversation.' })).toBeVisible();
 });
 
+test('connects business priorities and published resources to contact without JavaScript', async ({ browser, baseURL, viewport, isMobile, hasTouch }) => {
+  // Test the links without racing native smooth scrolling after the contact fragment.
+  // Normal-motion layouts and keyboard behavior are covered by the neighboring tests.
+  const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: 'reduce', baseURL, viewport, isMobile, hasTouch });
+  const page = await context.newPage();
+  try {
+    await page.goto('/');
+    const method = page.locator('#methode');
+    await expect(method.getByRole('heading', { name: 'Vérification & remise' })).toBeVisible();
+    await expect(method).toContainText('garder le contrôle après la mise en ligne');
+    for (const path of ['checklist-fin-projet-web', 'barometre-consentement-2026']) {
+      const resource = method.locator(`a[href="/ressources/${path}/"]`);
+      await expect(resource).toBeVisible();
+      await resource.click();
+      await expect(page.locator('main h1')).toBeVisible();
+      await page.locator('.editorial-actions a[href$="#contact"]').click();
+      await expect(page).toHaveURL(/\/?(?:\?demande=[a-z]+)?#contact$/);
+      const message = page.getByLabel('Votre projet', { exact: true });
+      await expect(message).toBeVisible();
+      await expect(message).toHaveAttribute('aria-describedby', 'contact-priorities-help contact-length-help');
+      await expect(message).not.toHaveAttribute('maxlength');
+      await expect(page.locator('[data-brief-length]')).toContainText('5 000 caractères maximum');
+      await expect(page.locator('#contact-priorities-help')).toContainText('jusqu’à trois points');
+      await expect(page.locator('#contact-priorities-help')).toContainText('Ne transmettez ni mot de passe');
+      await expect(page.getByRole('link', { name: 'Préparer un courriel', exact: true })).toHaveAttribute(
+        'href', 'mailto:bonjour@27pm.org',
+      );
+    }
+  } finally {
+    await context.close();
+  }
+});
+
 test('switches capability proof with pointer and keyboard controls', async ({ page }) => {
   await page.goto('/');
 
@@ -125,7 +158,7 @@ test('composes the scenario locally without navigation or submission', async ({ 
 
   expect(page.url()).toBe(originalUrl);
   await expect(scenarioForm.getByRole('button')).toHaveCount(0);
-  await expect(page.getByText(/Les choix saisis.+ne sont pas transmis à 27PM/)).toBeVisible();
+  await expect(page.getByText(/Vos choix restent locaux.+ne seront transmis que si vous envoyez ensuite votre demande/)).toBeVisible();
 });
 
 test('presents both independent projects as clearly labelled full demos', async ({ page }) => {
@@ -241,7 +274,7 @@ test('explains the email handoff and copies the visible fallback address', async
   await page.goto('/#contact');
 
   await expect(page.getByText('De quoi voulez-vous parler?')).toBeVisible();
-  await expect(page.getByText(/Le courriel préparé reste disponible/)).toBeVisible();
+  await expect(page.getByText(/Le courriel préparé ouvre votre messagerie/)).toBeVisible();
   await expect(page.locator('[data-contact-email]')).toBeVisible();
 
   await page.getByRole('button', { name: 'Copier l’adresse' }).click();
@@ -388,7 +421,7 @@ test('handles the exact mocked queued CRM response once with Turnstile enabled',
   releaseRequest?.();
 
   await expect(page.locator('[data-project-status]')).toHaveText(
-    'Demande reçue et placée dans la file d’examen. Aucun message ni suivi n’est envoyé automatiquement.',
+    'Réception confirmée pour cette demande. Elle attend son examen par le studio; aucun rendez-vous ni suivi automatique n’est confirmé.',
   );
   await expect(submit).toBeDisabled();
   await expect(page.getByLabel('Votre organisation')).toBeEnabled();
@@ -460,7 +493,7 @@ test('reuses idempotency on CRM retry and keeps the mail fallback visible', asyn
   const submit = page.getByRole('button', { name: 'Envoyer pour examen' });
   await submit.click();
   await expect(page.locator('[data-project-status]')).toHaveText(
-    'L’envoi direct n’a pas abouti. Réessayez ou utilisez le courriel préparé.',
+    'Réception non confirmée. Votre demande a peut-être été reçue. Réessayez ce même brouillon; si vous passez au courriel, signalez cette première tentative.',
   );
   await expect(page.getByRole('link', { name: 'Préparer un courriel' })).toBeVisible();
   await expect(submit).toBeEnabled();
@@ -527,7 +560,7 @@ test('recovers the CRM form after a stalled request and retries idempotently', a
   await page.clock.fastForward(12_000);
   await expect(form).not.toHaveAttribute('aria-busy', 'true');
   await expect(status).toHaveText(
-    'L’envoi direct n’a pas abouti. Réessayez ou utilisez le courriel préparé.',
+    'Réception non confirmée. Votre demande a peut-être été reçue. Réessayez ce même brouillon; si vous passez au courriel, signalez cette première tentative.',
   );
   await expect(submit).toHaveText('Envoyer pour examen');
   await expect(submit).toBeEnabled();
@@ -561,7 +594,7 @@ test('keeps the mail fallback when CRM configuration is absent', async ({ page }
 
   await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'disabled');
   await expect(page.locator('.crm-intake')).toBeHidden();
-  await expect(page.getByText(/L’envoi direct est indisponible/)).toBeVisible();
+  await expect(page.getByText(/L’envoi direct n’est pas disponible ici/)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Préparer un courriel' })).toBeVisible();
 });
 
@@ -571,7 +604,7 @@ test('keeps CRM intake dormant without explicit approval', async ({ page }) => {
 
   await expect(page.locator('html')).toHaveAttribute('data-crm-intake', 'disabled');
   await expect(page.locator('.crm-intake')).toBeHidden();
-  await expect(page.getByText(/L’envoi direct est indisponible/)).toBeVisible();
+  await expect(page.getByText(/L’envoi direct n’est pas disponible ici/)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Préparer un courriel' })).toBeVisible();
 });
 

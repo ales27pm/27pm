@@ -33,7 +33,7 @@ for (const [path, heading] of pages) {
     const violations = (await new AxeBuilder({ page }).analyze()).violations;
     expect(violations).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.locator('.editorial-actions a[href="/#contact"]').click();
+    await page.locator('.editorial-actions a[href$="#contact"]').click();
     await expect(page).toHaveURL(/\/#contact$/);
     await expect(page.getByLabel('Votre projet')).toBeVisible();
   });
@@ -130,7 +130,8 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   await page.goto('/ressources/barometre-consentement-2026/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
   const publicationNotice = page.locator('[data-results-status="published"][data-publication-ready="true"][data-release-status="published"]');
-  await expect(publicationNotice).toContainText('Publication révisée — données agrégées seulement');
+  await expect(publicationNotice).toContainText('Publication — données agrégées seulement');
+  await expect(page.locator('#precision-methodologique')).toContainText('La fenêtre d’observation varie');
   const results = page.locator('[data-results-reviewed]');
   await expect(results).toContainText('20 des 53 pages analysables, soit 37,7');
   await expect(results).toContainText('17 présentaient exactement une action de refus reconnue au premier niveau, soit 85');
@@ -336,7 +337,7 @@ test('publishes a canonical author profile and linked visible bylines', async ({
 
   await page.goto('/services/agence-web/');
   const byline = page.locator('.editorial-byline');
-  await expect(byline).toContainText('Mis à jour le 9 octobre 2026');
+  await expect(byline).toContainText('Mis à jour le 12 octobre 2026');
   await expect(byline.getByRole('link', { name: 'Alexis Boulet' })).toHaveAttribute(
     'href',
     '/auteurs/alexis-boulet/',

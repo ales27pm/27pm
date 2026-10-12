@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { buildProjectMailto, copyEmailAddress, isProjectKind } from './contact';
 
 describe('project contact link', () => {
+  it('never silently shortens an overlong brief or splits an emoji', () => {
+    expect(() => buildProjectMailto('site', { context: 'x'.repeat(5001) })).toThrow(/5.?000/);
+    expect(() => buildProjectMailto('site', { context: 'x'.repeat(4999) + '😀' })).toThrow(/5.?000/);
+    expect(decodeURIComponent(buildProjectMailto('site', { context: 'x'.repeat(4998) + '😀' }))).toContain('😀');
+  });
   it('encodes the selected project in the subject and body', () => {
     const link = buildProjectMailto('application');
 
