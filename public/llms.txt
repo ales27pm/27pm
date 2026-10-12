@@ -12,7 +12,7 @@ Auteur des contenus: Alexis Boulet. Éditeur: 27PM.
 
 ## Services
 
-- [Création de site web](https://27pm.org/services/creation-sites-web/): étapes, coûts, délais, plateformes, hébergement et responsabilités pour une PME québécoise.
+- [Création de sites web au Québec](https://27pm.org/services/creation-sites-web/): étapes, coûts, délais, plateformes, hébergement et responsabilités pour une PME québécoise.
 - [Agence web](https://27pm.org/services/agence-web/): conception, refonte et développement sur mesure par 27PM.
 - [Refonte de site web](https://27pm.org/services/refonte-site-web/): inventaire des URL, redirections, accessibilité, performance et contrôles de mise en ligne.
 - [Sites et catalogues pour fabricants](https://27pm.org/services/sites-catalogues-fabricants/): catalogues, configurateurs et parcours techniques.

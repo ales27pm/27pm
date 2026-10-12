@@ -219,10 +219,21 @@ const agencyText = text(agency);
 const redesignText = text(redesign);
 const checklistText = text(checklist);
 
-assert.match(primaryHeading(creationSite), /création de site web/i, 'pillar H1 must clearly name the service');
+assert.match(primaryHeading(creationSite), /création de sites web au québec/i, 'pillar H1 must match the observed Quebec service query naturally');
 assert.match(metaDescription(creationSite), /création site web/i, 'pillar description must contain the exact primary query');
 assert.match(metaDescription(creationSite), /créer un site web/i, 'pillar description must contain the exact secondary query');
 assert.ok(metaDescription(creationSite).length >= 120 && metaDescription(creationSite).length <= 170, 'pillar description must stay within 120–170 characters');
+assert.match(creationSite, /<title>Création de sites web au Québec pour PME \| 27PM<\/title>/, 'pillar title must lead with the observed Quebec service query');
+assert.match(
+  documents.get('/'),
+  new RegExp(`<a href="${base}${creationSiteRoute.slice(1)}">Création de sites web au Québec pour PME</a>`),
+  'homepage must link to the pillar with the observed Quebec service query',
+);
+assert.match(
+  llms,
+  /\[Création de sites web au Québec\]\(https:\/\/27pm\.org\/services\/creation-sites-web\/\)/,
+  'llms.txt must describe the pillar with the observed Quebec service query',
+);
 for (const topic of [
   /étapes de création d[’']un site web/i,
   /conception site internet/i,

@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const pages = [
-  ['/services/creation-sites-web/', 'Création de site web pour les PME du Québec'],
+  ['/services/creation-sites-web/', 'Création de sites web au Québec pour les PME'],
   ['/services/agence-web/', 'Agence web au Québec : conception, refonte et développement'],
   ['/services/refonte-site-web/', 'Refonte de site web au Québec : préserver vos acquis'],
   ['/services/sites-catalogues-fabricants/', 'Sites web et catalogues pour fabricants québécois'],
