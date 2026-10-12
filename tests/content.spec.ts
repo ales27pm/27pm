@@ -234,6 +234,8 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
     expect.objectContaining({ '@type': 'WebPage' }),
     expect.objectContaining({
       '@type': ['Article', 'TechArticle'],
+      identifier: 'https://doi.org/10.5281/zenodo.23307073',
+      sameAs: 'https://zenodo.org/records/23307073',
       license: 'https://creativecommons.org/licenses/by/4.0/',
       image: expect.objectContaining({
         license: 'https://creativecommons.org/licenses/by/4.0/',
@@ -294,6 +296,10 @@ test('publishes the reviewed consent barometer and aggregate downloads', async (
   );
   await expect(page.locator('a[rel~="license"]')).toHaveText(
     'Creative Commons Attribution 4.0 International (CC BY 4.0)',
+  );
+  await expect(page.getByRole('link', { name: '10.5281/zenodo.23307073' })).toHaveAttribute(
+    'href',
+    'https://doi.org/10.5281/zenodo.23307073',
   );
   const imageResponse = await request.get('/assets/barometre-consentement-2026-resultats-1200x630.png');
   expect(imageResponse.status()).toBe(200);

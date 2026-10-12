@@ -13,6 +13,8 @@ const agencyRoute = '/services/agence-web/';
 const redesignRoute = '/services/refonte-site-web/';
 const applicationsRoute = '/services/applications-web-sur-mesure/';
 const automationRoute = '/services/automatisation-ia/';
+const catalogRoute = '/services/sites-catalogues-fabricants/';
+const bouletStudyRoute = '/etudes/boulet/';
 const checklistRoute = '/ressources/checklist-fin-projet-web/';
 const checklistJsonDownload = 'ressources/checklist-fin-projet-web.json';
 const checklistImage = 'assets/checklist-fin-projet-web-1200x630.png';
@@ -21,6 +23,8 @@ const barometerPdfDownload = 'ressources/barometre-consentement-2026.pdf';
 const barometerJsonDownload = 'ressources/barometre-consentement-2026.json';
 const barometerCsvDownload = 'ressources/barometre-consentement-2026-agregats.csv';
 const barometerImage = 'assets/barometre-consentement-2026-resultats-1200x630.png';
+const barometerDoi = 'https://doi.org/10.5281/zenodo.23307073';
+const barometerRecord = 'https://zenodo.org/records/23307073';
 const authorRoute = '/auteurs/alexis-boulet/';
 const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
 const authorId = `${siteMetadata.origin}${authorRoute}#person`;
@@ -168,6 +172,8 @@ const agency = documents.get(agencyRoute);
 const redesign = documents.get(redesignRoute);
 const applications = documents.get(applicationsRoute);
 const automation = documents.get(automationRoute);
+const catalog = documents.get(catalogRoute);
+const bouletStudy = documents.get(bouletStudyRoute);
 const checklist = documents.get(checklistRoute);
 const barometer = documents.get(barometerRoute);
 const authorProfile = documents.get(authorRoute);
@@ -176,6 +182,8 @@ assert.ok(agency, 'the agency service page must be present in the build');
 assert.ok(redesign, 'the website-redesign service page must be present in the build');
 assert.ok(applications, 'the custom-application service page must be present in the build');
 assert.ok(automation, 'the automation service page must be present in the build');
+assert.ok(catalog, 'the catalog service page must be present in the build');
+assert.ok(bouletStudy, 'the Boulet study page must be present in the build');
 assert.ok(checklist, 'the end-of-project checklist resource must be present in the build');
 assert.ok(barometer, 'the consent barometer resource must be present in the build');
 assert.ok(authorProfile, 'the Alexis Boulet author profile must be present in the build');
@@ -263,6 +271,21 @@ assert.match(redesign, new RegExp(`href="${base}${agencyRoute.slice(1)}`), 'rede
 assert.match(redesign, new RegExp(`href="${base}${creationSiteRoute.slice(1)}`), 'redesign page must link to creation pillar');
 assert.match(agency, new RegExp(`href="${base}${redesignRoute.slice(1)}`), 'agency page must link to redesign service');
 assert.match(creationSite, new RegExp(`href="${base}${redesignRoute.slice(1)}`), 'creation pillar must link to redesign service');
+assert.match(
+  catalog,
+  new RegExp(`<a href="${base}${creationSiteRoute.slice(1)}">structurer un site d’entreprise</a>`),
+  'catalog service must link contextually to the creation pillar',
+);
+assert.match(
+  automation,
+  new RegExp(`<a href="${base}${creationSiteRoute.slice(1)}">un site d’entreprise bien cadré</a>`),
+  'automation service must link contextually to the creation pillar',
+);
+assert.match(
+  bouletStudy,
+  new RegExp(`<a href="${base}${creationSiteRoute.slice(1)}">cadrer un projet de site web</a>`),
+  'Boulet study must link contextually to the creation pillar',
+);
 
 const redesignGraph = JSON.parse(
   redesign.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1] ?? '{}',
@@ -628,6 +651,8 @@ assert.equal(barometerArticle?.datePublished, '2026-10-11', 'barometer Article p
 assert.equal(barometerDataset?.datePublished, '2026-10-11', 'barometer Dataset publication date');
 assert.equal(barometerDataset?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Dataset must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer Article must expose the approved CC BY 4.0 license');
+assert.equal(barometerArticle?.identifier, barometerDoi, 'barometer Article must expose its version DOI');
+assert.equal(barometerArticle?.sameAs, barometerRecord, 'barometer Article must link to its public archival record');
 assert.equal(barometerArticle?.image?.license, 'https://creativecommons.org/licenses/by/4.0/', 'barometer infographic must expose the approved CC BY 4.0 license');
 assert.equal(barometerArticle?.image?.acquireLicensePage, `${origin}${barometerRoute}`, 'barometer infographic must link to its human-readable license page');
 assert.equal(barometerArticle?.image?.copyrightNotice, '© 2026 Alexis Boulet et 27PM', 'barometer infographic must publish its copyright notice');
@@ -665,6 +690,7 @@ assert.match(barometerText, new RegExp(String.raw`SHA-256\s*:\s*${barometerJsonS
 assert.match(barometer, new RegExp(`href="${base}${barometerPdfDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the permanent PDF');
 assert.match(barometer, new RegExp(`href="${base}${barometerCsvDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the aggregate CSV');
 assert.match(barometer, new RegExp(`href="${base}${barometerJsonDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the cleaned JSON');
+assert.match(barometer, new RegExp(`href="${barometerDoi}"[^>]*rel="[^"]*external[^"]*"`), 'barometer citation must visibly link to its DOI');
 assert.match(barometer, /rel="alternate"\s+type="application\/pdf"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.pdf"/, 'barometer must advertise its permanent PDF');
 assert.match(barometer, /rel="alternate"\s+type="application\/json"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.json"/, 'barometer must advertise its JSON representation');
 assert.match(barometer, new RegExp(`property="og:image"\\s+content="${origin}/${barometerImage}"`), 'barometer must publish its dedicated social image');
