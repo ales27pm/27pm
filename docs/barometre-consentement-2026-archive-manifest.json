@@ -1,0 +1,168 @@
+{
+  "manifest_version": "1.0",
+  "resource": {
+    "version": "0.1.2",
+    "publication_date": "2026-10-11",
+    "canonical_url": "https://27pm.org/ressources/barometre-consentement-2026/",
+    "subtitle": "Baromètre 27PM 2026 — le refus au clavier sur 60 pages d’accueil",
+    "collection_date": "2026-10-11",
+    "author": "Alexis Boulet",
+    "publisher": "27PM",
+    "license": "cc-by-4.0"
+  },
+  "files": [
+    {
+      "path": "public/ressources/barometre-consentement-2026.pdf",
+      "filename": "barometre-consentement-2026.pdf",
+      "media_type": "application/pdf",
+      "bytes": 144694,
+      "sha256": "ed63ec27dba084c39effb86e5a27425a4f532838f511530061189da12cc9ba4d",
+      "role": "primary"
+    },
+    {
+      "path": "public/ressources/barometre-consentement-2026-agregats.csv",
+      "filename": "barometre-consentement-2026-agregats.csv",
+      "media_type": "text/csv",
+      "bytes": 450,
+      "sha256": "b805cab2f83bb9b88117ea19adbada8e717955d3f8b54b07b6102105e80d3fcb",
+      "role": "supporting-data"
+    },
+    {
+      "path": "public/ressources/barometre-consentement-2026.json",
+      "filename": "barometre-consentement-2026.json",
+      "media_type": "application/json",
+      "bytes": 13370,
+      "sha256": "0f7f4797ff663da0cea30315f6c8faf39ef409e632d5a5daf68267e67f8a188f",
+      "role": "supporting-data"
+    }
+  ],
+  "zenodo": {
+    "status": "published",
+    "submitted": true,
+    "record_id": 23307073,
+    "doi": "10.5281/zenodo.23307073",
+    "concept_doi": "10.5281/zenodo.23307072",
+    "record_url": "https://zenodo.org/records/23307073",
+    "api_url": "https://zenodo.org/api/records/23307073",
+    "files_visibility": "public",
+    "primary_file": "barometre-consentement-2026.pdf",
+    "default_preview": "barometre-consentement-2026-agregats.csv",
+    "doi_origin": "zenodo-minted",
+    "resource_type": {
+      "type": "publication",
+      "subtype": "report",
+      "id": "publication-report"
+    },
+    "title": "Le droit de refuser fonctionne-t-il au clavier?",
+    "publication_date": "2026-10-11",
+    "creators": [
+      {
+        "type": "personal",
+        "family_name": "Boulet",
+        "given_name": "Alexis",
+        "affiliation": "27PM"
+      }
+    ],
+    "publisher": "Zenodo",
+    "original_publisher": "27PM",
+    "version": "0.1.2",
+    "language": "fra",
+    "license": "cc-by-4.0",
+    "description": "Le Baromètre 27PM 2026 présente une observation automatisée réalisée le 11 octobre 2026 sur 60 pages d’accueil associées à des établissements répertoriés dans trois jeux de données SIT Québec; 53 pages étaient analysables. Une bannière de consentement a été détectée sur 20 pages (37,7 %); parmi celles-ci, 17 présentaient une action de refus unique reconnue au premier niveau. Le dépôt publie huit agrégats révisés, leurs définitions et la méthode, sans nommer ni classer aucun site. L’échantillon est déterministe, non probabiliste et non pondéré; il ne représente ni toutes les PME ni l’ensemble des sites du Québec. Le dépôt contient le rapport PDF, le CSV agrégé et le JSON public, sous licence CC BY 4.0.",
+    "additional_descriptions": [
+      {
+        "type": "methods",
+        "description": "Échantillon déterministe équilibré par source et région, à parts égales parmi les trois sources SIT Québec. Chaque page a été chargée dans un contexte Chromium neuf — profil mobile 390 × 844, tactile, français canadien, fuseau America/Toronto. Après validation de la destination, du statut, du type HTML et de l’absence d’interstitiel, les huit agrégats publics ont été recalculés et revus indépendamment. Les noms, hôtes, URL et observations individuelles ne sont pas publiés."
+      }
+    ],
+    "keywords": [
+      "consentement numérique",
+      "refus au clavier",
+      "accessibilité Web",
+      "bannières de consentement",
+      "témoins (cookies)",
+      "stockage Web",
+      "vie privée",
+      "pages d’accueil",
+      "Québec",
+      "données ouvertes",
+      "SIT Québec"
+    ],
+    "published_files": [
+      {
+        "filename": "barometre-consentement-2026.pdf",
+        "bytes": 144694,
+        "md5": "d3fac45e72d00683ee5f1105053afdff"
+      },
+      {
+        "filename": "barometre-consentement-2026-agregats.csv",
+        "bytes": 450,
+        "md5": "7af0abd443c1d98e6d5f8d00278f1c23"
+      },
+      {
+        "filename": "barometre-consentement-2026.json",
+        "bytes": 13370,
+        "md5": "98601a06bf97206229774842c85062b9"
+      }
+    ],
+    "related_works": [
+      {
+        "identifier": "https://27pm.org/ressources/barometre-consentement-2026/",
+        "relation": "isdocumentedby",
+        "resource_type": "other"
+      },
+      {
+        "identifier": "https://www.donneesquebec.ca/recherche/dataset/17dfa825-9515-4fac-be6b-3964d25194c3",
+        "relation": "isderivedfrom",
+        "resource_type": "dataset"
+      },
+      {
+        "identifier": "https://www.donneesquebec.ca/recherche/dataset/e9e2429f-7f23-41f2-bd0e-e41a6e349aa5",
+        "relation": "isderivedfrom",
+        "resource_type": "dataset"
+      },
+      {
+        "identifier": "https://www.donneesquebec.ca/recherche/dataset/8184607d-4969-4d29-ab12-7a1e0109bc46",
+        "relation": "isderivedfrom",
+        "resource_type": "dataset"
+      }
+    ],
+    "official_guidance": [
+      "https://help.zenodo.org/docs/deposit/create-new-upload/",
+      "https://help.zenodo.org/docs/deposit/describe-records/resource-type/",
+      "https://help.zenodo.org/docs/deposit/describe-records/reserve-doi/"
+    ]
+  },
+  "banq": {
+    "status": "administrative-prerequisites-pending",
+    "publication_type": "publication numérique libre d’accès",
+    "title": "Le droit de refuser fonctionne-t-il au clavier?",
+    "price": "gratuit",
+    "isbn": null,
+    "issn": null,
+    "deposit_file": "barometre-consentement-2026.pdf",
+    "distribution_url": "https://27pm.org/ressources/barometre-consentement-2026.pdf",
+    "internal_target_date": "2026-10-18",
+    "legal_due_date": "2026-10-19",
+    "administrative_prerequisites": [
+      {
+        "id": "publisher-account",
+        "status": "not-confirmed"
+      },
+      {
+        "id": "signed-free-publication-license",
+        "status": "pending-user-signature"
+      },
+      {
+        "id": "confirmation-email",
+        "status": "required-at-submission",
+        "privacy": "not-stored-in-repository"
+      }
+    ],
+    "official_guidance": [
+      "https://www.banq.qc.ca/sites/default/files/2025-08/guide_depot_legal_publications_numeriques.pdf",
+      "https://www.banq.qc.ca/sites/default/files/2024-09/licence_publications_gratuites.pdf",
+      "https://depotlegal.banq.qc.ca/idel/public/inscription"
+    ]
+  }
+}
