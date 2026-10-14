@@ -24,6 +24,7 @@ const barometerJsonDownload = 'ressources/barometre-consentement-2026.json';
 const barometerCsvDownload = 'ressources/barometre-consentement-2026-agregats.csv';
 const barometerImage = 'assets/barometre-consentement-2026-resultats-1200x630.png';
 const barometerDoi = 'https://doi.org/10.5281/zenodo.23307073';
+const barometerBanqCopy = 'https://collections.banq.qc.ca/document/fOeTqmhLsZiVCntd_4cpbw';
 const barometerRecord = 'https://zenodo.org/records/23307073';
 const authorRoute = '/auteurs/alexis-boulet/';
 const serviceAreaCopyRoutes = new Set(['/', ...routes.filter((route) => route !== '/conditions-utilisation/')]);
@@ -725,6 +726,7 @@ assert.match(barometer, new RegExp(`href="${base}${barometerPdfDownload}"[^>]*\\
 assert.match(barometer, new RegExp(`href="${base}${barometerCsvDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the aggregate CSV');
 assert.match(barometer, new RegExp(`href="${base}${barometerJsonDownload}"[^>]*\\bdownload\\b`), 'barometer page must link to the cleaned JSON');
 assert.match(barometer, new RegExp(`href="${barometerDoi}"[^>]*rel="[^"]*external[^"]*"`), 'barometer citation must visibly link to its DOI');
+assert.match(barometer, new RegExp(`href="${barometerBanqCopy}"[^>]*rel="[^"]*external[^"]*"`), 'barometer citation must visibly link to the BAnQ-hosted copy');
 assert.match(barometer, /rel="alternate"\s+type="application\/pdf"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.pdf"/, 'barometer must advertise its permanent PDF');
 assert.match(barometer, /rel="alternate"\s+type="application\/json"\s+href="https:\/\/27pm\.org\/ressources\/barometre-consentement-2026\.json"/, 'barometer must advertise its JSON representation');
 assert.match(barometer, new RegExp(`property="og:image"\\s+content="${origin}/${barometerImage}"`), 'barometer must publish its dedicated social image');
